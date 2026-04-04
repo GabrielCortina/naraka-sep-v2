@@ -50,11 +50,13 @@ Plans:
   2. Apos login, usuario e redirecionado automaticamente para a tela principal do seu role
   3. Cada role ve apenas as abas permitidas (Admin: todas; Lider: Dashboard/Upload/Fardos/Prateleira; Separador: Prateleira; Fardista: Fardos/Baixa)
   4. Usuario pode fazer logout de qualquer tela e volta para a tela de login
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — Infraestrutura de auth: migration Custom Access Token Hook, role config, slugify e seed de usuarios
+- [ ] 02-02-PLAN.md — Tela de login (nome + PIN) e middleware JWT com protecao de rotas por role
+- [ ] 02-03-PLAN.md — AppShell responsivo (sidebar + bottom tabs), logout e paginas placeholder
 
 ### Phase 3: Upload e Processamento
 **Goal**: Lider pode importar planilha do ERP e o sistema processa, classifica e persiste todos os pedidos corretamente
@@ -183,7 +185,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infraestrutura | 3/3 | Complete   | 2026-04-04 |
-| 2. Autenticacao | 0/? | Not started | - |
+| 2. Autenticacao | 0/3 | Not started | - |
 | 3. Upload e Processamento | 0/? | Not started | - |
 | 4. Estoque e Reserva de Fardos | 0/? | Not started | - |
 | 5. Cards e UI Foundation | 0/? | Not started | - |
