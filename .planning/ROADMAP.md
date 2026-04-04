@@ -12,7 +12,7 @@ Sistema de separacao e gestao de pedidos para armazem, reconstruido do zero com 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Infraestrutura** - Projeto Next.js 14 com Supabase, Vercel e Google Sheets API configurados
+- [x] **Phase 1: Infraestrutura** - Projeto Next.js 14 com Supabase, Vercel e Google Sheets API configurados (completed 2026-04-04)
 - [ ] **Phase 2: Autenticacao** - Login por PIN com roles e permissoes por aba
 - [ ] **Phase 3: Upload e Processamento** - Importacao de planilha ERP com classificacao, deduplicacao e virada de dia
 - [ ] **Phase 4: Estoque e Reserva de Fardos** - Integracao Google Sheets para leitura de estoque e reserva via subset sum
@@ -39,7 +39,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-PLAN.md — Criar projeto Next.js 14 com Tailwind, shadcn/ui e estrutura de pastas
 - [x] 01-02-PLAN.md — Configurar Supabase (schema, clientes, middleware) e Google Sheets API
-- [ ] 01-03-PLAN.md — Git, schema push, GitHub, deploy Vercel e verificacao end-to-end
+- [x] 01-03-PLAN.md — Git, schema push, GitHub, deploy Vercel e verificacao end-to-end
 
 ### Phase 2: Autenticacao
 **Goal**: Usuarios conseguem acessar o sistema com PIN e ver apenas as abas permitidas para seu role
@@ -182,7 +182,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infraestrutura | 0/3 | Planning complete | - |
+| 1. Infraestrutura | 3/3 | Complete   | 2026-04-04 |
 | 2. Autenticacao | 0/? | Not started | - |
 | 3. Upload e Processamento | 0/? | Not started | - |
 | 4. Estoque e Reserva de Fardos | 0/? | Not started | - |
