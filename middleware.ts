@@ -1,5 +1,21 @@
 import { createServerClient } from '@supabase/ssr'
+import { jwtVerify } from 'jose'
 import { NextResponse, type NextRequest } from 'next/server'
+
+// Inlined from role-config.ts (Edge Runtime may not resolve path aliases)
+const ROLE_ROUTES: Record<string, string[]> = {
+  admin: ['/dashboard', '/upload', '/fardos', '/prateleira', '/baixa'],
+  lider: ['/dashboard', '/upload', '/fardos', '/prateleira'],
+  separador: ['/prateleira'],
+  fardista: ['/fardos', '/baixa'],
+}
+
+const ROLE_DEFAULTS: Record<string, string> = {
+  admin: '/dashboard',
+  lider: '/dashboard',
+  separador: '/prateleira',
+  fardista: '/fardos',
+}
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -25,8 +41,64 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // Refresh session (keeps cookies alive)
   await supabase.auth.getUser()
-  return supabaseResponse
+
+  const pathname = request.nextUrl.pathname
+
+  // Skip auth for public routes
+  if (pathname === '/login' || pathname.startsWith('/api/')) {
+    return supabaseResponse
+  }
+
+  // Get session
+  const { data: { session } } = await supabase.auth.getSession()
+
+  // No session -> redirect to login with returnTo
+  if (!session) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    if (pathname !== '/' && pathname !== '/login') {
+      url.searchParams.set('returnTo', pathname)
+    }
+    return NextResponse.redirect(url)
+  }
+
+  // Verify JWT and extract role
+  try {
+    const secret = new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!)
+    const { payload } = await jwtVerify(session.access_token, secret)
+    const userRole = payload.user_role as string | undefined
+
+    if (!userRole) {
+      // No role in token -> redirect to login
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      return NextResponse.redirect(url)
+    }
+
+    // Root path -> redirect to role default
+    if (pathname === '/') {
+      return NextResponse.redirect(
+        new URL(ROLE_DEFAULTS[userRole] || '/dashboard', request.url)
+      )
+    }
+
+    // Check route permission
+    const allowedRoutes = ROLE_ROUTES[userRole]
+    if (allowedRoutes && !allowedRoutes.some(route => pathname.startsWith(route))) {
+      return NextResponse.redirect(
+        new URL(ROLE_DEFAULTS[userRole] || '/login', request.url)
+      )
+    }
+
+    return supabaseResponse
+  } catch {
+    // JWT verification failed -> redirect to login
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
 }
 
 export const config = {
