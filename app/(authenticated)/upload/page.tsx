@@ -1,0 +1,16 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Upload | NARAKA SEP v2',
+}
+
+export default function UploadPage() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-2">
+      <h1 className="text-xl font-semibold">Upload</h1>
+      <p className="text-base text-muted-foreground">
+        Upload sera implementado na Fase 3.
+      </p>
+    </div>
+  )
+}
