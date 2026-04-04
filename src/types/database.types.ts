@@ -1,7 +1,3 @@
-// Este arquivo sera substituido pelo output de:
-// npx supabase gen types typescript --project-id <PROJECT_ID> > src/types/database.types.ts
-// Por enquanto, tipo minimo para compilacao
-
 export type Json =
   | string
   | number
@@ -10,272 +6,355 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   public: {
     Tables: {
-      users: {
+      atribuicoes: {
         Row: {
-          id: string
-          nome: string
-          pin_hash: string
-          role: 'admin' | 'lider' | 'separador' | 'fardista'
-          ativo: boolean
+          card_key: string
           created_at: string
+          id: string
+          tipo: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          nome: string
-          pin_hash: string
-          role: 'admin' | 'lider' | 'separador' | 'fardista'
-          ativo?: boolean
+          card_key: string
           created_at?: string
+          id?: string
+          tipo: string
+          user_id: string
         }
         Update: {
-          id?: string
-          nome?: string
-          pin_hash?: string
-          role?: 'admin' | 'lider' | 'separador' | 'fardista'
-          ativo?: boolean
+          card_key?: string
           created_at?: string
+          id?: string
+          tipo?: string
+          user_id?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "atribuicoes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      baixados: {
+        Row: {
+          baixado_em: string
+          baixado_por: string
+          codigo_in: string
+          id: string
+          trafego_id: string
+        }
+        Insert: {
+          baixado_em?: string
+          baixado_por: string
+          codigo_in: string
+          id?: string
+          trafego_id: string
+        }
+        Update: {
+          baixado_em?: string
+          baixado_por?: string
+          codigo_in?: string
+          id?: string
+          trafego_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baixados_baixado_por_fkey"
+            columns: ["baixado_por"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "baixados_trafego_id_fkey"
+            columns: ["trafego_id"]
+            isOneToOne: false
+            referencedRelation: "trafego_fardos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       config: {
         Row: {
-          id: string
           chave: string
-          valor: string
+          id: string
           updated_at: string
+          valor: string
         }
         Insert: {
-          id?: string
           chave: string
-          valor: string
+          id?: string
           updated_at?: string
+          valor: string
         }
         Update: {
-          id?: string
           chave?: string
-          valor?: string
+          id?: string
           updated_at?: string
+          valor?: string
         }
+        Relationships: []
+      }
+      fardos_nao_encontrados: {
+        Row: {
+          codigo_in: string
+          id: string
+          reportado_em: string
+          reportado_por: string
+          trafego_id: string
+        }
+        Insert: {
+          codigo_in: string
+          id?: string
+          reportado_em?: string
+          reportado_por: string
+          trafego_id: string
+        }
+        Update: {
+          codigo_in?: string
+          id?: string
+          reportado_em?: string
+          reportado_por?: string
+          trafego_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fardos_nao_encontrados_reportado_por_fkey"
+            columns: ["reportado_por"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fardos_nao_encontrados_trafego_id_fkey"
+            columns: ["trafego_id"]
+            isOneToOne: false
+            referencedRelation: "trafego_fardos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pedidos: {
         Row: {
+          card_key: string
+          created_at: string
+          grupo_envio: string
           id: string
+          importacao_data: string
+          importacao_numero: number
+          loja: string
+          metodo_envio: string
+          nome_produto: string | null
           numero_pedido: string
           numero_pedido_plataforma: string | null
           plataforma: string
-          loja: string
-          sku: string
-          quantidade: number
-          variacao: string | null
-          nome_produto: string | null
-          metodo_envio: string
-          grupo_envio: string
-          tipo: 'unitario' | 'kit' | 'combo'
-          importacao_numero: number
-          importacao_data: string
-          card_key: string
           prazo_envio: string | null
-          created_at: string
+          quantidade: number
+          sku: string
+          tipo: string
+          variacao: string | null
         }
         Insert: {
+          card_key: string
+          created_at?: string
+          grupo_envio: string
           id?: string
+          importacao_data?: string
+          importacao_numero: number
+          loja: string
+          metodo_envio: string
+          nome_produto?: string | null
           numero_pedido: string
           numero_pedido_plataforma?: string | null
           plataforma: string
-          loja: string
-          sku: string
-          quantidade: number
-          variacao?: string | null
-          nome_produto?: string | null
-          metodo_envio: string
-          grupo_envio: string
-          tipo: 'unitario' | 'kit' | 'combo'
-          importacao_numero: number
-          importacao_data?: string
-          card_key: string
           prazo_envio?: string | null
-          created_at?: string
+          quantidade: number
+          sku: string
+          tipo: string
+          variacao?: string | null
         }
         Update: {
+          card_key?: string
+          created_at?: string
+          grupo_envio?: string
           id?: string
+          importacao_data?: string
+          importacao_numero?: number
+          loja?: string
+          metodo_envio?: string
+          nome_produto?: string | null
           numero_pedido?: string
           numero_pedido_plataforma?: string | null
           plataforma?: string
-          loja?: string
-          sku?: string
-          quantidade?: number
-          variacao?: string | null
-          nome_produto?: string | null
-          metodo_envio?: string
-          grupo_envio?: string
-          tipo?: 'unitario' | 'kit' | 'combo'
-          importacao_numero?: number
-          importacao_data?: string
-          card_key?: string
           prazo_envio?: string | null
-          created_at?: string
+          quantidade?: number
+          sku?: string
+          tipo?: string
+          variacao?: string | null
         }
+        Relationships: []
       }
       progresso: {
         Row: {
           id: string
           pedido_id: string
           quantidade_separada: number
-          status: 'pendente' | 'parcial' | 'completo' | 'nao_encontrado' | 'aguardar_fardista' | 'transformacao'
+          status: string
           updated_at: string
         }
         Insert: {
           id?: string
           pedido_id: string
           quantidade_separada?: number
-          status?: 'pendente' | 'parcial' | 'completo' | 'nao_encontrado' | 'aguardar_fardista' | 'transformacao'
+          status?: string
           updated_at?: string
         }
         Update: {
           id?: string
           pedido_id?: string
           quantidade_separada?: number
-          status?: 'pendente' | 'parcial' | 'completo' | 'nao_encontrado' | 'aguardar_fardista' | 'transformacao'
+          status?: string
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "progresso_pedido_id_fkey"
+            columns: ["pedido_id"]
+            isOneToOne: false
+            referencedRelation: "pedidos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reservas: {
         Row: {
+          codigo_in: string
+          created_at: string
+          endereco: string | null
           id: string
           pedido_id: string
-          codigo_in: string
-          sku: string
           quantidade: number
-          endereco: string | null
-          status: 'reservado' | 'cancelado'
-          created_at: string
+          sku: string
+          status: string
         }
         Insert: {
+          codigo_in: string
+          created_at?: string
+          endereco?: string | null
           id?: string
           pedido_id: string
-          codigo_in: string
-          sku: string
           quantidade: number
-          endereco?: string | null
-          status?: 'reservado' | 'cancelado'
-          created_at?: string
+          sku: string
+          status?: string
         }
         Update: {
+          codigo_in?: string
+          created_at?: string
+          endereco?: string | null
           id?: string
           pedido_id?: string
-          codigo_in?: string
-          sku?: string
           quantidade?: number
-          endereco?: string | null
-          status?: 'reservado' | 'cancelado'
-          created_at?: string
+          sku?: string
+          status?: string
         }
-      }
-      atribuicoes: {
-        Row: {
-          id: string
-          card_key: string
-          user_id: string
-          tipo: 'separador' | 'fardista'
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          card_key: string
-          user_id: string
-          tipo: 'separador' | 'fardista'
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          card_key?: string
-          user_id?: string
-          tipo?: 'separador' | 'fardista'
-          created_at?: string
-        }
+        Relationships: [
+          {
+            foreignKeyName: "reservas_pedido_id_fkey"
+            columns: ["pedido_id"]
+            isOneToOne: false
+            referencedRelation: "pedidos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trafego_fardos: {
         Row: {
-          id: string
-          reserva_id: string
           codigo_in: string
-          sku: string
-          quantidade: number
-          endereco: string | null
-          status: 'pendente' | 'encontrado' | 'nao_encontrado'
-          fardista_id: string | null
           created_at: string
-        }
-        Insert: {
-          id?: string
-          reserva_id: string
-          codigo_in: string
-          sku: string
+          endereco: string | null
+          fardista_id: string | null
+          id: string
           quantidade: number
-          endereco?: string | null
-          status?: 'pendente' | 'encontrado' | 'nao_encontrado'
-          fardista_id?: string | null
+          reserva_id: string
+          sku: string
+          status: string
+        }
+        Insert: {
+          codigo_in: string
           created_at?: string
+          endereco?: string | null
+          fardista_id?: string | null
+          id?: string
+          quantidade: number
+          reserva_id: string
+          sku: string
+          status?: string
         }
         Update: {
-          id?: string
-          reserva_id?: string
           codigo_in?: string
-          sku?: string
+          created_at?: string
+          endereco?: string | null
+          fardista_id?: string | null
+          id?: string
           quantidade?: number
-          endereco?: string | null
-          status?: 'pendente' | 'encontrado' | 'nao_encontrado'
-          fardista_id?: string | null
+          reserva_id?: string
+          sku?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trafego_fardos_fardista_id_fkey"
+            columns: ["fardista_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trafego_fardos_reserva_id_fkey"
+            columns: ["reserva_id"]
+            isOneToOne: false
+            referencedRelation: "reservas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          nome: string
+          pin_hash: string
+          role: string
+        }
+        Insert: {
+          ativo?: boolean
           created_at?: string
-        }
-      }
-      baixados: {
-        Row: {
-          id: string
-          trafego_id: string
-          codigo_in: string
-          baixado_por: string
-          baixado_em: string
-        }
-        Insert: {
           id?: string
-          trafego_id: string
-          codigo_in: string
-          baixado_por: string
-          baixado_em?: string
+          nome: string
+          pin_hash: string
+          role: string
         }
         Update: {
+          ativo?: boolean
+          created_at?: string
           id?: string
-          trafego_id?: string
-          codigo_in?: string
-          baixado_por?: string
-          baixado_em?: string
+          nome?: string
+          pin_hash?: string
+          role?: string
         }
-      }
-      fardos_nao_encontrados: {
-        Row: {
-          id: string
-          trafego_id: string
-          codigo_in: string
-          reportado_por: string
-          reportado_em: string
-        }
-        Insert: {
-          id?: string
-          trafego_id: string
-          codigo_in: string
-          reportado_por: string
-          reportado_em?: string
-        }
-        Update: {
-          id?: string
-          trafego_id?: string
-          codigo_in?: string
-          reportado_por?: string
-          reportado_em?: string
-        }
+        Relationships: []
       }
     }
     Views: {
@@ -287,5 +366,131 @@ export interface Database {
     Enums: {
       [_ in never]: never
     }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
 }
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const
