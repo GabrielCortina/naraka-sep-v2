@@ -47,10 +47,10 @@ Exceptions: Drop zone minimum height 200px to provide adequate drag target area.
 
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
-| Body | 16px (text-base) | 400 (normal) | 1.5 | Import list details, preview numbers |
-| Label | 14px (text-sm) | 500 (medium) | 1.4 | Drop zone hint text, stat labels, timestamps |
+| Body | 16px (text-base) | 400 (normal) | 1.5 | Import list details, preview numbers, stat labels, timestamps |
+| Label | 14px (text-sm) | 400 (normal) | 1.4 | Drop zone hint text, badges, secondary text |
 | Heading | 20px (text-xl) | 600 (semibold) | 1.2 | Page title "Upload", section headings |
-| Display | 28px (text-2xl) | 700 (bold) | 1.2 | Preview summary numbers (total pedidos) |
+| Display | 28px (text-2xl) | 600 (semibold) | 1.2 | Preview summary numbers (total pedidos) |
 
 ---
 
@@ -60,11 +60,11 @@ Exceptions: Drop zone minimum height 200px to provide adequate drag target area.
 |------|-------|-----|-------|
 | Dominant (60%) | --background | 0 0% 100% | Page background, main surface |
 | Secondary (30%) | --card / --muted | 0 0% 100% / 0 0% 96.1% | Drop zone card, import list cards, preview card |
-| Accent (10%) | --primary | 0 0% 9% | "Processar" button, "Confirmar Importacao" button |
+| Accent (10%) | --primary | 0 0% 9% | "Processar planilha" button, "Confirmar Importacao" button |
 | Destructive | --destructive | 0 84.2% 60.2% | "Desfazer ultima importacao" button |
 
 Accent reserved for:
-- "Processar" primary CTA button (solid fill)
+- "Processar planilha" primary CTA button (solid fill)
 - "Confirmar Importacao" confirmation button (solid fill)
 - Drop zone border on drag-over state (dashed border turns primary)
 
@@ -94,7 +94,7 @@ Additional semantic colors for this phase:
 
 | Component | From | Usage |
 |-----------|------|-------|
-| Button | shadcn/ui | Processar, Confirmar, Desfazer, Selecionar arquivo |
+| Button | shadcn/ui | Processar planilha, Confirmar, Desfazer, Selecionar arquivo |
 | Card, CardHeader, CardContent | shadcn/ui | Drop zone wrapper, preview, import list |
 | Sonner (toast) | shadcn/ui | Success, day-reset, error, empty-result toasts |
 
@@ -123,14 +123,14 @@ Additional semantic colors for this phase:
                           |   - [Selecionar arquivo] button (secondary variant)
                           |   --- after file selected ---
                           |   - File name + file size
-                          |   - [Processar] button (primary)
+                          |   - [Processar planilha] button (primary)
                           |
                           | [ImportPreview card — full width, max-w-2xl, centered]
                           |   (appears after processing, before confirming)
                           |   - Summary grid: Total | Filtrados | Duplicados
                           |   - Breakdown: Unitario | Kit | Combo
                           |   - [Confirmar Importacao] button (primary)
-                          |   - [Cancelar] button (ghost)
+                          |   - [Voltar ao upload] button (ghost)
                           |
                           | [Separator]
                           |
@@ -155,7 +155,7 @@ Same vertical stack, full width (p-4 from AppShell). Drop zone takes full viewpo
 | Idle | Dashed border (--border), upload cloud icon (lucide `Upload`), hint text | Accepts drag or click |
 | Drag-over | Dashed border (--primary), background primary/5, icon scales to 110% | Visual feedback for valid drag |
 | Drag-invalid | Dashed border (--destructive), shake animation 300ms | Non-.xlsx file dragged |
-| File selected | Solid border (--border), file icon (lucide `FileSpreadsheet`), filename + size displayed, [Processar] button appears | Ready to process |
+| File selected | Solid border (--border), file icon (lucide `FileSpreadsheet`), filename + size displayed, [Processar planilha] button appears | Ready to process |
 | Processing | Spinner overlay with "Processando arquivo..." text, button disabled | SheetJS parsing in progress |
 
 ### ImportPreview States
@@ -171,9 +171,9 @@ Same vertical stack, full width (p-4 from AppShell). Drop zone takes full viewpo
 | Button | Variant | Disabled When |
 |--------|---------|---------------|
 | Selecionar arquivo | secondary, outline | During processing |
-| Processar | primary (default) | No file selected, during processing |
+| Processar planilha | primary (default) | No file selected, during processing |
 | Confirmar Importacao | primary (default) | During server persist |
-| Cancelar | ghost | During server persist |
+| Voltar ao upload | ghost | During server persist |
 | Desfazer ultima importacao | destructive, outline | During any processing, not most recent |
 
 ### Loading States
@@ -197,9 +197,9 @@ All copy in Brazilian Portuguese as per CLAUDE.md.
 | Drop zone hint (idle) | Arraste o arquivo .xlsx aqui ou |
 | Drop zone file button | Selecionar arquivo |
 | Drop zone file selected | {filename} ({size}) |
-| Primary CTA (parse) | Processar |
+| Primary CTA (parse) | Processar planilha |
 | Primary CTA (confirm) | Confirmar Importacao |
-| Cancel button | Cancelar |
+| Cancel/back button | Voltar ao upload |
 | Processing spinner (parse) | Processando arquivo... |
 | Processing spinner (persist) | Importando pedidos... |
 | Preview heading | Resumo da importacao |
@@ -250,7 +250,7 @@ All animations respect `prefers-reduced-motion: reduce` — disable transform an
 | Processing state | `aria-live="polite"` on status text, `aria-busy="true"` on form during processing |
 | Button disabled states | Native `disabled` attribute (not aria-disabled), cursor-not-allowed |
 | Toast announcements | Sonner handles `aria-live` regions automatically |
-| Focus management | After file select, focus moves to "Processar" button. After confirm, focus returns to drop zone |
+| Focus management | After file select, focus moves to "Processar planilha" button. After confirm, focus returns to drop zone |
 | Heading hierarchy | h1 "Upload" (page), h2 "Resumo da importacao" (preview), h2 "Importacoes de hoje" (list) |
 | Contrast | All text meets 4.5:1 minimum against its background (verified by shadcn neutral palette) |
 | Destructive confirmation | "Desfazer" uses `window.confirm()` or inline confirmation before executing |
