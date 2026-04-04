@@ -18,8 +18,8 @@
 - [x] **AUTH-02**: PIN armazenado como hash SHA-256 no banco
 - [x] **AUTH-03**: Sessão mantida via JWT do Supabase
 - [x] **AUTH-04**: Redirecionamento automático por role após login
-- [ ] **AUTH-05**: Cada role vê apenas as abas permitidas (Admin: todas; Líder: Dashboard/Upload/Fardos/Prateleira; Separador: Prateleira; Fardista: Fardos/Baixa)
-- [ ] **AUTH-06**: Usuário pode fazer logout de qualquer tela
+- [x] **AUTH-05**: Cada role vê apenas as abas permitidas (Admin: todas; Líder: Dashboard/Upload/Fardos/Prateleira; Separador: Prateleira; Fardista: Fardos/Baixa)
+- [x] **AUTH-06**: Usuário pode fazer logout de qualquer tela
 
 ### Upload
 
@@ -151,8 +151,8 @@
 | AUTH-02 | Phase 2 | Complete |
 | AUTH-03 | Phase 2 | Complete |
 | AUTH-04 | Phase 2 | Complete |
-| AUTH-05 | Phase 2 | Pending |
-| AUTH-06 | Phase 2 | Pending |
+| AUTH-05 | Phase 2 | Complete |
+| AUTH-06 | Phase 2 | Complete |
 | UPLD-01 | Phase 3 | Pending |
 | UPLD-02 | Phase 3 | Pending |
 | UPLD-03 | Phase 3 | Pending |

@@ -56,7 +56,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Infraestrutura de auth: migration Custom Access Token Hook, role config, slugify e seed de usuarios
 - [x] 02-02-PLAN.md — Tela de login (nome + PIN) e middleware JWT com protecao de rotas por role
-- [ ] 02-03-PLAN.md — AppShell responsivo (sidebar + bottom tabs), logout e paginas placeholder
+- [x] 02-03-PLAN.md — AppShell responsivo (sidebar + bottom tabs), logout e paginas placeholder
 
 ### Phase 3: Upload e Processamento
 **Goal**: Lider pode importar planilha do ERP e o sistema processa, classifica e persiste todos os pedidos corretamente
