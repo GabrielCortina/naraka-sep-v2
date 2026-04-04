@@ -51,7 +51,7 @@ export async function middleware(request: NextRequest) {
   )
 
   // Refresh session — getUser() validates server-side and may refresh tokens
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
 
   const pathname = request.nextUrl.pathname
 
@@ -60,8 +60,13 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
+  // DEBUG: log auth state for every protected route request
+  const cookieNames = request.cookies.getAll().map(c => c.name).filter(n => n.startsWith('sb-'))
+  console.log(`[middleware] path=${pathname} user=${user?.id ?? 'null'} userError=${userError?.message ?? 'none'} cookies=[${cookieNames.join(', ')}]`)
+
   // No authenticated user -> redirect to login with returnTo
   if (!user) {
+    console.log(`[middleware] NO USER — redirecting to /login (error: ${userError?.message ?? 'none'})`)
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     if (pathname !== '/' && pathname !== '/login') {
@@ -71,13 +76,21 @@ export async function middleware(request: NextRequest) {
   }
 
   // Get session for JWT access token
-  const { data: { session } } = await supabase.auth.getSession()
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+
+  console.log(`[middleware] session=${session ? 'exists' : 'null'} sessionError=${sessionError?.message ?? 'none'}`)
 
   if (!session) {
+    console.log(`[middleware] NO SESSION despite user exists — redirecting to /login`)
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return redirectWithCookies(url, supabaseResponse)
   }
+
+  // DEBUG: decode JWT payload without verification to inspect claims
+  const tokenParts = session.access_token.split('.')
+  const rawPayload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString())
+  console.log(`[middleware] JWT claims: user_role=${rawPayload.user_role ?? 'MISSING'} sub=${rawPayload.sub} exp=${rawPayload.exp} aud=${rawPayload.aud}`)
 
   // Verify JWT and extract role
   try {
@@ -85,8 +98,10 @@ export async function middleware(request: NextRequest) {
     const { payload } = await jwtVerify(session.access_token, secret)
     const userRole = payload.user_role as string | undefined
 
+    console.log(`[middleware] jwtVerify OK — userRole=${userRole ?? 'MISSING'}`)
+
     if (!userRole) {
-      // No role in token — force token refresh by signing out and back in
+      console.log(`[middleware] NO ROLE IN JWT — redirecting to /login?reason=missing_role`)
       const url = request.nextUrl.clone()
       url.pathname = '/login'
       url.searchParams.set('reason', 'missing_role')
@@ -104,15 +119,17 @@ export async function middleware(request: NextRequest) {
     // Check route permission
     const allowedRoutes = ROLE_ROUTES[userRole]
     if (allowedRoutes && !allowedRoutes.some(route => pathname.startsWith(route))) {
+      console.log(`[middleware] ROUTE NOT ALLOWED for role=${userRole} path=${pathname} — redirecting to ${ROLE_DEFAULTS[userRole]}`)
       return redirectWithCookies(
         new URL(ROLE_DEFAULTS[userRole] || '/login', request.url),
         supabaseResponse
       )
     }
 
+    console.log(`[middleware] ACCESS GRANTED role=${userRole} path=${pathname}`)
     return supabaseResponse
-  } catch {
-    // JWT verification failed -> redirect to login
+  } catch (err) {
+    console.log(`[middleware] JWT VERIFY FAILED: ${err instanceof Error ? err.message : String(err)}`)
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return redirectWithCookies(url, supabaseResponse)
