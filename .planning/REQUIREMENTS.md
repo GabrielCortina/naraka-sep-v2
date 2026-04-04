@@ -8,9 +8,9 @@
 ### Setup
 
 - [x] **SETUP-01**: Projeto Next.js 14 criado com Tailwind CSS e shadcn/ui
-- [ ] **SETUP-02**: Supabase conectado com todas as tabelas criadas (users, config, pedidos, progresso, reservas, atribuicoes, trafego_fardos, baixados, fardos_nao_encontrados)
+- [x] **SETUP-02**: Supabase conectado com todas as tabelas criadas (users, config, pedidos, progresso, reservas, atribuicoes, trafego_fardos, baixados, fardos_nao_encontrados)
 - [ ] **SETUP-03**: Repositório GitHub conectado ao Vercel com deploy automático
-- [ ] **SETUP-04**: Google Sheets API configurada com conta de serviço e credenciais em variáveis de ambiente
+- [x] **SETUP-04**: Google Sheets API configurada com conta de serviço e credenciais em variáveis de ambiente
 
 ### Authentication
 
@@ -144,9 +144,9 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SETUP-01 | Phase 1 | Complete |
-| SETUP-02 | Phase 1 | Pending |
+| SETUP-02 | Phase 1 | Complete |
 | SETUP-03 | Phase 1 | Pending |
-| SETUP-04 | Phase 1 | Pending |
+| SETUP-04 | Phase 1 | Complete |
 | AUTH-01 | Phase 2 | Pending |
 | AUTH-02 | Phase 2 | Pending |
 | AUTH-03 | Phase 2 | Pending |
