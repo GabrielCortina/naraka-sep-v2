@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-04-04T22:12:54.804Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-04-04T22:20:06.179Z"
 last_activity: 2026-04-04
 progress:
   total_phases: 10
   completed_phases: 1
   total_plans: 6
-  completed_plans: 4
-  percent: 67
+  completed_plans: 5
+  percent: 83
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 02 (autenticacao) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-04
 
@@ -55,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-infraestrutura P01 | 4min | 2 tasks | 22 files |
 | Phase 01-infraestrutura P02 | 4min | 2 tasks | 14 files |
 | Phase 02-autenticacao P01 | 8min | 3 tasks | 5 files |
+| Phase 02-autenticacao P02 | 4min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,8 @@ Recent decisions affecting current work:
 - [Phase 01-infraestrutura]: Plan 01-03 requires user credentials for all operations (Supabase link, db push, gen types, GitHub push, Vercel deploy) -- presented as human-action checkpoint
 - [Phase 02-autenticacao]: Custom Access Token Hook injeta user_role no JWT automaticamente a cada token refresh
 - [Phase 02-autenticacao]: Email ficticio @naraka.local via slug deterministic do nome do usuario
+- [Phase 02-autenticacao]: ROLE_ROUTES inlined no middleware (Edge Runtime nao resolve path aliases)
+- [Phase 02-autenticacao]: returnTo validado contra open redirect (/ obrigatorio, :// proibido)
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T22:12:54.802Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-04-04T22:20:06.177Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
