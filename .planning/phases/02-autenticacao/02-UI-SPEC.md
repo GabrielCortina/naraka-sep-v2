@@ -50,18 +50,18 @@ Exceptions: Bottom navigation bar height = 56px (touch-friendly, not in spacing 
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 16px | 400 (regular) | 1.5 |
-| Label | 14px | 500 (medium) | 1.4 |
+| Label | 14px | 600 (semibold) | 1.4 |
 | Heading | 20px | 600 (semibold) | 1.2 |
 | Display | 28px | 600 (semibold) | 1.2 |
 
 **Phase-specific notes:**
 - Login page title "NARAKA" uses Display size (28px, semibold)
-- Login page subtitle "SEP v2" uses Label size (14px, medium), muted-foreground color
-- Form labels use Label role
-- Input text uses Body role
+- Login page subtitle "SEP v2" uses Label size (14px, semibold), muted-foreground color
+- Form labels use Label role (14px, semibold)
+- Input text uses Body role (16px, regular)
 - Error message uses Label size (14px), destructive color
-- Bottom tab labels use 12px, weight 500 (exception: navigation only)
-- Sidebar nav items use Body size (16px, regular)
+- Bottom tab labels use Label token (14px, semibold) — same typographic role as form labels, applied at navigation scale
+- Sidebar nav items use Body size (16px, regular); active sidebar items use Body size at weight 600
 
 ---
 
@@ -73,6 +73,8 @@ Exceptions: Bottom navigation bar height = 56px (touch-friendly, not in spacing 
 | Secondary (30%) | hsl(0 0% 100%) — white | Login card surface, content area, sidebar background |
 | Accent (10%) | hsl(0 0% 9%) — primary black | Primary CTA button, active nav indicator |
 | Destructive | hsl(0 84.2% 60.2%) — red | Error message text only |
+
+**Primary focal point:** Login card (white Card surface with "NARAKA" Display heading) centered on dark background — the sole interactive element on the page, drawing immediate user attention.
 
 **Rationale:** CONTEXT.md D-05 specifies "fundo escuro/neutro" for login with "card branco centralizado". The app uses the shadcn neutral palette already configured in globals.css. This phase uses dark mode for the login page background and light mode for the card surface and authenticated app shell.
 
@@ -116,10 +118,10 @@ Exceptions: Bottom navigation bar height = 56px (touch-friendly, not in spacing 
 |---------|-----------|----------|
 | Desktop sidebar | Custom component, 240px width | White background, left-aligned, full height, border-right |
 | Sidebar logo | "NARAKA" text (Heading size) | Top of sidebar, 24px padding |
-| Sidebar nav items | Vertical list with Lucide icons | 16px body text, 8px icon-to-label gap, 48px row height, active item has accent background with rounded-md |
+| Sidebar nav items | Vertical list with Lucide icons | 16px body text (regular), active item 16px semibold, 8px icon-to-label gap, 48px row height, active item has accent background with rounded-md |
 | Sidebar logout | Bottom of sidebar, separated by border-top | Lucide LogOut icon + "Sair" label, muted-foreground color, hover: foreground color |
 | Mobile bottom tabs | Fixed bottom bar, 56px height | White background, border-top, safe-area-inset padding |
-| Tab items | Icon (24px) + label (12px) stacked vertically | Centered in equal-width columns, active: foreground color, inactive: muted-foreground |
+| Tab items | Icon (24px) + label (14px, semibold) stacked vertically | Centered in equal-width columns, active: foreground color, inactive: muted-foreground |
 | Mobile header | Fixed top bar, 48px height | White background, "NARAKA" left-aligned (Heading size), border-bottom |
 | Content area | Main content region | Scrollable, padding 16px on mobile, 24px on desktop |
 
@@ -161,7 +163,7 @@ Transition is a hard switch at 768px (Tailwind `md:` breakpoint). No intermediat
 
 | Element | Copy |
 |---------|------|
-| Primary CTA | "Entrar" |
+| Primary CTA | "Entrar" (standard pt-BR login convention — single verb without noun is the established UX pattern for authentication in Brazilian Portuguese, equivalent to English "Sign in") |
 | Page title | "NARAKA" |
 | Page subtitle | "SEP v2" |
 | Nome field label | "Nome" |
