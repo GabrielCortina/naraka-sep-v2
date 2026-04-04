@@ -12,7 +12,8 @@ Separadores e fardistas conseguem processar todos os pedidos do dia dentro dos p
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Integração Google Sheets API para leitura do estoque externo — Validated in Phase 1: Infraestrutura
+- [x] Realtime obrigatório via Supabase subscriptions (zero polling) — Infrastructure ready (Phase 1), subscriptions to be wired in later phases
 
 ### Active
 
@@ -121,4 +122,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-04 after initialization*
+*Last updated: 2026-04-04 after Phase 1: Infraestrutura complete — Next.js 14 + Supabase + Google Sheets + Vercel deploy*
