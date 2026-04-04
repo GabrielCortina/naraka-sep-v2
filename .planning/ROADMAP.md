@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Requirements**: SETUP-01, SETUP-02, SETUP-03, SETUP-04
 **Success Criteria** (what must be TRUE):
   1. Projeto Next.js 14 roda localmente com Tailwind e shadcn/ui funcionando
-  2. Supabase conectado com todas as 8 tabelas criadas e acessiveis
+  2. Supabase conectado com todas as 9 tabelas criadas e acessiveis
   3. Push no GitHub dispara deploy automatico no Vercel e o site abre
   4. Google Sheets API responde com dados da planilha de estoque via conta de servico
 **Plans**: 3 plans
