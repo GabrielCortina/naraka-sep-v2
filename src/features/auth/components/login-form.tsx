@@ -47,10 +47,24 @@ export function LoginForm() {
         return
       }
 
-      // Decode JWT payload to get user_role
-      const tokenParts = data.session.access_token.split('.')
-      const payload = JSON.parse(atob(tokenParts[1]))
-      const userRole = payload.user_role as string | undefined
+      // Extract role: try JWT claim first, fall back to database lookup
+      let userRole: string | undefined
+      try {
+        const tokenParts = data.session.access_token.split('.')
+        const payload = JSON.parse(atob(tokenParts[1]))
+        userRole = payload.user_role
+      } catch {
+        // JWT decode failed — will fall back to DB
+      }
+
+      if (!userRole) {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', data.user.id)
+          .single()
+        userRole = userData?.role
+      }
 
       // Check returnTo param (prevent open redirect: must start with / and no protocol)
       const returnTo = searchParams.get('returnTo')
