@@ -17,6 +17,15 @@ const ROLE_DEFAULTS: Record<string, string> = {
   fardista: '/fardos',
 }
 
+// Copy session cookies from supabaseResponse onto a redirect response
+function redirectWithCookies(url: URL, supabaseResponse: NextResponse) {
+  const redirect = NextResponse.redirect(url)
+  supabaseResponse.cookies.getAll().forEach((cookie) => {
+    redirect.cookies.set(cookie.name, cookie.value)
+  })
+  return redirect
+}
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -41,8 +50,8 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Refresh session (keeps cookies alive)
-  await supabase.auth.getUser()
+  // Refresh session — getUser() validates server-side and may refresh tokens
+  const { data: { user } } = await supabase.auth.getUser()
 
   const pathname = request.nextUrl.pathname
 
@@ -51,17 +60,23 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
-  // Get session
-  const { data: { session } } = await supabase.auth.getSession()
-
-  // No session -> redirect to login with returnTo
-  if (!session) {
+  // No authenticated user -> redirect to login with returnTo
+  if (!user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     if (pathname !== '/' && pathname !== '/login') {
       url.searchParams.set('returnTo', pathname)
     }
-    return NextResponse.redirect(url)
+    return redirectWithCookies(url, supabaseResponse)
+  }
+
+  // Get session for JWT access token
+  const { data: { session } } = await supabase.auth.getSession()
+
+  if (!session) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return redirectWithCookies(url, supabaseResponse)
   }
 
   // Verify JWT and extract role
@@ -71,24 +86,27 @@ export async function middleware(request: NextRequest) {
     const userRole = payload.user_role as string | undefined
 
     if (!userRole) {
-      // No role in token -> redirect to login
+      // No role in token — force token refresh by signing out and back in
       const url = request.nextUrl.clone()
       url.pathname = '/login'
-      return NextResponse.redirect(url)
+      url.searchParams.set('reason', 'missing_role')
+      return redirectWithCookies(url, supabaseResponse)
     }
 
     // Root path -> redirect to role default
     if (pathname === '/') {
-      return NextResponse.redirect(
-        new URL(ROLE_DEFAULTS[userRole] || '/dashboard', request.url)
+      return redirectWithCookies(
+        new URL(ROLE_DEFAULTS[userRole] || '/dashboard', request.url),
+        supabaseResponse
       )
     }
 
     // Check route permission
     const allowedRoutes = ROLE_ROUTES[userRole]
     if (allowedRoutes && !allowedRoutes.some(route => pathname.startsWith(route))) {
-      return NextResponse.redirect(
-        new URL(ROLE_DEFAULTS[userRole] || '/login', request.url)
+      return redirectWithCookies(
+        new URL(ROLE_DEFAULTS[userRole] || '/login', request.url),
+        supabaseResponse
       )
     }
 
@@ -97,7 +115,7 @@ export async function middleware(request: NextRequest) {
     // JWT verification failed -> redirect to login
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    return NextResponse.redirect(url)
+    return redirectWithCookies(url, supabaseResponse)
   }
 }
 
