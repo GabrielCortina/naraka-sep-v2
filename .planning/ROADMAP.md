@@ -34,10 +34,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Supabase conectado com todas as 8 tabelas criadas e acessiveis
   3. Push no GitHub dispara deploy automatico no Vercel e o site abre
   4. Google Sheets API responde com dados da planilha de estoque via conta de servico
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md — Criar projeto Next.js 14 com Tailwind, shadcn/ui e estrutura de pastas
+- [ ] 01-02-PLAN.md — Configurar Supabase (schema, clientes, middleware) e Google Sheets API
+- [ ] 01-03-PLAN.md — Git, schema push, GitHub, deploy Vercel e verificacao end-to-end
 
 ### Phase 2: Autenticacao
 **Goal**: Usuarios conseguem acessar o sistema com PIN e ver apenas as abas permitidas para seu role
@@ -180,7 +182,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infraestrutura | 0/? | Not started | - |
+| 1. Infraestrutura | 0/3 | Planning complete | - |
 | 2. Autenticacao | 0/? | Not started | - |
 | 3. Upload e Processamento | 0/? | Not started | - |
 | 4. Estoque e Reserva de Fardos | 0/? | Not started | - |
