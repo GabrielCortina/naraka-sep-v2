@@ -37,7 +37,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Criar projeto Next.js 14 com Tailwind, shadcn/ui e estrutura de pastas
+- [x] 01-01-PLAN.md — Criar projeto Next.js 14 com Tailwind, shadcn/ui e estrutura de pastas
 - [ ] 01-02-PLAN.md — Configurar Supabase (schema, clientes, middleware) e Google Sheets API
 - [ ] 01-03-PLAN.md — Git, schema push, GitHub, deploy Vercel e verificacao end-to-end
 
