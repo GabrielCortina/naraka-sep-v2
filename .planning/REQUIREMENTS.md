@@ -14,8 +14,8 @@
 
 ### Authentication
 
-- [ ] **AUTH-01**: Usuário pode fazer login com nome + PIN numérico (4-6 dígitos)
-- [ ] **AUTH-02**: PIN armazenado como hash SHA-256 no banco
+- [x] **AUTH-01**: Usuário pode fazer login com nome + PIN numérico (4-6 dígitos)
+- [x] **AUTH-02**: PIN armazenado como hash SHA-256 no banco
 - [ ] **AUTH-03**: Sessão mantida via JWT do Supabase
 - [ ] **AUTH-04**: Redirecionamento automático por role após login
 - [ ] **AUTH-05**: Cada role vê apenas as abas permitidas (Admin: todas; Líder: Dashboard/Upload/Fardos/Prateleira; Separador: Prateleira; Fardista: Fardos/Baixa)
@@ -147,8 +147,8 @@
 | SETUP-02 | Phase 1 | Complete |
 | SETUP-03 | Phase 1 | Pending |
 | SETUP-04 | Phase 1 | Complete |
-| AUTH-01 | Phase 2 | Pending |
-| AUTH-02 | Phase 2 | Pending |
+| AUTH-01 | Phase 2 | Complete |
+| AUTH-02 | Phase 2 | Complete |
 | AUTH-03 | Phase 2 | Pending |
 | AUTH-04 | Phase 2 | Pending |
 | AUTH-05 | Phase 2 | Pending |

@@ -54,7 +54,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 02-01-PLAN.md — Infraestrutura de auth: migration Custom Access Token Hook, role config, slugify e seed de usuarios
+- [x] 02-01-PLAN.md — Infraestrutura de auth: migration Custom Access Token Hook, role config, slugify e seed de usuarios
 - [ ] 02-02-PLAN.md — Tela de login (nome + PIN) e middleware JWT com protecao de rotas por role
 - [ ] 02-03-PLAN.md — AppShell responsivo (sidebar + bottom tabs), logout e paginas placeholder
 
