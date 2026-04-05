@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-04-05T14:32:07.596Z"
+status: verifying
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-04-05T15:02:57.211Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 10
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 13
-  completed_plans: 12
-  percent: 92
+  completed_plans: 13
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-04)
 
 **Core value:** Separadores e fardistas conseguem processar todos os pedidos do dia dentro dos prazos de envio de cada marketplace, com visibilidade em tempo real para o lider.
-**Current focus:** Phase 03 — upload-e-processamento
+**Current focus:** Phase 05 — next phase
 
 ## Current Position
 
-Phase: 4
-Plan: 2 of 3 complete
-Status: Ready to execute
+Phase: 4 complete
+Plan: 3 of 3 complete
+Status: Phase complete — ready for verification
 Last activity: 2026-04-05
 
-Progress: [█████████░] 85%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [█████████░] 85%
 | Phase 03-upload-e-processamento P03 | 6min | 2 tasks | 6 files |
 | Phase 04 P01 | 2min | 2 tasks | 4 files |
 | Phase 04 P02 | 4min | 2 tasks | 5 files |
+| Phase 04 P03 | 6min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -87,8 +88,14 @@ Recent decisions affecting current work:
 - [Phase 03-upload-e-processamento]: RefObject<HTMLInputElement> sem | null para compatibilidade com Next.js 14 legacy ref types
 - [Phase 04]: Algoritmo DP com Map<soma, DpEntry> para subset sum -- eficiente para somas esparsas com 20-50 fardos
 - [Phase 04]: withRetry generico com backoff exponencial (1s, 2s, 4s) reutilizavel para Google Sheets
-- [Phase 04]: Header mapping case-insensitive com trim para robustez contra variacoes na planilha
+- [Phase 04]: Header mapping normalizado com NFD (remove acentos, lowercase, trim) — mesmo padrao do parse-xlsx
 - [Phase 04]: Unicidade intra-execucao via Set de codigos_in atualizado entre iteracoes de SKU
+- [Phase 04]: Headers reais da planilha de estoque: PRIORIDADE, PRATELEIRA, POSIÇÃO, ALTURA, ENDEREÇO, SKU, QUANTIDADE, CODIGO UPSELLER (sem acento), DATA ENTRADA, HORA ENTRADA, OPERADOR, TRANFERENCIA, DATA TRANFERENCIA, OPERADOR
+- [Phase 04]: StockItem inclui posicao (coluna POSIÇÃO) para uso futuro na separacao
+- [Phase 04]: Card de resumo pos-upload fica aberto ate lider clicar "OK" (sem auto-close por timer)
+- [Phase 04]: Array.from(Map) para iterar Maps -- tsconfig target compat (padrao Phase 03)
+- [Phase 04]: NFD header normalization no stock-parser -- robusto contra acentos na planilha externa
+- [Phase 04]: OK button no card de sucesso ao inves de auto-close 3s -- lider precisa de tempo para ler dados de estoque
 
 ### Pending Todos
 
@@ -100,6 +107,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T14:32:07.594Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-04-05T15:02:57.209Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None

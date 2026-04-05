@@ -91,7 +91,7 @@ Plans:
 Plans:
 - [x] 04-01-PLAN.md — Migration SQL, tipos do dominio fardos e algoritmo subset sum com TDD
 - [x] 04-02-PLAN.md — Cache, stock-parser com retry, e reservation engine com testes
-- [ ] 04-03-PLAN.md — Integracao no upload route, endpoint re-reserva, feedback UI e schema push
+- [x] 04-03-PLAN.md — Integracao no upload route, endpoint re-reserva, feedback UI e schema push
 
 ### Phase 5: Cards e UI Foundation
 **Goal**: Pedidos processados aparecem organizados em cards com progresso, urgencia e design system completo do sistema
