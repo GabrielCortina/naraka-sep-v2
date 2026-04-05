@@ -75,7 +75,7 @@ Plans:
 - [x] 03-01-PLAN.md — Instalar dependencias, configurar vitest e implementar logica pura (parse, classify, envio-groups) com testes
 - [x] 03-02-PLAN.md — Route Handlers POST /api/upload e DELETE /api/upload/undo com classificacao, deduplicacao e virada de dia
 - [x] 03-03-PLAN.md — Componentes UI (DropZone, ImportPreview, ImportList) e hook useUpload
-- [ ] 03-04-PLAN.md — Pagina /upload conectando todos os componentes + checkpoint de verificacao
+- [x] 03-04-PLAN.md — Pagina /upload conectando todos os componentes + checkpoint de verificacao
 
 ### Phase 4: Estoque e Reserva de Fardos
 **Goal**: Sistema le estoque externo do Google Sheets e reserva fardos automaticamente usando subset sum com margem de 20%
