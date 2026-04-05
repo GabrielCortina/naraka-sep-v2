@@ -47,11 +47,11 @@
 ### Cards
 
 - [x] **CARD-01**: Cada card agrupa pedidos por grupo_envio + tipo + importacao_numero
-- [ ] **CARD-02**: Card exibe lista de itens (SKU, endereço, quantidade, fardo ID se aplicável)
+- [x] **CARD-02**: Card exibe lista de itens (SKU, endereço, quantidade, fardo ID se aplicável)
 - [x] **CARD-03**: Card exibe barra de progresso (peças separadas / total)
 - [x] **CARD-04**: Card exibe contagem regressiva até o prazo de envio
 - [x] **CARD-05**: Card exibe badge de urgência (verde >2h, amarelo <2h, vermelho atrasado, verde opaco concluído)
-- [ ] **CARD-06**: Card exibe atribuição (separador/fardista responsável)
+- [x] **CARD-06**: Card exibe atribuição (separador/fardista responsável)
 - [x] **CARD-07**: Cards são colapsáveis por método de envio
 - [x] **CARD-08**: Card 100% completo vai automaticamente para seção CONCLUÍDOS
 - [x] **CARD-09**: Seção CONCLUÍDOS é colapsável no final da lista
@@ -107,8 +107,8 @@
 - [x] **UIUX-02**: Mobile first para separadores/fardistas
 - [x] **UIUX-03**: Desktop otimizado para líder/admin
 - [x] **UIUX-04**: Cores por marketplace: Shopee #ee4d2d, ML #ffe600, TikTok #25F4EE, Shein #000000
-- [ ] **UIUX-05**: Modal para abrir card e trabalhar itens
-- [ ] **UIUX-06**: Popup de quantidade no mobile
+- [x] **UIUX-05**: Modal para abrir card e trabalhar itens
+- [x] **UIUX-06**: Popup de quantidade no mobile
 
 ## v2 Requirements
 
@@ -171,11 +171,11 @@
 | STOK-06 | Phase 4 | Complete |
 | STOK-07 | Phase 4 | Complete |
 | CARD-01 | Phase 5 | Complete |
-| CARD-02 | Phase 5 | Pending |
+| CARD-02 | Phase 5 | Complete |
 | CARD-03 | Phase 5 | Complete |
 | CARD-04 | Phase 5 | Complete |
 | CARD-05 | Phase 5 | Complete |
-| CARD-06 | Phase 5 | Pending |
+| CARD-06 | Phase 5 | Complete |
 | CARD-07 | Phase 5 | Complete |
 | CARD-08 | Phase 5 | Complete |
 | CARD-09 | Phase 5 | Complete |
@@ -213,8 +213,8 @@
 | UIUX-02 | Phase 5 | Complete |
 | UIUX-03 | Phase 5 | Complete |
 | UIUX-04 | Phase 5 | Complete |
-| UIUX-05 | Phase 5 | Pending |
-| UIUX-06 | Phase 5 | Pending |
+| UIUX-05 | Phase 5 | Complete |
+| UIUX-06 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 60 total

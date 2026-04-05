@@ -110,7 +110,7 @@ Plans:
 - [x] 05-01-PLAN.md — Design system tokens, tipos do dominio cards e logica pura card-utils com TDD
 - [x] 05-02-PLAN.md — Instalar deps shadcn/jspdf e componentes atomicos (ProgressBar, UrgencyBadge, MarketplaceBadge, OrderCard)
 - [x] 05-03-PLAN.md — KanbanBoard, KanbanColumn e CompletedSection com layout responsivo desktop/mobile
-- [ ] 05-04-PLAN.md — Modais (ItemModal, NumpadPopup, AssignModal) e PDF generator
+- [x] 05-04-PLAN.md — Modais (ItemModal, NumpadPopup, AssignModal) e PDF generator
 - [ ] 05-05-PLAN.md — Hooks de dados (realtime, countdown, card-data), migration SQL e wiring nas paginas /prateleira e /fardos
 - [ ] 05-06-PLAN.md — RLS write policies e API route handlers para progresso e atribuicao
 
