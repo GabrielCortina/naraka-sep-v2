@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-04-05T17:58:55.685Z"
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-04-05T18:02:09.586Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 10
   completed_phases: 4
   total_plans: 19
-  completed_plans: 14
-  percent: 74
+  completed_plans: 15
+  percent: 79
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 05 (cards-e-ui-foundation) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -65,6 +65,7 @@ Progress: [██████████] 100%
 | Phase 04 P02 | 4min | 2 tasks | 5 files |
 | Phase 04 P03 | 6min | 3 tasks | 11 files |
 | Phase 05-cards-e-ui-foundation P01 | 3min | 2 tasks | 8 files |
+| Phase 05-cards-e-ui-foundation P02 | 2min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,8 @@ Recent decisions affecting current work:
 - [Phase 05-cards-e-ui-foundation]: getUrgencyTier aceita now opcional para testabilidade sem mock global de Date
 - [Phase 05-cards-e-ui-foundation]: CSS variables HSL sem alpha channel (formato Tailwind padrao)
 - [Phase 05-cards-e-ui-foundation]: aggregateItems status agregado: nao_encontrado > separado > parcial > pendente
+- [Phase 05-cards-e-ui-foundation]: Badge variant=outline with className override for marketplace colors (avoids custom shadcn variants)
+- [Phase 05-cards-e-ui-foundation]: UrgencyBadge uses key={urgency} for force remount with CSS pulse animation on tier change
 
 ### Pending Todos
 
@@ -111,6 +114,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T17:58:55.683Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-04-05T18:02:09.584Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
