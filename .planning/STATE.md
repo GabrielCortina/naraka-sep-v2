@@ -115,7 +115,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+- [Phase 07] **Backend exclusão de card** — DeleteCardModal (visual) criado em Phase 05, lógica pendente: verificar PIN via bcrypt, apagar pedidos/progresso por card_key, cancelar reservas exclusivas de fardos (se fardo reservado só para este card → cancelar reserva + liberar fardo; se compartilhado → manter), liberar fardos cancelados como disponíveis. Componente visual: `src/features/cards/components/delete-card-modal.tsx`. API route necessária: `POST /api/cards/delete`.
 
 ### Blockers/Concerns
 
