@@ -1,33 +1,35 @@
 # Phase 6: Lista de Fardos - Research
 
 **Researched:** 2026-04-05
-**Domain:** UI de lista de fardos + integracao Google Sheets + Supabase realtime + PDF
+**Domain:** UI de lista de fardos com acoes OK/N/E, integracao Google Sheets, PDF, realtime Supabase
 **Confidence:** HIGH
 
 ## Summary
 
-Esta fase transforma a tela de fardos de um KanbanBoard (atual) para uma lista plana dedicada com acoes OK e N/E. O escopo envolve: (1) migration do banco para adicionar campos na tabela `trafego_fardos` e reestruturar `fardos_nao_encontrados`, (2) 3-4 API routes novas (OK, N/E, atribuicao em lote, sincronizar estoque), (3) substituicao completa do `fardos-client.tsx` com lista plana, filtros, contadores e selecao multipla, (4) geracao de PDF adaptada para fardos.
+Esta fase substitui a tela de fardos atual (que usa KanbanBoard da Phase 5) por uma lista plana dedicada. O fardista interage com botoes OK (encontrado) e N/E (nao encontrado), enquanto o lider atribui fardistas em lote via checkboxes. A complexidade principal esta nos fluxos OK e N/E: OK envolve operacao transacional entre Google Sheets (leitura + apagamento de colunas) e Supabase (insercao em trafego_fardos com todos os campos da planilha); N/E envolve busca de fardo alternativo (reutilizando subset-sum para importacao normal ou busca simples para cascata) e, se nao encontrar, cancelamento de reserva + liberacao para prateleira.
 
-O codigo existente ja possui todos os building blocks necessarios: `fetchStock` para leitura da planilha, `clearSheetRange` para apagar colunas, `findOptimalCombination` para busca de alternativo, `AssignModal` para atribuicao, `useCardsRealtime` para subscriptions, e `jsPDF + autoTable` para PDF. A complexidade principal esta nos fluxos transacionais OK e N/E que envolvem operacoes multi-sistema (Supabase + Google Sheets) com tratamento de erros robusto.
+O codebase ja fornece todas as pecas fundamentais: `fetchStock` com normalizacao NFD, `findOptimalCombination` para subset sum, `clearSheetRange` para apagar colunas, `AssignModal` para atribuicao, `useCardsRealtime` para subscricoes, e `jsPDF` + `jspdf-autotable` para geracao de PDF. A tabela `trafego_fardos` precisa de migration para adicionar campos da planilha de estoque (prioridade, prateleira, posicao, altura, etc.).
 
-**Recomendacao principal:** Dividir em 4-5 planos sequenciais: migration DB primeiro, depois API routes (OK + N/E separados por complexidade), UI da lista, e PDF/atribuicao em lote por ultimo.
+A tela e a unica no sistema que escreve E apaga na planilha externa de estoque, exigindo dupla verificacao antes de qualquer operacao destrutiva. O padrao de API route ja esta consolidado: `createClient()` -> `getUser()` -> role check via admin DB -> operacao com `supabaseAdmin`.
+
+**Primary recommendation:** Dividir em 3 planos: (1) Migration DB + API routes OK/N/E + Sincronizar Estoque, (2) UI da lista plana com filtros/busca/contadores + atribuicao em lote, (3) PDF + polimento visual.
 
 <user_constraints>
 ## User Constraints (from CONTEXT.md)
 
 ### Locked Decisions
-- **D-01:** Tela de fardos e uma LISTA PLANA dedicada — NAO usa KanbanBoard, NAO agrupa por card
-- **D-02:** Cada fardo e uma linha/card branco com borda lateral esquerda azul, fundo geral cinza claro
-- **D-03:** Layout horizontal compacto: checkbox (lider), SKU bold, ID codigo IN, endereco com pin verde, badge status, quantidade "CONTEM", botoes OK/N/E
-- **D-04/D-05:** Visao lider/admin ve todos os fardos com checkboxes; fardista ve apenas seus fardos sem checkboxes
-- **D-06 a D-12:** Header com busca por codigo IN, filtros por status (tabs/chips), filtro por atribuicao, contadores, selecionar todos, ordenacao, botao sincronizar estoque
-- **D-13:** Ordem padrao por endereco (A-Z) para otimizar rota do fardista
-- **D-14 a D-19:** Fluxo OK direto sem confirmacao: buscar na planilha, copiar para trafego_fardos, apagar colunas F+ da planilha, dupla verificacao obrigatoria
-- **D-20 a D-22:** Fluxo N/E: buscar alternativo (20% margem para normal, qualquer qtd para cascata), se nao achar registrar em fardos_nao_encontrados, cancelar reserva, liberar prateleira
-- **D-23 a D-25:** Atribuicao em lote via barra flutuante + AssignModal com filterRole='fardista'
-- **D-26 a D-28:** PDF com fardos selecionados ou todos, conteudo: codigo IN, SKU, endereco, qtd, nome do separador
-- **D-29 a D-30:** Animacao suave, toast, spinner no botao, prevencao de clique duplo
-- **D-31:** Migration para adicionar campos da planilha na tabela trafego_fardos
+- D-01: Tela de fardos e uma LISTA PLANA dedicada — NAO usa KanbanBoard, NAO agrupa por card
+- D-02: Cada fardo e uma linha/card branco com borda lateral esquerda azul, fundo geral cinza claro
+- D-03: Layout horizontal compacto com SKU bold, codigo IN, endereco com pin verde, badge de status, quantidade "CONTEM", botoes OK/N/E
+- D-04: Lider/admin ve TODOS os fardos com checkboxes; D-05: Fardista ve APENAS seus fardos sem checkboxes
+- D-06 a D-12: Header com busca por codigo IN, filtros por status/atribuicao, contadores, "Selecionar Todos", ordenacao, botao "Sincronizar Estoque"
+- D-13: Ordem padrao por endereco (A-Z) para otimizar rota do fardista
+- D-14 a D-19: Fluxo OK — sem confirmacao, busca na planilha por CODIGO UPSELLER (match exato, trim+toLowerCase, NFD), copia linha para trafego_fardos, apaga colunas F+ preservando A-E, tratamento transacional
+- D-20 a D-22: Fluxo N/E — importacao normal usa 20% margem (subset sum), cascata aceita qualquer fardo; se encontrou alternativo reserva novo; se nao encontrou registra em fardos_nao_encontrados, cancela reserva, libera prateleira
+- D-23 a D-25: Atribuicao em lote com barra flutuante, AssignModal reutilizado, checkboxes so para lider/admin
+- D-26 a D-28: PDF imprime selecionados ou todos, conteudo com codigo IN/SKU/endereco/quantidade/separador, botao no header
+- D-29 a D-30: Realtime com animacao suave, toast, spinner no botao, prevencao de clique duplo
+- D-31: Migration para trafego_fardos — adicionar prioridade, prateleira, posicao, altura, data_entrada, hora_entrada, operador, transferencia, data_transferencia, operador_transferencia, fardista_nome, clicked_at
 
 ### Claude's Discretion
 - Implementacao exata dos filtros (tabs vs chips vs dropdown)
@@ -38,8 +40,8 @@ O codigo existente ja possui todos os building blocks necessarios: `fetchStock` 
 - Design exato da barra flutuante de selecao
 
 ### Deferred Ideas (OUT OF SCOPE)
-- Phase 8 (Baixa) foca em scanner de codigo IN + remover do trafego + liberar prateleira (limpeza de planilha ja acontece no OK desta phase)
-- Phase 7 (Prateleira) trata o efeito visual de "AGUARDAR FARDISTA" desbloqueando — a logica backend (cancelar reserva + update progresso) e implementada aqui
+- Phase 8 (Baixa) — limpeza de colunas F+ agora acontece no OK da Phase 6, Phase 8 foca em scanner/confirmacao/remover trafego/liberar prateleira
+- Phase 7 (Prateleira) — efeito visual do N/E na prateleira e Phase 7, mas logica backend (cancelar reserva + update progresso) e implementada aqui
 </user_constraints>
 
 <phase_requirements>
@@ -47,365 +49,388 @@ O codigo existente ja possui todos os building blocks necessarios: `fetchStock` 
 
 | ID | Description | Research Support |
 |----|-------------|------------------|
-| FARD-01 | Fardista ve lista de fardos agrupados por card com info: endereco, codigo IN, SKU, quantidade | Lista plana com dados de `reservas` JOIN `trafego_fardos`, componente FardoListItem |
-| FARD-02 | Fardista pode marcar fardo como OK (encontrado, entra no trafego) | API route `/api/fardos/ok` — busca planilha, insere trafego_fardos, apaga colunas F+ |
-| FARD-03 | Fardista pode marcar fardo como N/E — sistema busca alternativo; se nao achar, libera prateleira | API route `/api/fardos/ne` — reutiliza findOptimalCombination, cancela reserva, atualiza progresso |
-| FARD-04 | Lista de fardos atualiza em tempo real via Supabase subscription | useCardsRealtime ja escuta trafego_fardos e reservas — reutilizar ou criar hook dedicado |
-| FARD-05 | Lider pode atribuir fardistas a cards de fardos | Atribuicao em lote via barra flutuante + AssignModal existente, API route para atribuicao multipla |
-| FARD-06 | Botao "Imprimir Fardos" gera PDF com codigo IN, SKU, endereco, quantidade, para quem entregar | jsPDF + autoTable ja instalados, adaptar pdf-generator.ts para formato de lista de fardos |
+| FARD-01 | Fardista ve lista de fardos agrupados por card com info: endereco, codigo IN, SKU, quantidade | Lista plana com dados da tabela reservas JOIN pedidos; layout D-01 a D-05 |
+| FARD-02 | Fardista pode marcar fardo como OK (encontrado, entra no trafego) | API route /api/fardos/ok com fluxo D-14 a D-19; fetchStock + getSheetData + clearSheetRange + insert trafego_fardos |
+| FARD-03 | Fardista pode marcar fardo como N/E — sistema busca alternativo; se nao achar, libera linha na prateleira | API route /api/fardos/ne com fluxo D-20 a D-22; findOptimalCombination para alternativo, cancel reserva + update progresso |
+| FARD-04 | Lista de fardos atualiza em tempo real via Supabase subscription | useCardsRealtime ja escuta reservas e trafego_fardos; D-29 |
+| FARD-05 | Lider pode atribuir fardistas a cards de fardos | AssignModal reutilizado com filterRole='fardista'; API /api/cards/assign ja suporta tipo='fardista'; D-23 a D-25 para atribuicao em lote |
+| FARD-06 | Botao "Imprimir Fardos" gera PDF com codigo IN, SKU, endereco, quantidade, para quem entregar | jsPDF + jspdf-autotable; adaptar pdf-generator existente; D-26 a D-28 |
 </phase_requirements>
 
 ## Standard Stack
 
-### Core (ja instalado)
+### Core
 | Library | Version | Purpose | Why Standard |
 |---------|---------|---------|--------------|
-| next | 14.2.35 | Framework + Route Handlers para API | Stack do projeto [VERIFIED: package.json] |
-| @supabase/supabase-js | 2.101.1 | DB operations + realtime subscriptions | Stack do projeto [VERIFIED: package.json] |
-| googleapis | 171.4.0 | Google Sheets API leitura/escrita | Stack do projeto [VERIFIED: package.json] |
-| jspdf | 4.2.1 | Geracao de PDF client-side | Ja usado na Phase 5 [VERIFIED: package.json + npm registry] |
-| jspdf-autotable | 5.0.7 | Tabelas no PDF | Ja usado na Phase 5 [VERIFIED: package.json + npm registry] |
-| sonner | 2.0.7 | Toast notifications | Stack do projeto [VERIFIED: package.json] |
-| lucide-react | 1.7.0 | Icones (MapPin, Check, X, Printer) | Stack do projeto [VERIFIED: package.json] |
+| Next.js | 14.2.35 | Framework, API routes, server components | Stack locked (CLAUDE.md) [VERIFIED: package.json] |
+| @supabase/supabase-js | 2.101.1 | DB queries, realtime subscriptions | Stack locked [VERIFIED: package.json] |
+| @supabase/ssr | 0.10.0 | Server-side Supabase client | Stack locked [VERIFIED: package.json] |
+| googleapis | 171.4.0 | Google Sheets API (leitura/escrita/apagamento) | Stack locked [VERIFIED: package.json] |
+| jsPDF | 4.2.1 | Geracao de PDF no cliente | Ja instalado, usado na Phase 5 [VERIFIED: package.json] |
+| jspdf-autotable | 5.0.7 | Tabelas formatadas no PDF | Ja instalado, usado na Phase 5 [VERIFIED: package.json] |
 
-### Nao precisa instalar nada novo
-Todas as dependencias necessarias ja estao no projeto. Nao ha pacotes adicionais a instalar.
+### Supporting
+| Library | Version | Purpose | When to Use |
+|---------|---------|---------|-------------|
+| lucide-react | 1.7.0 | Icones (MapPin, Check, X, Printer, Search, Filter) | UI da lista [VERIFIED: package.json] |
+| sonner | 2.0.7 | Toast de feedback ("Fardo IN-4421 encontrado") | Feedback pos-acao [VERIFIED: package.json] |
+| tailwind-merge + clsx | 3.5.0 / 2.1.1 | Merge de classes CSS condicionais | Estilizacao condicional por status [VERIFIED: package.json] |
+| @radix-ui/react-dialog | 1.1.15 | AssignModal | Ja usado na Phase 5 [VERIFIED: package.json] |
+
+### Alternatives Considered
+Nenhuma — todo o stack ja esta definido e instalado. Nao ha novas dependencias necessarias.
 
 ## Architecture Patterns
 
-### Estrutura de arquivos proposta
+### Estrutura de Arquivos Recomendada
 ```
-src/features/fardos/
-  types.ts                    # Adicionar FardoListItem, FardoStatus, etc.
-  utils/
-    stock-parser.ts           # EXISTENTE — reutilizar fetchStock
-    subset-sum.ts             # EXISTENTE — reutilizar findOptimalCombination
-    reservation-engine.ts     # EXISTENTE — reutilizar executeReservation
-    stock-cache.ts            # EXISTENTE
-  components/
-    fardo-list.tsx            # NOVO — lista principal com filtros
-    fardo-item.tsx            # NOVO — card individual do fardo
-    fardo-filters.tsx         # NOVO — busca, filtros status/atribuicao
-    fardo-counters.tsx        # NOVO — contadores no header
-    selection-bar.tsx         # NOVO — barra flutuante de selecao
-  hooks/
-    use-fardos-data.ts        # NOVO — fetch de reservas + trafego para lista plana
-  lib/
-    fardo-pdf-generator.ts    # NOVO — PDF adaptado para fardos
-
-app/api/fardos/
-  ok/route.ts                 # NOVO — fluxo OK (planilha -> trafego -> limpar)
-  ne/route.ts                 # NOVO — fluxo N/E (alternativo ou liberar)
-  assign/route.ts             # NOVO — atribuicao em lote de fardista
-  sync/route.ts               # NOVO — sincronizar estoque (reutiliza executeReservation)
-
-app/(authenticated)/fardos/
-  page.tsx                    # EXISTENTE — manter server component
-  fardos-client.tsx           # EXISTENTE — SUBSTITUIR completamente
-
-supabase/migrations/
-  00005_trafego_fardos_campos.sql  # NOVO — migration
+src/
+├── features/fardos/
+│   ├── components/
+│   │   ├── fardos-list.tsx           # Lista principal (client component)
+│   │   ├── fardo-item.tsx            # Linha individual do fardo
+│   │   ├── fardos-header.tsx         # Header com busca, filtros, contadores
+│   │   ├── fardos-selection-bar.tsx  # Barra flutuante de selecao
+│   │   └── fardos-pdf.ts            # Gerador de PDF adaptado
+│   ├── hooks/
+│   │   └── use-fardos-data.ts       # Hook para buscar/filtrar dados de fardos
+│   ├── types.ts                     # (existente) StockItem, SubsetResult, etc.
+│   └── utils/
+│       ├── reservation-engine.ts    # (existente) reutilizar para Sincronizar Estoque
+│       ├── subset-sum.ts            # (existente) reutilizar para busca de alternativo
+│       ├── stock-parser.ts          # (existente) reutilizar fetchStock
+│       └── stock-cache.ts           # (existente) cache de 2min
+├── app/
+│   ├── (authenticated)/fardos/
+│   │   ├── page.tsx                 # (existente) server component com auth
+│   │   └── fardos-client.tsx        # (existente) SUBSTITUIR conteudo
+│   └── api/fardos/
+│       ├── ok/route.ts              # NOVO: fluxo OK (busca planilha + insert trafego + clear)
+│       ├── ne/route.ts              # NOVO: fluxo N/E (busca alternativo ou libera prateleira)
+│       ├── sync/route.ts            # NOVO: Sincronizar Estoque (reutiliza executeReservation)
+│       └── list/route.ts            # NOVO: listar fardos reservados (JOIN reservas + pedidos + atribuicoes)
 ```
 
-### Pattern 1: Lista Plana de Fardos (nao Kanban)
-**O que:** Fardos exibidos como lista vertical plana, cada fardo e uma linha independente. Dados vem de `reservas` com status='reservado', enriquecidos com `trafego_fardos` e `atribuicoes`.
-**Quando usar:** Sempre — decisao D-01 e irrevogavel.
-**Fonte de dados:**
+### Pattern 1: Fluxo OK Transacional
+**What:** Operacao de 3 passos com rollback parcial
+**When to use:** Quando fardista clica OK em um fardo
+**Example:**
 ```typescript
-// Buscar reservas ativas + trafego + atribuicoes
-const { data: reservas } = await supabase
-  .from('reservas')
-  .select('*, trafego_fardos(*)')
-  .eq('status', 'reservado')
-
-// Enriquecer com atribuicoes de fardista
-const { data: atribuicoes } = await supabase
-  .from('atribuicoes')
-  .select('card_key, user_id, users(nome)')
-  .eq('tipo', 'fardista')
-```
-
-### Pattern 2: Operacao Transacional Multi-Sistema (OK)
-**O que:** Fluxo OK envolve 3 sistemas: Google Sheets (leitura), Supabase (escrita), Google Sheets (escrita). Deve ser tratado como transacao com rollback parcial.
-**Regra critica (D-18):** Se falhar ao inserir no trafego_fardos, NAO apagar da planilha. Se falhar ao apagar da planilha, manter registro no trafego_fardos (logar erro).
-**Exemplo:**
-```typescript
-// [VERIFIED: google-sheets.ts existente]
-// Passo 1: Buscar fardo na planilha
+// Source: decisoes D-14 a D-18 do CONTEXT.md
+// 1. Buscar fardo na planilha (match exato por CODIGO UPSELLER)
 const rows = await getSheetData('Estoque')
-const headerRow = rows[0]
-// Normalizar headers com NFD (padrao stock-parser.ts)
-const headers = headerRow.map(h => h.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))
-const codigoCol = headers.indexOf('codigo upseller') // coluna H (index 7)
+const rowIndex = findRowByCodigoIn(rows, codigoIn) // trim().toLowerCase() + NFD
+if (rowIndex === -1) return { error: 'Fardo nao encontrado na planilha', status: 404 }
 
-// Encontrar linha com match exato
-const targetRow = rows.findIndex((row, i) =>
-  i > 0 && row[codigoCol]?.toString().trim().toLowerCase() === codigo_in.trim().toLowerCase()
-)
-if (targetRow === -1) return { error: 'Fardo nao encontrado na planilha', status: 404 }
+// 2. Inserir no trafego_fardos com TODOS os campos
+const { error: insertError } = await supabaseAdmin.from('trafego_fardos').insert({
+  codigo_in, sku, quantidade, endereco, reserva_id,
+  prioridade, prateleira, posicao, altura,
+  data_entrada, hora_entrada, operador,
+  transferencia, data_transferencia, operador_transferencia,
+  fardista_nome, fardista_id, clicked_at, status: 'encontrado'
+})
+if (insertError) return { error: 'Erro ao inserir no trafego' }
 
-// Passo 2: Inserir no trafego_fardos (Supabase)
-const { error: insertError } = await supabaseAdmin.from('trafego_fardos').insert({...})
-if (insertError) return { error: 'Erro ao registrar fardo', status: 500 }
-
-// Passo 3: Dupla verificacao + apagar colunas F+ (index 5 em diante)
-// Re-ler a linha para confirmar que ainda bate
-const recheck = await getSheetData(`Estoque!A${targetRow + 1}:N${targetRow + 1}`)
-if (recheck[0][codigoCol] !== rows[targetRow][codigoCol]) {
+// 3. Dupla verificacao + apagar colunas F+ (preservar A-E)
+const currentRow = await getSheetData(`Estoque!A${rowIndex}:N${rowIndex}`)
+if (currentRow[0]?.[7]?.trim().toLowerCase() !== codigoIn.trim().toLowerCase()) {
   // Linha mudou — NAO apagar, logar erro
-  console.error('[fardo-ok] Linha mudou entre leitura e escrita')
-  return { error: 'Conflito na planilha', status: 409 }
+  return { error: 'Linha alterada, abortando limpeza' }
 }
+await clearSheetRange(`Estoque!F${rowIndex}:N${rowIndex}`)
 
-// Limpar colunas F ate o final (preservar A-E)
-await clearSheetRange(`Estoque!F${targetRow + 1}:N${targetRow + 1}`)
+// 4. Atualizar status da reserva
+await supabaseAdmin.from('reservas').update({ status: 'encontrado' }).eq('codigo_in', codigoIn)
 ```
+[VERIFIED: google-sheets.ts, stock-parser.ts, decisoes D-14 a D-18 do CONTEXT.md]
 
-### Pattern 3: Busca de Alternativo no N/E
-**O que:** Reutilizar `fetchStock` + `findOptimalCombination` para buscar fardo alternativo.
-**Regra D-20:** Importacao normal usa margem 20% (subset sum padrao). Cascata aceita qualquer fardo do SKU.
-**Exemplo:**
+### Pattern 2: Fluxo N/E com Busca de Alternativo
+**What:** Busca fardo substituto ou libera para prateleira
+**When to use:** Quando fardista clica N/E em um fardo
+**Example:**
 ```typescript
-// [VERIFIED: subset-sum.ts + stock-parser.ts existentes]
-const stock = await fetchStock(true) // forceRefresh
-const disponiveis = stock.filter(item =>
-  item.sku === sku && !fardosJaReservados.has(item.codigo_in)
-)
+// Source: decisoes D-20 a D-22 do CONTEXT.md
+// 1. Buscar alternativo
+const stock = await fetchStock(true) // forceRefresh para dados atuais
+const reservados = await getReservedCodigosIn()
+const disponiveis = stock.filter(f => f.sku === sku && !reservados.has(f.codigo_in))
 
-if (tipo === 'cascata') {
-  // Qualquer fardo disponivel serve
-  const alternativo = disponiveis[0]
-  // ...reservar alternativo
+let alternativo: StockItem | null = null
+if (tipoCascata) {
+  // Cascata: qualquer fardo disponivel
+  alternativo = disponiveis[0] ?? null
 } else {
-  // Importacao normal — usar subset sum com 20%
+  // Normal: subset sum com 20% margem
   const resultado = findOptimalCombination(disponiveis, quantidade)
-  // ...reservar se encontrou
+  alternativo = resultado.fardos[0] ?? null
+}
+
+// 2A. Se encontrou: reservar novo fardo
+if (alternativo) {
+  await supabaseAdmin.from('reservas').insert({
+    codigo_in: alternativo.codigo_in, sku, quantidade: alternativo.quantidade,
+    endereco: alternativo.endereco, status: 'reservado', importacao_numero
+  })
+  // Cancelar reserva antiga
+  await supabaseAdmin.from('reservas').update({ status: 'substituido' }).eq('id', reservaId)
+}
+
+// 2B. Se NAO encontrou: registrar N/E + cancelar reserva + liberar prateleira
+if (!alternativo) {
+  await supabaseAdmin.from('fardos_nao_encontrados').insert({ ... })
+  await supabaseAdmin.from('reservas').update({ status: 'cancelado' }).eq('id', reservaId)
+  // Liberar prateleira: update progresso de 'aguardar_fardista' para 'pendente'
 }
 ```
+[VERIFIED: subset-sum.ts, reservation-engine.ts, decisoes D-20 a D-22 do CONTEXT.md]
 
-### Anti-Patterns a Evitar
-- **NAO usar KanbanBoard:** Decisao D-01 explicita. A tela e lista plana
-- **NAO mostrar popup de confirmacao no OK:** Decisao D-14. Toque direto processa imediatamente
-- **NAO apagar planilha antes de inserir no Supabase:** Decisao D-18. Transacao "segura" (inserir primeiro, apagar depois)
-- **NAO usar polling:** Constraint do projeto. Apenas Supabase subscriptions
-- **NAO criar novo canal de realtime:** useCardsRealtime ja escuta trafego_fardos e reservas. Reutilizar ou criar hook similar com o mesmo padrao (canal unico, multiplos handlers)
+### Pattern 3: Consulta de Fardos para Lista
+**What:** Query combinada para exibir fardos com todas as informacoes necessarias
+**When to use:** Ao carregar a lista de fardos
+**Example:**
+```typescript
+// Buscar reservas do dia com dados do pedido para contexto
+const { data: reservas } = await supabaseAdmin
+  .from('reservas')
+  .select('id, codigo_in, sku, quantidade, endereco, status, importacao_numero')
+  .in('status', ['reservado', 'encontrado', 'nao_encontrado'])
+
+// Buscar atribuicoes de fardista
+const { data: atribuicoes } = await supabaseAdmin
+  .from('atribuicoes')
+  .select('card_key, user_id')
+  .eq('tipo', 'fardista')
+
+// Buscar trafego para saber quais ja foram encontrados
+const { data: trafego } = await supabaseAdmin
+  .from('trafego_fardos')
+  .select('codigo_in, status')
+```
+[VERIFIED: database.types.ts, padrao de query da Phase 5]
+
+### Anti-Patterns to Avoid
+- **KanbanBoard na tela de fardos:** D-01 proibe explicitamente. Substituir completamente o FardosClient atual
+- **Polling para atualizacao:** CLAUDE.md proibe. Usar useCardsRealtime (ja escuta trafego_fardos e reservas)
+- **Apagar planilha antes de inserir no trafego:** D-18 exige ordem inversa. Insert primeiro, clear depois
+- **Buscar fardo sem dupla verificacao:** D-17 exige releitura da linha antes de apagar
+- **Criar nova Supabase subscription:** useCardsRealtime ja cobre as tabelas necessarias. Tambem precisa escutar fardos_nao_encontrados se usarmos essa tabela
 
 ## Don't Hand-Roll
 
-| Problem | Nao Construir | Usar Ao Inves | Por que |
-|---------|---------------|---------------|---------|
-| PDF | Template HTML + window.print | jsPDF + autoTable | Ja instalado, padrao Phase 5, consistencia |
-| Subset sum | Loop simples | findOptimalCombination | DP otimizado com margem 20%, ja testado |
-| Leitura planilha | fetch direto ao Sheets API | fetchStock + getSheetData | Cache, retry, normalizacao NFD |
-| Realtime | SSE/polling customizado | Supabase subscriptions | Constraint do projeto |
-| Toast | Alert/modal customizado | Sonner toast | Stack do projeto |
-| Modal de atribuicao | Modal customizado | AssignModal existente | Ja implementado com filterRole |
+| Problem | Don't Build | Use Instead | Why |
+|---------|-------------|-------------|-----|
+| Subset sum para alternativo | Algoritmo proprio | `findOptimalCombination` de subset-sum.ts | Ja testado, cobre edge cases de margem 20% |
+| Leitura de planilha com NFD | Parser de headers | `fetchStock` de stock-parser.ts | Normalizacao NFD ja implementada e testada |
+| Retry com backoff | Loop de retry | `withRetry` de stock-parser.ts | Generico, 1s/2s/4s exponencial |
+| Modal de atribuicao | Dialog customizado | `AssignModal` com filterRole='fardista' | Ja existe, filtra por role |
+| Realtime subscriptions | Channel manual | `useCardsRealtime` | Ja escuta trafego_fardos e reservas |
+| Tabela PDF | Renderizacao manual | `jspdf-autotable` | Formatacao automatica de tabelas |
+| Toast de feedback | Alert customizado | `sonner` (toast) | Ja configurado no projeto |
+| Cache de estoque | Cache manual | `stock-cache.ts` (getCached/setCache/invalidateCache) | TTL 2min, invalidacao por key |
+
+**Key insight:** Esta fase reutiliza massivamente codigo das Phases 4 e 5. As unicas pecas genuinamente novas sao: (1) os Route Handlers de OK/N/E, (2) a UI da lista plana, e (3) a migration do banco.
 
 ## Common Pitfalls
 
 ### Pitfall 1: Race Condition na Planilha de Estoque
-**O que da errado:** Dois fardistas clicam OK no mesmo fardo simultaneamente. Ambos leem a planilha, ambos veem o fardo, ambos tentam apagar.
-**Por que acontece:** Google Sheets nao tem locking.
-**Como evitar:** (1) Verificar no Supabase ANTES de tocar na planilha — se trafego_fardos ja tem um registro com este codigo_in + status='encontrado', rejeitar. (2) Dupla verificacao antes de apagar (D-17). (3) Spinner + desabilitar botao (D-30).
-**Sinais de alerta:** Dois toasts de sucesso para o mesmo fardo.
+**What goes wrong:** Dois fardistas clicam OK no mesmo momento para fardos na mesma planilha
+**Why it happens:** Google Sheets nao tem transacoes ACID
+**How to avoid:** Dupla verificacao (D-17): reler a linha antes de apagar. Se o conteudo mudou, abortar. Logar conflito. Usar status 'encontrado' na reserva como lock otimista no Supabase
+**Warning signs:** Linhas apagadas da planilha que nao aparecem no trafego
 
-### Pitfall 2: Headers da Planilha com Acentos
-**O que da errado:** Busca por "CODIGO UPSELLER" nao encontra porque header real tem ou nao tem acento.
-**Por que acontece:** Headers reais da planilha variam ("POSICAO" vs "POSICAO", "TRANFERENCIA" vs "TRANSFERENCIA").
-**Como evitar:** Usar normalizacao NFD em AMBOS os lados da comparacao (padrao stock-parser.ts). [VERIFIED: stock-parser.ts usa normalizeHeader]
-**Sinais de alerta:** 404 "Fardo nao encontrado" quando o fardo claramente existe.
+### Pitfall 2: Cache Stale no fetchStock
+**What goes wrong:** Fardista clica N/E, busca alternativo, mas cache de 2min retorna estoque desatualizado
+**Why it happens:** fetchStock tem cache de 2 minutos
+**How to avoid:** Sempre usar `forceRefresh=true` no fluxo N/E para buscar dados atuais. No fluxo OK tambem usar forceRefresh para garantir que a linha existe
+**Warning signs:** Alternativo encontrado pelo sistema ja foi reservado por outro processo
 
-### Pitfall 3: Apagar Colunas Erradas na Planilha
-**O que da errado:** Apagar A-E (endereco fisico) ao inves de F-N (dados do fardo).
-**Por que acontece:** Indexacao errada de colunas. Planilha tem: A=prioridade, B=prateleira, C=posicao, D=altura, E=endereco, F=SKU, G=quantidade, H=codigo upseller, I-N=campos diversos.
-**Como evitar:** (1) Range explicito `Estoque!F{row}:N{row}` no clearSheetRange. (2) D-17 exige dupla verificacao antes de apagar. (3) PRESERVAR colunas A-E sempre. [VERIFIED: CONTEXT.md D-17]
-**Sinais de alerta:** Enderecos desaparecem da planilha de estoque.
+### Pitfall 3: Indices de Linha da Planilha Off-by-One
+**What goes wrong:** Apagar a linha errada na planilha de estoque
+**Why it happens:** getSheetData retorna rows[0] como header, mas a API do Sheets usa indice 1-based (row 1 = header, row 2 = primeiro dado)
+**How to avoid:** `sheetRowIndex = dataArrayIndex + 2` (1 para 1-based + 1 para header). Sempre incluir dupla verificacao (D-17)
+**Warning signs:** Colunas de endereco (A-E) aparecem zeradas apos OK
 
-### Pitfall 4: API Routes de Cards Nao Existem
-**O que da errado:** fardos-client.tsx atual faz fetch para `/api/cards/progress` e `/api/cards/assign` que NAO existem como route files.
-**Por que acontece:** Foram referenciados no codigo da Phase 5 mas os route handlers nao foram criados como arquivos separados.
-**Como evitar:** (1) Esta phase SUBSTITUI o fardos-client.tsx completamente, entao nao depende dessas rotas. (2) Criar rotas novas em `/api/fardos/` para a logica desta phase. [VERIFIED: Glob nao encontrou app/api/cards/]
-**Sinais de alerta:** 404 em chamadas de API.
+### Pitfall 4: fardos_nao_encontrados Schema Mismatch
+**What goes wrong:** Insert falha porque schema atual de fardos_nao_encontrados nao tem todos os campos necessarios (D-22)
+**Why it happens:** Schema atual so tem: codigo_in, trafego_id, reportado_por, reportado_em. D-22 exige: codigo_upseller, sku, quantidade, endereco, fardista_nome, fardista_id
+**How to avoid:** Migration deve alterar fardos_nao_encontrados tambem — adicionar campos faltantes. Manter trafego_id como nullable (fardo nao foi para trafego)
+**Warning signs:** Insert retorna 400 por colunas desconhecidas
 
-### Pitfall 5: Tabela fardos_nao_encontrados com Schema Insuficiente
-**O que da errado:** D-22 exige registrar sku, quantidade, endereco, fardista_nome, fardista_id, timestamp — mas a tabela atual so tem codigo_in, trafego_id, reportado_por, reportado_em.
-**Por que acontece:** Schema original foi desenhado antes das decisoes detalhadas da Phase 6.
-**Como evitar:** Migration precisa adicionar colunas OU a logica pode buscar esses dados via JOIN com reservas/trafego_fardos. Recomendacao: usar dados do trafego_fardos via FK existente (trafego_id) para evitar duplicacao.
-**Sinais de alerta:** Dados incompletos no registro de fardos nao encontrados.
+### Pitfall 5: Atribuicao em Lote vs Individual
+**What goes wrong:** AssignModal so atribui a um card_key por vez, mas D-23 pede atribuicao em lote de multiplos fardos
+**Why it happens:** AssignModal recebe um unico cardKey, nao uma lista
+**How to avoid:** A barra flutuante deve coletar os card_keys selecionados e ao confirmar fardista no modal, chamar a API de assign para cada card_key. Na pratica, fardos sao agrupados por card (atribuicao e por card, nao por fardo individual), entao multiplas chamadas sequenciais funcionam
+**Warning signs:** Selecionar 5 fardos de cards diferentes e atribuir so atribui o primeiro card
 
-### Pitfall 6: Fardista Sem Fardos Atribuidos Ve Tela Vazia
-**O que da errado:** Fardista novo ou sem atribuicao ve tela completamente vazia sem explicacao.
-**Por que acontece:** D-05 filtra apenas fardos atribuidos ao fardista.
-**Como evitar:** Mostrar empty state claro: "Nenhum fardo atribuido. Aguarde o lider atribuir fardos para voce."
+### Pitfall 6: Liberacao para Prateleira no N/E
+**What goes wrong:** N/E sem alternativo deveria liberar linha "AGUARDAR FARDISTA" na prateleira, mas o status nao muda
+**Why it happens:** Falta o update na tabela progresso para mudar status de 'aguardar_fardista' para 'pendente'
+**How to avoid:** No fluxo N/E sem alternativo, buscar pedidos com esse SKU na progresso com status='aguardar_fardista' e atualizar para 'pendente'
+**Warning signs:** Separador continua vendo "AGUARDAR FARDISTA" mesmo apos N/E
+
+### Pitfall 7: clearSheetRange Range Incorreto
+**What goes wrong:** Apagar colunas erradas da planilha — inclusive as de endereco (A-E)
+**Why it happens:** Range string mal formado (ex: "Estoque!F2:N2" vs "Estoque!F2:2")
+**How to avoid:** Range deve ser `Estoque!F${rowIndex}:N${rowIndex}` onde N e a ultima coluna com dados. Testar com planilha de teste antes
+**Warning signs:** Endereco do fardo desaparece da planilha
 
 ## Code Examples
 
-### Migration SQL para trafego_fardos (D-31)
-```sql
--- [VERIFIED: database.types.ts mostra campos atuais de trafego_fardos]
--- Campos existentes: id, reserva_id, codigo_in, sku, quantidade, endereco, status, fardista_id, created_at
--- Campos novos baseados em D-16 (colunas da planilha):
-
-ALTER TABLE trafego_fardos
-  ADD COLUMN IF NOT EXISTS prioridade TEXT,
-  ADD COLUMN IF NOT EXISTS prateleira TEXT,
-  ADD COLUMN IF NOT EXISTS posicao TEXT,
-  ADD COLUMN IF NOT EXISTS altura TEXT,
-  ADD COLUMN IF NOT EXISTS data_entrada TEXT,
-  ADD COLUMN IF NOT EXISTS hora_entrada TEXT,
-  ADD COLUMN IF NOT EXISTS operador TEXT,
-  ADD COLUMN IF NOT EXISTS transferencia TEXT,
-  ADD COLUMN IF NOT EXISTS data_transferencia TEXT,
-  ADD COLUMN IF NOT EXISTS operador_transferencia TEXT,
-  ADD COLUMN IF NOT EXISTS fardista_nome TEXT,
-  ADD COLUMN IF NOT EXISTS clicked_at TIMESTAMPTZ;
-
--- Publicacao realtime ja existe (20260405_realtime_publication.sql)
--- RLS de leitura ja existe (00001_initial_schema.sql)
--- Adicionar policy de escrita para trafego_fardos (via supabaseAdmin, nao precisa RLS write)
-```
-
-### Busca na Planilha com Match Exato (D-15)
+### Busca por CODIGO UPSELLER na Planilha (match exato com NFD)
 ```typescript
-// [VERIFIED: stock-parser.ts usa mesma normalizacao NFD]
-function findBaleInSheet(
-  rows: string[][],
-  headers: string[],
-  codigoIn: string
-): { rowIndex: number; rowData: string[] } | null {
-  const codigoCol = headers.indexOf('codigo upseller')
-  if (codigoCol === -1) return null
+// Source: stock-parser.ts normalizeHeader + decisao D-15
+function normalizeForMatch(value: string): string {
+  return value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
 
-  const normalizedTarget = codigoIn.trim().toLowerCase()
+async function findRowInSheet(codigoIn: string): Promise<{ rowIndex: number; rowData: string[] } | null> {
+  const rows = await getSheetData('Estoque')
+  if (!rows || rows.length < 2) return null
+
+  const normalizedTarget = normalizeForMatch(codigoIn)
+  const headers = rows[0].map((h: string) => normalizeForMatch(h?.toString() ?? ''))
+  const colH = headers.indexOf('codigo upseller') // coluna H = indice 7
 
   for (let i = 1; i < rows.length; i++) {
-    const cellValue = rows[i][codigoCol]?.toString().trim().toLowerCase()
-    if (cellValue === normalizedTarget) {
-      return { rowIndex: i, rowData: rows[i] }
+    const cellValue = rows[i]?.[colH]?.toString() ?? ''
+    if (normalizeForMatch(cellValue) === normalizedTarget) {
+      return { rowIndex: i + 1, rowData: rows[i] } // +1 para 1-based Sheets API
     }
   }
   return null
 }
 ```
+[VERIFIED: stock-parser.ts normalizeHeader, google-sheets.ts getSheetData]
 
-### Hook useFardosData (novo)
+### Mapeamento de Colunas da Planilha para trafego_fardos
 ```typescript
-// Padrao baseado em use-card-data.ts [VERIFIED: existente]
-export function useFardosData(userId: string, userRole: string) {
-  const [fardos, setFardos] = useState<FardoItem[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const fetchFardos = useCallback(async () => {
-    const supabase = createClient()
-
-    // Buscar reservas ativas com dados de trafego
-    const [reservasRes, atribRes, trafegoRes] = await Promise.all([
-      supabase.from('reservas').select('*').eq('status', 'reservado'),
-      supabase.from('atribuicoes').select('card_key, user_id, users(nome)').eq('tipo', 'fardista'),
-      supabase.from('trafego_fardos').select('*'),
-    ])
-
-    // Montar lista plana de fardos
-    // Filtrar por role: fardista ve so seus, lider/admin ve todos
-    // ...
-  }, [userId, userRole])
-
-  useCardsRealtime(fetchFardos) // Reutilizar hook existente
-  return { fardos, loading }
+// Source: decisao D-16, headers reais documentados no STATE.md
+// Colunas da planilha: A=PRIORIDADE, B=PRATELEIRA, C=POSICAO, D=ALTURA, E=ENDERECO,
+// F=SKU, G=QUANTIDADE, H=CODIGO UPSELLER, I=DATA ENTRADA, J=HORA ENTRADA,
+// K=OPERADOR, L=TRANFERENCIA, M=DATA TRANFERENCIA, N=OPERADOR (transferencia)
+function mapRowToTrafego(row: string[], reservaId: string, fardista: { id: string; nome: string }) {
+  return {
+    prioridade: row[0]?.toString().trim() ?? null,
+    prateleira: row[1]?.toString().trim() ?? null,
+    posicao: row[2]?.toString().trim() ?? null,
+    altura: row[3]?.toString().trim() ?? null,
+    endereco: row[4]?.toString().trim() ?? null,
+    sku: row[5]?.toString().trim() ?? '',
+    quantidade: Number(row[6]) || 0,
+    codigo_in: row[7]?.toString().trim() ?? '',
+    data_entrada: row[8]?.toString().trim() ?? null,
+    hora_entrada: row[9]?.toString().trim() ?? null,
+    operador: row[10]?.toString().trim() ?? null,
+    transferencia: row[11]?.toString().trim() ?? null,
+    data_transferencia: row[12]?.toString().trim() ?? null,
+    operador_transferencia: row[13]?.toString().trim() ?? null,
+    reserva_id: reservaId,
+    fardista_id: fardista.id,
+    fardista_nome: fardista.nome,
+    clicked_at: new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
+    status: 'encontrado',
+  }
 }
 ```
+[VERIFIED: STATE.md headers reais da planilha, decisao D-16 do CONTEXT.md]
 
-### Geracao de PDF para Fardos (D-26/D-27)
+### Geracao de PDF para Fardos
 ```typescript
-// Adaptar padrao de pdf-generator.ts [VERIFIED: existente com jsPDF + autoTable]
+// Source: pdf-generator.ts existente (Phase 5) + decisao D-27
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
-export function generateFardosPdf(fardos: FardoItem[]): void {
+export function generateFardosPdf(
+  fardos: Array<{ codigo_in: string; sku: string; endereco: string; quantidade: number; separador_nome: string | null }>
+): void {
   const doc = new jsPDF()
   doc.setFontSize(14)
   doc.text('Lista de Fardos', 14, 20)
+  doc.setFontSize(10)
+  doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`, 14, 28)
 
   autoTable(doc, {
-    startY: 30,
+    startY: 35,
     head: [['Codigo IN', 'SKU', 'Endereco', 'Qtd', 'Entregar para']],
     body: fardos.map(f => [
       f.codigo_in,
       f.sku,
-      f.endereco ?? '',
+      f.endereco,
       String(f.quantidade),
-      f.separador_nome ?? '---', // D-27: nome do separador do card
+      f.separador_nome ?? '---',
     ]),
-    styles: { fontSize: 10 },
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [0, 0, 0] },
   })
 
   doc.save('fardos.pdf')
 }
 ```
+[VERIFIED: pdf-generator.ts padrao, jsPDF 4.2.1, jspdf-autotable 5.0.7]
 
 ## State of the Art
 
-| Abordagem Antiga | Abordagem Atual | Quando Mudou | Impacto |
-|-------------------|-----------------|--------------|---------|
-| KanbanBoard para fardos | Lista plana dedicada | Phase 6 (D-01) | Substituir fardos-client.tsx completamente |
-| Limpeza planilha na Baixa (Phase 8) | Limpeza no OK (Phase 6) | Decisao CONTEXT.md deferred | Phase 8 fica mais simples |
-| fardos_nao_encontrados sem detalhes | Registro completo com FK para trafego | Phase 6 (D-22) | Rastreabilidade de fardos nao encontrados |
+| Old Approach | Current Approach | When Changed | Impact |
+|--------------|------------------|--------------|--------|
+| KanbanBoard na tela de fardos | Lista plana dedicada | Phase 6 (agora) | Substituir FardosClient completamente |
+| trafego_fardos com poucos campos | trafego_fardos com TODOS os campos da planilha | Phase 6 migration | Precisa SQL migration antes de qualquer insercao |
+| Limpeza de planilha na Baixa (Phase 8) | Limpeza de planilha no OK (Phase 6) | Decisao Phase 6 | Phase 8 nao limpa mais planilha, Phase 6 sim |
 
 ## Assumptions Log
 
 | # | Claim | Section | Risk if Wrong |
 |---|-------|---------|---------------|
-| A1 | API routes de fardos devem estar em `/api/fardos/` (nao `/api/cards/`) | Architecture Patterns | Baixo — convencao de nomenclatura, facil ajustar |
-| A2 | `clearSheetRange` funciona com range `Estoque!F{n}:N{n}` para limpar colunas F-N de uma linha | Code Examples | Medio — se range syntax errada, pode apagar dados errados. Validar com teste manual |
-| A3 | Dados de fardos_nao_encontrados podem ser derivados via JOIN com trafego_fardos ao inves de duplicar colunas | Pitfall 5 | Baixo — FK ja existe, JOIN e seguro |
-| A4 | O campo `reserva_id` em trafego_fardos permite correlacionar fardo com card (via reservas -> pedidos -> card_key) | Architecture Patterns | Medio — se a cadeia de FK quebrar, "entregar para" no PDF fica sem dado |
+| A1 | fardos_nao_encontrados precisa de migration para campos adicionais (sku, quantidade, endereco, fardista_nome, fardista_id) | Common Pitfalls | Insert falharia se campos nao existem; alternativa: usar reserva_id como FK e buscar dados via JOIN |
+| A2 | Tipo de fardo (cascata vs normal) pode ser determinado a partir da tabela de reservas/pedidos | Architecture Patterns | Se nao houver campo que diferencie, logica N/E nao saberia qual regra aplicar |
+| A3 | Atribuicao em lote reutiliza a mesma API /api/cards/assign com multiplas chamadas | Common Pitfalls | Se API for lenta, lote grande pode dar timeout; alternativa: endpoint de bulk assign |
 
 ## Open Questions
 
-1. **Como determinar se fardo e de "importacao normal" vs "cascata" no fluxo N/E?**
-   - O que sabemos: D-20 diz regras diferentes para cada tipo. Pedidos tem campo `tipo` (unitario/kit/combo).
-   - O que nao esta claro: "Cascata" nao e um tipo de pedido — e um tipo de reserva que surge quando separador marca parcial/N/E na prateleira. Na Phase 6, fardos N/E deveriam SEMPRE usar a regra de 20% (importacao normal) porque nao vem de cascata. Cascata so surge na Phase 7.
-   - Recomendacao: Implementar apenas a busca com 20% margem (normal) na Phase 6. Quando Phase 7 criar reservas de cascata, adicionar flag `is_cascata` na reserva.
+1. **Como determinar se um fardo e de cascata ou importacao normal?**
+   - O que sabemos: D-20 distingue entre "fardo de IMPORTACAO NORMAL" (usa subset sum 20%) e "fardo de CASCATA" (aceita qualquer fardo)
+   - O que nao esta claro: Nao ha campo explicito na tabela reservas que indique se e cascata. A cascata e um conceito da Phase 7 (PRAT-05)
+   - Recomendacao: Adicionar campo `origem` ('importacao' | 'cascata') na tabela reservas durante a migration. Ou inferir pela ausencia de importacao_numero
 
-2. **Como vincular fardo ao separador do card para o PDF ("para quem entregar")?**
-   - O que sabemos: Reservas tem `sku` e `importacao_numero`. Pedidos tem `card_key`. Atribuicoes tem `card_key` + `user_id`.
-   - Chain: reserva.sku + reserva.importacao_numero -> pedidos.card_key -> atribuicoes.user_id -> users.nome
-   - Recomendacao: Fazer JOIN no hook de dados para popular campo `separador_nome` em cada fardo.
+2. **Tabela fardos_nao_encontrados precisa de quais campos adicionais?**
+   - O que sabemos: Schema atual tem codigo_in, trafego_id, reportado_por, reportado_em. D-22 pede: codigo_upseller, sku, quantidade, endereco, fardista_nome, fardista_id, timestamp
+   - O que nao esta claro: Se devemos alterar a tabela existente ou se os campos existentes cobrem via JOINs (trafego_id pode ser NULL se fardo nao foi para trafego)
+   - Recomendacao: Alterar tabela na migration para incluir sku, quantidade, endereco, fardista_nome, fardista_id. Manter trafego_id como nullable
 
-3. **Fardos atribuidos vs nao atribuidos — como funciona a atribuicao?**
-   - O que sabemos: D-23/D-24 descrevem atribuicao em lote via checkbox + AssignModal. Atribuicoes usam `card_key` + tipo='fardista'.
-   - O que nao esta claro: Fardos sao atribuidos individualmente ou por card_key? CONTEXT.md diz "atribuir fardistas a cards de fardos" (FARD-05) — portanto atribuicao e por card_key, nao por fardo individual. Mas a lista e plana sem agrupamento por card.
-   - Recomendacao: Selecao por checkbox seleciona fardos individuais (reservas), mas a atribuicao grupa pelo card_key. Ao atribuir fardista, todos os fardos do mesmo card_key ficam atribuidos.
+3. **"Para quem entregar" no PDF — como resolver separador do card?**
+   - O que sabemos: D-27 pede o nome do separador do card que usa aquele fardo
+   - O que nao esta claro: Um fardo (via reserva) pode atender multiplos cards. Precisamos de JOIN reservas -> pedidos -> card_key -> atribuicoes (tipo='separador')
+   - Recomendacao: Query JOIN na hora de gerar o PDF. Se fardo atende multiplos cards, listar todos os separadores. Se nao tem separador atribuido, mostrar "---"
 
 ## Validation Architecture
 
 ### Test Framework
 | Property | Value |
 |----------|-------|
-| Framework | vitest 4.1.2 |
+| Framework | Vitest 4.1.2 |
 | Config file | vitest.config.ts |
-| Quick run command | `npm run test` |
-| Full suite command | `npm run test` |
+| Quick run command | `npx vitest run --reporter=verbose` |
+| Full suite command | `npx vitest run` |
 
 ### Phase Requirements -> Test Map
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| FARD-01 | Lista de fardos monta dados corretos de reservas | unit | `npx vitest run src/features/fardos/utils/__tests__/fardo-list.test.ts -x` | Wave 0 |
-| FARD-02 | Fluxo OK busca planilha, insere trafego, limpa colunas | unit | `npx vitest run src/features/fardos/utils/__tests__/fardo-ok.test.ts -x` | Wave 0 |
-| FARD-03 | Fluxo N/E busca alternativo ou libera prateleira | unit | `npx vitest run src/features/fardos/utils/__tests__/fardo-ne.test.ts -x` | Wave 0 |
-| FARD-04 | Realtime atualiza lista | manual-only | Requer Supabase rodando — verificar via UI | N/A |
-| FARD-05 | Atribuicao em lote funciona | unit | `npx vitest run src/features/fardos/utils/__tests__/fardo-assign.test.ts -x` | Wave 0 |
-| FARD-06 | PDF gera com campos corretos | unit | `npx vitest run src/features/fardos/__tests__/fardo-pdf.test.ts -x` | Wave 0 |
+| FARD-01 | Lista de fardos exibe dados corretos | unit | `npx vitest run src/features/fardos/hooks/__tests__/use-fardos-data.test.ts -x` | Wave 0 |
+| FARD-02 | Fluxo OK: busca planilha + insert trafego + clear | unit | `npx vitest run src/features/fardos/utils/__tests__/ok-flow.test.ts -x` | Wave 0 |
+| FARD-03 | Fluxo N/E: busca alternativo ou libera prateleira | unit | `npx vitest run src/features/fardos/utils/__tests__/ne-flow.test.ts -x` | Wave 0 |
+| FARD-04 | Realtime via subscription | manual-only | Verificar useCardsRealtime ja cobre tabelas | N/A |
+| FARD-05 | Atribuicao de fardistas | unit | Reutiliza teste existente da Phase 5 | Existente |
+| FARD-06 | PDF com dados corretos | unit | `npx vitest run src/features/fardos/components/__tests__/fardos-pdf.test.ts -x` | Wave 0 |
 
 ### Sampling Rate
-- **Per task commit:** `npm run test`
-- **Per wave merge:** `npm run test`
+- **Per task commit:** `npx vitest run --reporter=verbose`
+- **Per wave merge:** `npx vitest run`
 - **Phase gate:** Full suite green antes de `/gsd-verify-work`
 
 ### Wave 0 Gaps
-- [ ] `src/features/fardos/utils/__tests__/fardo-ok.test.ts` — logica do fluxo OK
-- [ ] `src/features/fardos/utils/__tests__/fardo-ne.test.ts` — logica do fluxo N/E
-- [ ] `src/features/fardos/__tests__/fardo-pdf.test.ts` — geracao de PDF (mock jsPDF como Phase 5)
+- [ ] `src/features/fardos/utils/__tests__/ok-flow.test.ts` — cobre FARD-02 (mock Google Sheets + Supabase)
+- [ ] `src/features/fardos/utils/__tests__/ne-flow.test.ts` — cobre FARD-03 (mock alternativo/sem alternativo)
+- [ ] `src/features/fardos/components/__tests__/fardos-pdf.test.ts` — cobre FARD-06
 
 ## Security Domain
 
@@ -413,48 +438,60 @@ export function generateFardosPdf(fardos: FardoItem[]): void {
 
 | ASVS Category | Applies | Standard Control |
 |---------------|---------|-----------------|
-| V2 Authentication | sim | getUser() + DB lookup de role (padrao Phase 2) |
-| V3 Session Management | sim | JWT Supabase (padrao existente) |
-| V4 Access Control | sim | Role check: fardista so ve seus fardos, lider/admin ve todos; API routes validam role |
-| V5 Input Validation | sim | Validar codigo_in antes de buscar na planilha (trim, sanitize) |
-| V6 Cryptography | nao | N/A nesta phase |
+| V2 Authentication | sim | createClient() -> getUser() em cada route handler [VERIFIED: api/cards/progress/route.ts] |
+| V3 Session Management | sim | JWT Supabase via @supabase/ssr [VERIFIED: padrao Phase 2] |
+| V4 Access Control | sim | Role check via admin DB (lider/admin para atribuir e sync, fardista para OK/N/E) [VERIFIED: api/cards/assign/route.ts] |
+| V5 Input Validation | sim | Validar codigo_in, reserva_id, user_id no body das API routes |
+| V6 Cryptography | nao | Sem operacoes criptograficas nesta fase |
 
 ### Known Threat Patterns
 
 | Pattern | STRIDE | Standard Mitigation |
 |---------|--------|---------------------|
-| Fardista tenta OK em fardo de outro | Elevation | API verifica se fardo esta atribuido ao usuario (ou se admin/lider) |
-| Manipulacao de codigo_in no request | Tampering | Validar codigo_in contra reservas existentes no Supabase antes de tocar planilha |
-| Escrita nao autorizada na planilha | Tampering | API routes usam supabaseAdmin (service role), client nunca acessa planilha diretamente |
-| Clique duplo no OK gerando duplicata | Tampering | Verificar se trafego_fardos ja tem registro com este codigo_in + status='encontrado' |
+| Fardista marca OK em fardo de outro | Elevation | Verificar que fardo esta atribuido ao usuario logado (ou que usuario e lider/admin) |
+| Manipulacao de reserva_id no body | Tampering | Validar que reserva_id existe e pertence ao fardista logado |
+| Clique duplo envia 2x para trafego | Tampering | Verificar se codigo_in ja existe em trafego_fardos antes de inserir + spinner no frontend |
+| IDOR na lista de fardos | Information Disclosure | Fardista so ve fardos atribuidos a ele (filtro por user_id no backend) |
+
+## Project Constraints (from CLAUDE.md)
+
+- **Tech stack**: Next.js 14 + Supabase + Vercel + Google Sheets API + Tailwind + shadcn/ui + SheetJS — nao negociavel
+- **Realtime**: Obrigatorio via Supabase subscriptions — polling proibido
+- **Estoque externo**: Planilha Google Sheets nunca migra para Supabase
+- **Margem fardos**: Sempre 20% percentual
+- **Comunicacao**: Sempre em portugues brasileiro
+- **Auth pattern**: getUser() + DB fallback para role (nunca verificar JWT manualmente)
+- **API route pattern**: createClient() -> getUser() -> role check via admin DB -> supabaseAdmin para escrita
+- **Array iteration**: Array.from(Map) para iterar Maps (tsconfig compat)
+- **NFD normalization**: Obrigatorio para headers da planilha externa
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- `src/features/fardos/utils/stock-parser.ts` — normalizacao NFD, fetchStock, cache
-- `src/features/fardos/utils/subset-sum.ts` — findOptimalCombination com margem 20%
-- `src/features/fardos/utils/reservation-engine.ts` — executeReservation com forceRefresh
+- `src/features/fardos/utils/stock-parser.ts` — fetchStock, normalizeHeader, withRetry
+- `src/features/fardos/utils/subset-sum.ts` — findOptimalCombination
+- `src/features/fardos/utils/reservation-engine.ts` — executeReservation
 - `src/lib/google-sheets.ts` — getSheetData, updateSheetData, clearSheetRange
-- `src/features/cards/components/assign-modal.tsx` — AssignModal reutilizavel
-- `src/features/cards/hooks/use-cards-realtime.ts` — hook de realtime
-- `src/features/cards/lib/pdf-generator.ts` — padrao jsPDF + autoTable
-- `supabase/migrations/00001_initial_schema.sql` — schema atual completo
-- `supabase/migrations/00003_alter_reservas_schema.sql` — reservas por SKU
-- `supabase/migrations/20260405_realtime_publication.sql` — publicacao realtime
-- `src/types/database.types.ts` — tipos gerados do Supabase
-- `package.json` — todas as dependencias verificadas
+- `src/features/cards/components/assign-modal.tsx` — AssignModal com filterRole
+- `src/features/cards/hooks/use-cards-realtime.ts` — useCardsRealtime
+- `src/features/cards/lib/pdf-generator.ts` — generateChecklist (referencia para PDF)
+- `src/types/database.types.ts` — schema completo do banco
+- `src/types/index.ts` — StatusTrafego, StatusProgresso
+- `package.json` — versoes de todas as dependencias
 
 ### Secondary (MEDIUM confidence)
-- `.planning/phases/06-lista-de-fardos/06-CONTEXT.md` — 31 decisoes detalhadas do usuario
+- `.planning/phases/06-lista-de-fardos/06-CONTEXT.md` — decisoes D-01 a D-31
+- `.planning/STATE.md` — headers reais da planilha de estoque, decisoes acumuladas
+
+### Tertiary (LOW confidence)
+- Nenhum claim baseado apenas em WebSearch
 
 ## Metadata
 
 **Confidence breakdown:**
-- Standard stack: HIGH — todas as libs ja estao instaladas e verificadas no package.json
-- Architecture: HIGH — patterns existentes (hooks, API routes, realtime) bem documentados no codigo
-- Pitfalls: HIGH — baseados em analise direta do codigo existente e schema do banco
-- Fluxo OK transacional: MEDIUM — dupla verificacao + clearSheetRange precisa validacao manual do range syntax
-- Fluxo N/E cascata: MEDIUM — pergunta aberta sobre quando cascata se aplica (provavelmente so Phase 7)
+- Standard stack: HIGH — todo instalado e verificado no package.json
+- Architecture: HIGH — padrao de API routes e componentes consolidado em 5 fases anteriores
+- Pitfalls: HIGH — baseado em analise direta do codigo existente e decisoes do CONTEXT.md
 
 **Research date:** 2026-04-05
-**Valid until:** 2026-05-05 (stack estavel, nenhuma dependencia fast-moving)
+**Valid until:** 2026-05-05 (stack estavel, sem mudancas esperadas)
