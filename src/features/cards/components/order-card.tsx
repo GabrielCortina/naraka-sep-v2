@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { User } from 'lucide-react'
+import { User, Trash2 } from 'lucide-react'
 import type { CardData } from '../types'
 import { TYPE_ABBREV } from '../lib/deadline-config'
 import { formatCountdown } from '../lib/card-utils'
@@ -15,6 +15,8 @@ interface OrderCardProps {
   card: CardData
   onOpenModal: (cardKey: string) => void
   onAssign: (cardKey: string) => void
+  onDelete?: (cardKey: string) => void
+  userRole?: string
 }
 
 const urgencyBorderMap: Record<string, string> = {
@@ -33,7 +35,8 @@ function getCountdown(grupoEnvio: string): string | null {
   return formatCountdown(deadline.getTime() - now.getTime())
 }
 
-export function OrderCard({ card, onOpenModal, onAssign }: OrderCardProps) {
+export function OrderCard({ card, onOpenModal, onAssign, onDelete, userRole }: OrderCardProps) {
+  const canDelete = userRole === 'admin' || userRole === 'lider'
   const percent =
     card.total_pecas === 0
       ? 0
@@ -87,12 +90,26 @@ export function OrderCard({ card, onOpenModal, onAssign }: OrderCardProps) {
           <ProgressBar percent={percent} urgency={card.urgency} />
         </div>
 
-        {/* Linha 5: percentual + peças */}
-        <div className="flex justify-between mt-1">
+        {/* Linha 5: percentual + peças + lixeira */}
+        <div className="flex items-center justify-between mt-1">
           <span className="text-xs font-bold">{percent}%</span>
-          <span className="text-xs text-muted-foreground">
-            {card.pecas_separadas}/{card.total_pecas} peças
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">
+              {card.pecas_separadas}/{card.total_pecas} peças
+            </span>
+            {canDelete && onDelete && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete(card.card_key)
+                }}
+                className="text-muted-foreground/40 hover:text-red-500 transition-colors p-0.5 rounded"
+                aria-label="Excluir card"
+              >
+                <Trash2 size={12} />
+              </button>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
