@@ -50,14 +50,9 @@ export function OrderCard({ card, onOpenModal, onAssign }: OrderCardProps) {
       onClick={() => onOpenModal(card.card_key)}
     >
       <CardContent className="p-3">
-        {/* Linha 1: marketplace + tipo + importacao + spacer + atribuir */}
-        <div className="flex items-center gap-1.5 justify-between">
-          <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
-            <MarketplaceBadge grupoEnvio={card.grupo_envio} />
-            <span className="text-[11px] font-bold text-muted-foreground whitespace-nowrap truncate">
-              {TYPE_ABBREV[card.tipo] || card.tipo.toUpperCase()} #{card.importacao_numero}
-            </span>
-          </div>
+        {/* Linha 1: badge método de envio + botão atribuir */}
+        <div className="flex items-center justify-between">
+          <MarketplaceBadge grupoEnvio={card.grupo_envio} />
           <button
             onClick={(e) => {
               e.stopPropagation()
@@ -68,30 +63,35 @@ export function OrderCard({ card, onOpenModal, onAssign }: OrderCardProps) {
               card.atribuido_a ? 'text-blue-600' : 'text-muted-foreground',
             )}
           >
-            <User size={16} />
+            <User size={14} />
             {card.atribuido_a && (
-              <span className="text-[11px] font-bold max-w-[50px] truncate">
+              <span className="text-[11px] font-bold max-w-[60px] truncate">
                 {card.atribuido_a.nome}
               </span>
             )}
           </button>
         </div>
 
-        {/* Linha 2: urgency badge */}
-        <div className="mt-1">
+        {/* Linha 2: tipo + número importação */}
+        <p className="text-xs text-muted-foreground mt-1">
+          {TYPE_ABBREV[card.tipo] || card.tipo.toUpperCase()} #{card.importacao_numero}
+        </p>
+
+        {/* Linha 3: urgência / contagem regressiva */}
+        <div className="mt-1.5">
           <UrgencyBadge urgency={card.urgency} countdown={countdown} />
         </div>
 
-        {/* Linha 3: progress bar */}
-        <div className="mt-1">
+        {/* Linha 4: barra de progresso */}
+        <div className="mt-1.5">
           <ProgressBar percent={percent} urgency={card.urgency} />
         </div>
 
-        {/* Linha 4: percent + pecas */}
+        {/* Linha 5: percentual + peças */}
         <div className="flex justify-between mt-1">
           <span className="text-xs font-bold">{percent}%</span>
           <span className="text-xs text-muted-foreground">
-            {card.pecas_separadas}/{card.total_pecas} pecas
+            {card.pecas_separadas}/{card.total_pecas} peças
           </span>
         </div>
       </CardContent>
