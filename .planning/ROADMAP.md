@@ -68,11 +68,14 @@ Plans:
   3. Pedidos com Numero de Pedido ja existente no banco sao ignorados na nova importacao; linhas com mesmo numero dentro da planilha sao agrupadas
   4. Cada importacao recebe numero sequencial e metodo de envio e classificado nos 6 grupos corretos
   5. Upload em dia diferente da ultima importacao limpa o banco antes de processar
-**Plans**: TBD
+**Plans**: 4 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md — Instalar dependencias, configurar vitest e implementar logica pura (parse, classify, envio-groups) com testes
+- [ ] 03-02-PLAN.md — Route Handlers POST /api/upload e DELETE /api/upload/undo com classificacao, deduplicacao e virada de dia
+- [ ] 03-03-PLAN.md — Componentes UI (DropZone, ImportPreview, ImportList) e hook useUpload
+- [ ] 03-04-PLAN.md — Pagina /upload conectando todos os componentes + checkpoint de verificacao
 
 ### Phase 4: Estoque e Reserva de Fardos
 **Goal**: Sistema le estoque externo do Google Sheets e reserva fardos automaticamente usando subset sum com margem de 20%
@@ -186,7 +189,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 |-------|----------------|--------|-----------|
 | 1. Infraestrutura | 3/3 | Complete   | 2026-04-04 |
 | 2. Autenticacao | 0/3 | Not started | - |
-| 3. Upload e Processamento | 0/? | Not started | - |
+| 3. Upload e Processamento | 0/4 | Not started | - |
 | 4. Estoque e Reserva de Fardos | 0/? | Not started | - |
 | 5. Cards e UI Foundation | 0/? | Not started | - |
 | 6. Lista de Fardos | 0/? | Not started | - |
