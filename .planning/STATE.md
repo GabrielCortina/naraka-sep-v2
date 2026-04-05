@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-04-PLAN.md
-last_updated: "2026-04-05T18:09:47.132Z"
+stopped_at: Completed 05-06-PLAN.md
+last_updated: "2026-04-05T18:13:04.334Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 10
   completed_phases: 4
   total_plans: 19
-  completed_plans: 17
-  percent: 89
+  completed_plans: 18
+  percent: 95
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 05 (cards-e-ui-foundation) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -68,6 +68,7 @@ Progress: [██████████] 100%
 | Phase 05-cards-e-ui-foundation P02 | 2min | 2 tasks | 10 files |
 | Phase 05 P03 | 2min | 2 tasks | 3 files |
 | Phase 05 P04 | 3min | 2 tasks | 5 files |
+| Phase 05 P06 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,8 @@ Recent decisions affecting current work:
 - [Phase 05]: CompletedSection rendered outside desktop/mobile branch so it appears in both layouts
 - [Phase 05]: Function constructor mock for jsPDF in vitest (vi.fn with this binding)
 - [Phase 05]: Explicit vitest imports in test files for tsc compatibility (project pattern)
+- [Phase 05]: Select-then-insert/update pattern for progresso (no UNIQUE on pedido_id) instead of upsert
+- [Phase 05]: API route auth pattern: createClient() -> getUser() -> role check via admin DB lookup, write via supabaseAdmin
 
 ### Pending Todos
 
@@ -120,6 +123,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T18:09:47.130Z
-Stopped at: Completed 05-04-PLAN.md
+Last session: 2026-04-05T18:13:04.332Z
+Stopped at: Completed 05-06-PLAN.md
 Resume file: None

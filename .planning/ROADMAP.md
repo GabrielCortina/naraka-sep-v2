@@ -112,7 +112,7 @@ Plans:
 - [x] 05-03-PLAN.md — KanbanBoard, KanbanColumn e CompletedSection com layout responsivo desktop/mobile
 - [x] 05-04-PLAN.md — Modais (ItemModal, NumpadPopup, AssignModal) e PDF generator
 - [ ] 05-05-PLAN.md — Hooks de dados (realtime, countdown, card-data), migration SQL e wiring nas paginas /prateleira e /fardos
-- [ ] 05-06-PLAN.md — RLS write policies e API route handlers para progresso e atribuicao
+- [x] 05-06-PLAN.md — RLS write policies e API route handlers para progresso e atribuicao
 
 ### Phase 6: Lista de Fardos
 **Goal**: Fardista pode ver, trabalhar e imprimir sua lista de fardos com acoes OK e N/E em tempo real
