@@ -176,10 +176,15 @@ describe('reservation-engine', () => {
   })
 
   it('Test 5: cada fardo fisico reservado uma vez - codigos adicionados ao set', async () => {
-    // Dois SKUs compartilham o mesmo fardo IN-001
+    // IN-001 pertence ao SKU ABC, IN-002 pertence ao SKU DEF
+    // IN-003 tambem pertence ao SKU DEF
+    // ABC reserva IN-001, DEF deve ter IN-002 e IN-003 disponiveis (IN-001 nao e SKU DEF)
+    // Cenario real de unicidade: ABC e DEF compartilham IN-SHARED
     const stock: StockItem[] = [
       { codigo_in: 'IN-001', sku: 'ABC', quantidade: 500, endereco: 'A1' },
-      { codigo_in: 'IN-001', sku: 'DEF', quantidade: 500, endereco: 'A1' },
+      { codigo_in: 'IN-SHARED', sku: 'ABC', quantidade: 200, endereco: 'A2' },
+      { codigo_in: 'IN-SHARED', sku: 'DEF', quantidade: 200, endereco: 'A2' },
+      { codigo_in: 'IN-002', sku: 'DEF', quantidade: 300, endereco: 'B1' },
     ]
     mockedFetchStock.mockResolvedValue(stock)
 
@@ -195,27 +200,32 @@ describe('reservation-engine', () => {
     mockedFindOptimal.mockImplementation((fardos) => {
       callCount++
       if (callCount === 1) {
-        // Primeiro SKU: IN-001 disponivel
+        // ABC: tem IN-001 e IN-SHARED disponiveis, reserva IN-SHARED
+        const shared = fardos.find((f: StockItem) => f.codigo_in === 'IN-SHARED')!
         return {
-          fardos: [fardos[0]],
-          soma: 500,
+          fardos: [shared],
+          soma: 200,
           cobertura: 'total' as const,
         }
       }
-      // Segundo SKU: IN-001 ja reservado no primeiro, sem fardos disponiveis
-      // O engine deve ter filtrado IN-001 do segundo SKU
+      // DEF: IN-SHARED deve ter sido excluido (ja reservado por ABC)
+      // Deve ter apenas IN-002
       return {
-        fardos: fardos.length > 0 ? [fardos[0]] : [],
-        soma: fardos.length > 0 ? fardos[0].quantidade : 0,
-        cobertura: fardos.length > 0 ? 'total' as const : 'nenhuma' as const,
+        fardos: fardos,
+        soma: fardos.reduce((s: number, f: StockItem) => s + f.quantidade, 0),
+        cobertura: 'total' as const,
       }
     })
 
     const result = await executeReservation(1)
 
-    // Verifica que na segunda chamada o fardo IN-001 foi excluido
-    // (o engine adiciona ao set apos primeira reserva)
+    // Verifica que findOptimalCombination foi chamado 2x
     expect(mockedFindOptimal).toHaveBeenCalledTimes(2)
+    // Na segunda chamada, IN-SHARED foi excluido, so IN-002 disponivel
+    const secondCallFardos = mockedFindOptimal.mock.calls[1][0] as StockItem[]
+    expect(secondCallFardos).toHaveLength(1)
+    expect(secondCallFardos[0].codigo_in).toBe('IN-002')
+    expect(result.skus_fardo).toBe(2)
   })
 
   it('Test 6: nenhum pedido retorna resultado zerado', async () => {
