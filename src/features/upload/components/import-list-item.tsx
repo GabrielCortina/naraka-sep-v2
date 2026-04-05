@@ -7,15 +7,13 @@ import { Clock, Trash2 } from 'lucide-react'
 import type { ImportRecord } from '@/features/upload/types'
 
 function formatHorario(iso: string): string {
-  try {
-    return new Date(iso).toLocaleTimeString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'America/Sao_Paulo',
-    })
-  } catch {
-    return iso
-  }
+  const date = new Date(iso)
+  if (isNaN(date.getTime())) return iso
+  return date.toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'America/Sao_Paulo',
+  })
 }
 
 const TIPO_LABELS: Record<string, string> = {
