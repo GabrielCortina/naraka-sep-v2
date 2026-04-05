@@ -78,7 +78,7 @@ export function findOptimalCombination(
 
   // 4b. Menor soma no range [demanda, maxTarget]
   let melhorPorCima: { soma: number; entry: DpEntry } | null = null
-  for (const [soma, entry] of dp) {
+  for (const [soma, entry] of Array.from(dp)) {
     if (soma >= demanda && soma <= maxTarget) {
       if (
         !melhorPorCima ||
@@ -100,7 +100,7 @@ export function findOptimalCombination(
 
   // 4c. Maior soma abaixo da demanda (parcial)
   let melhorAbaixo: { soma: number; entry: DpEntry } | null = null
-  for (const [soma, entry] of dp) {
+  for (const [soma, entry] of Array.from(dp)) {
     if (soma > 0 && soma < demanda) {
       if (
         !melhorAbaixo ||

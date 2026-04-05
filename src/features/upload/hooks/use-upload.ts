@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { toast } from 'sonner'
 import { parseXlsx, type ParseResult } from '@/features/upload/lib/parse-xlsx'
-import type { ImportSummary, ImportRecord } from '@/features/upload/types'
+import type { ImportSummary, ImportRecord, EstoqueSummary } from '@/features/upload/types'
 
 export type UploadStep = 'idle' | 'file-selected' | 'parsing' | 'preview' | 'confirming' | 'success'
 
@@ -12,6 +12,7 @@ interface UploadApiResponse {
   dayReset: boolean
   importacao_numero: number
   summary: ImportSummary
+  estoque?: EstoqueSummary
   error?: string
 }
 
@@ -31,6 +32,7 @@ export function useUpload(initialImports: ImportRecord[] = []) {
   const [dayReset, setDayReset] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [imports, setImports] = useState<ImportRecord[]>(initialImports)
+  const [estoque, setEstoque] = useState<EstoqueSummary | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const isXlsx = (fileName: string): boolean => {
@@ -126,6 +128,7 @@ export function useUpload(initialImports: ImportRecord[] = []) {
 
       setSummary(data.summary)
       setImportacaoNumero(data.importacao_numero)
+      setEstoque(data.estoque ?? null)
 
       // Adicionar ao historico de importacoes
       if (data.summary.total_validos > 0) {
@@ -143,8 +146,11 @@ export function useUpload(initialImports: ImportRecord[] = []) {
         setImports(prev => [newRecord, ...prev])
       }
 
+      const estoqueInfo = data.estoque && !data.estoque.indisponivel
+        ? ` — ${data.estoque.fardos_reservados} fardos reservados`
+        : ''
       toast.success(
-        `Importacao #${data.importacao_numero} concluida — ${data.summary.total_validos} pedidos importados`
+        `Importacao #${data.importacao_numero} concluida — ${data.summary.total_validos} pedidos importados${estoqueInfo}`
       )
 
       setStep('success')
@@ -156,6 +162,7 @@ export function useUpload(initialImports: ImportRecord[] = []) {
         setParseResult(null)
         setSummary(null)
         setImportacaoNumero(null)
+        setEstoque(null)
         setDayReset(false)
       }, 3000)
     } catch (err) {
@@ -203,6 +210,7 @@ export function useUpload(initialImports: ImportRecord[] = []) {
     setParseResult(null)
     setSummary(null)
     setImportacaoNumero(null)
+    setEstoque(null)
     setError(null)
     setDayReset(false)
     // Limpar o input para permitir re-selecionar o mesmo arquivo
@@ -217,6 +225,7 @@ export function useUpload(initialImports: ImportRecord[] = []) {
     parseResult,
     summary,
     importacao_numero,
+    estoque,
     dayReset,
     error,
     imports,

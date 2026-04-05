@@ -1,9 +1,8 @@
-import { NextRequest } from 'next/server'
 import { createClient as createAuthClient } from '@/lib/supabase/server'
 import { executeReservation } from '@/features/fardos/utils/reservation-engine'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   // 1. Auth guard (mesmo padrao do upload route -- T-04-07)
   const authSupabase = await createAuthClient()
   const { data: { user }, error: authError } = await authSupabase.auth.getUser()

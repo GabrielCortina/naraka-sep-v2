@@ -3,6 +3,7 @@ import { createClient as createAuthClient } from '@/lib/supabase/server'
 import { createClient } from '@supabase/supabase-js'
 import { classifyOrders, generateCardKey } from '@/features/upload/lib/classify'
 import { classifyEnvio } from '@/features/upload/lib/envio-groups'
+import { executeReservation } from '@/features/fardos/utils/reservation-engine'
 import type { ParsedRow } from '@/features/upload/lib/parse-xlsx'
 import type { TablesInsert } from '@/types/database.types'
 import type { TipoPedido } from '@/types'
@@ -190,7 +191,30 @@ export async function POST(request: NextRequest) {
     .from('config')
     .upsert({ chave: 'ultimo_importacao_numero', valor: String(importacao_numero) }, { onConflict: 'chave' })
 
-  // 12. Retornar resultado
+  // 12. Reserva automatica de fardos (D-01)
+  let estoque: { skus_fardo: number; skus_prateleira: number; fardos_reservados: number; parciais: string[]; indisponivel: boolean } | undefined
+
+  try {
+    const reservaResult = await executeReservation(importacao_numero)
+    estoque = {
+      skus_fardo: reservaResult.skus_fardo,
+      skus_prateleira: reservaResult.skus_prateleira,
+      fardos_reservados: reservaResult.fardos_reservados,
+      parciais: reservaResult.parciais,
+      indisponivel: reservaResult.indisponivel,
+    }
+  } catch (error) {
+    console.error('[upload] Erro na reserva automatica:', error)
+    estoque = {
+      skus_fardo: 0,
+      skus_prateleira: 0,
+      fardos_reservados: 0,
+      parciais: [],
+      indisponivel: true,
+    }
+  }
+
+  // 13. Retornar resultado
   return Response.json({
     success: true,
     dayReset,
@@ -203,5 +227,6 @@ export async function POST(request: NextRequest) {
       por_tipo: porTipo,
       por_grupo: porGrupo,
     },
+    estoque,
   })
 }

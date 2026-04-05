@@ -72,7 +72,7 @@ export async function executeReservation(
   let fardos_reservados = 0
   const parciais: string[] = []
 
-  for (const [sku, demanda] of demandaPorSku) {
+  for (const [sku, demanda] of Array.from(demandaPorSku)) {
     // Filtrar fardos do estoque que tem esse SKU E nao estao ja reservados
     const fardosDisponiveis = stock.filter(
       item => item.sku === sku && !fardosJaReservados.has(item.codigo_in)

@@ -6,12 +6,13 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Loader2 } from 'lucide-react'
 import type { ParseResult } from '@/features/upload/lib/parse-xlsx'
-import type { ImportSummary } from '@/features/upload/types'
+import type { ImportSummary, EstoqueSummary } from '@/features/upload/types'
 
 interface ImportPreviewProps {
   parseResult: ParseResult
   summary: ImportSummary | null
   importacao_numero: number | null
+  estoque: EstoqueSummary | null
   step: string
   onConfirm: () => void
   onReset: () => void
@@ -27,6 +28,7 @@ export function ImportPreview({
   parseResult,
   summary,
   importacao_numero,
+  estoque,
   step,
   onConfirm,
   onReset,
@@ -139,6 +141,44 @@ export function ImportPreview({
                     </Badge>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Secao de estoque (D-14, D-15, D-16) */}
+            {estoque && (
+              <div className="space-y-2 pt-2 border-t">
+                <p className="text-sm font-medium text-muted-foreground">Estoque</p>
+                {estoque.indisponivel ? (
+                  <Alert>
+                    <AlertTitle>Estoque indisponivel</AlertTitle>
+                    <AlertDescription>
+                      Reserva pendente. Use &quot;Atualizar Reservas&quot; na tela de fardos quando o estoque estiver disponivel.
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <p className="text-xl font-semibold">{estoque.skus_fardo}</p>
+                        <p className="text-xs text-muted-foreground">SKUs com fardo</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <p className="text-xl font-semibold">{estoque.skus_prateleira}</p>
+                        <p className="text-xs text-muted-foreground">SKUs prateleira</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <p className="text-xl font-semibold">{estoque.fardos_reservados}</p>
+                        <p className="text-xs text-muted-foreground">Fardos reservados</p>
+                      </div>
+                    </div>
+                    {estoque.parciais.length > 0 && (
+                      <div className="flex items-center gap-2 text-sm text-amber-600">
+                        <span className="text-base">&#x26A0;</span>
+                        <span>{estoque.parciais.length} SKU{estoque.parciais.length > 1 ? 's' : ''} com cobertura parcial</span>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             )}
           </>

@@ -243,7 +243,7 @@ export type Database = {
           created_at: string
           endereco: string | null
           id: string
-          pedido_id: string
+          importacao_numero: number | null
           quantidade: number
           sku: string
           status: string
@@ -253,7 +253,7 @@ export type Database = {
           created_at?: string
           endereco?: string | null
           id?: string
-          pedido_id: string
+          importacao_numero?: number | null
           quantidade: number
           sku: string
           status?: string
@@ -263,20 +263,12 @@ export type Database = {
           created_at?: string
           endereco?: string | null
           id?: string
-          pedido_id?: string
+          importacao_numero?: number | null
           quantidade?: number
           sku?: string
           status?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "reservas_pedido_id_fkey"
-            columns: ["pedido_id"]
-            isOneToOne: false
-            referencedRelation: "pedidos"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       trafego_fardos: {
         Row: {
@@ -361,7 +353,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      custom_access_token_hook: { Args: { event: Json }; Returns: Json }
     }
     Enums: {
       [_ in never]: never

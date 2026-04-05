@@ -18,6 +18,7 @@ export function UploadClient({ initialImports }: UploadClientProps) {
     parseResult,
     summary,
     importacao_numero,
+    estoque,
     error,
     imports,
     inputRef,
@@ -56,6 +57,7 @@ export function UploadClient({ initialImports }: UploadClientProps) {
           parseResult={parseResult}
           summary={summary}
           importacao_numero={importacao_numero}
+          estoque={estoque}
           step={step}
           onConfirm={handleConfirm}
           onReset={handleReset}

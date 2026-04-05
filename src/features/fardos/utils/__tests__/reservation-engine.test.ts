@@ -12,9 +12,6 @@ vi.mock('../subset-sum', () => ({
 
 // Mock supabase admin
 const mockInsert = vi.fn()
-const mockEqStatus = vi.fn()
-const mockEqImportacao = vi.fn()
-const mockSelect = vi.fn()
 const mockFrom = vi.fn()
 
 vi.mock('@/lib/supabase/admin', () => ({
@@ -24,7 +21,7 @@ vi.mock('@/lib/supabase/admin', () => ({
 import { executeReservation } from '../reservation-engine'
 import { fetchStock } from '../stock-parser'
 import { findOptimalCombination } from '../subset-sum'
-import type { StockItem, SubsetResult } from '../../types'
+import type { StockItem } from '../../types'
 
 const mockedFetchStock = vi.mocked(fetchStock)
 const mockedFindOptimal = vi.mocked(findOptimalCombination)

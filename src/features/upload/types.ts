@@ -16,3 +16,12 @@ export interface ImportRecord {
   por_tipo: Record<TipoPedido, number>
   por_grupo: Record<string, number>
 }
+
+/** Resumo de estoque retornado pelo upload (D-14, D-15, D-16) */
+export interface EstoqueSummary {
+  skus_fardo: number
+  skus_prateleira: number
+  fardos_reservados: number
+  parciais: string[]
+  indisponivel: boolean
+}
