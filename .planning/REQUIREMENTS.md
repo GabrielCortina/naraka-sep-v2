@@ -24,15 +24,15 @@
 ### Upload
 
 - [ ] **UPLD-01**: Líder/Admin pode importar arquivo .xlsx do ERP UpSeller
-- [ ] **UPLD-02**: Sistema lê .xlsx no frontend com SheetJS e mapeia as 13 colunas do ERP
-- [ ] **UPLD-03**: Sistema filtra apenas pedidos com status "Em processo"
-- [ ] **UPLD-04**: Sistema ignora pedidos com método de envio contendo "Full" ou "Fulfillment"
-- [ ] **UPLD-05**: Sistema classifica pedidos automaticamente: Unitário (1 SKU, qtd=1), Kit (1 SKU, qtd>1), Combo (2+ SKUs diferentes)
+- [x] **UPLD-02**: Sistema lê .xlsx no frontend com SheetJS e mapeia as 13 colunas do ERP
+- [x] **UPLD-03**: Sistema filtra apenas pedidos com status "Em processo"
+- [x] **UPLD-04**: Sistema ignora pedidos com método de envio contendo "Full" ou "Fulfillment"
+- [x] **UPLD-05**: Sistema classifica pedidos automaticamente: Unitário (1 SKU, qtd=1), Kit (1 SKU, qtd>1), Combo (2+ SKUs diferentes)
 - [ ] **UPLD-06**: Deduplicação entre importações — Nº de Pedido que já existe no banco é ignorado na nova importação
-- [ ] **UPLD-07**: Linhas com mesmo Nº de Pedido dentro da mesma planilha são agrupadas normalmente (Combos/Kits)
+- [x] **UPLD-07**: Linhas com mesmo Nº de Pedido dentro da mesma planilha são agrupadas normalmente (Combos/Kits)
 - [ ] **UPLD-08**: Virada de dia (data diferente da última importação) limpa o banco automaticamente antes de processar
 - [ ] **UPLD-09**: Cada importação recebe número sequencial (Importação 1, 2, 3...)
-- [ ] **UPLD-10**: Sistema classifica método de envio nos 6 grupos por correspondência parcial case-insensitive (TikTok verificado antes de Shopee Xpress)
+- [x] **UPLD-10**: Sistema classifica método de envio nos 6 grupos por correspondência parcial case-insensitive (TikTok verificado antes de Shopee Xpress)
 
 ### Stock Integration
 
@@ -154,15 +154,15 @@
 | AUTH-05 | Phase 2 | Complete |
 | AUTH-06 | Phase 2 | Complete |
 | UPLD-01 | Phase 3 | Pending |
-| UPLD-02 | Phase 3 | Pending |
-| UPLD-03 | Phase 3 | Pending |
-| UPLD-04 | Phase 3 | Pending |
-| UPLD-05 | Phase 3 | Pending |
+| UPLD-02 | Phase 3 | Complete |
+| UPLD-03 | Phase 3 | Complete |
+| UPLD-04 | Phase 3 | Complete |
+| UPLD-05 | Phase 3 | Complete |
 | UPLD-06 | Phase 3 | Pending |
-| UPLD-07 | Phase 3 | Pending |
+| UPLD-07 | Phase 3 | Complete |
 | UPLD-08 | Phase 3 | Pending |
 | UPLD-09 | Phase 3 | Pending |
-| UPLD-10 | Phase 3 | Pending |
+| UPLD-10 | Phase 3 | Complete |
 | STOK-01 | Phase 4 | Pending |
 | STOK-02 | Phase 4 | Pending |
 | STOK-03 | Phase 4 | Pending |
