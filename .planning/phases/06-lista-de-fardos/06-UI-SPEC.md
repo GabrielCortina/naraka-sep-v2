@@ -52,9 +52,11 @@ Exceptions:
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
 | Body | 14px | 400 (regular) | 1.5 | Codigo IN text, endereco text, filter labels |
-| Label | 12px | 500 (medium) | 1.4 | "CONTEM" label, "ID:" prefix, status badges, counter labels |
+| Label | 12px | 400 (regular) | 1.4 | "CONTEM" label, "ID:" prefix, status badges, counter labels |
 | Heading | 16px | 600 (semibold) | 1.3 | SKU display on each fardo item, page title |
-| Display | 24px | 700 (bold) | 1.2 | Quantity number (large bold number next to "CONTEM") |
+| Display | 24px | 600 (semibold) | 1.2 | Quantity number (large number next to "CONTEM") |
+
+Weight rationale: 2 weights only (400 regular + 600 semibold). Label at 12px is visually distinct from Body at 14px without needing a separate weight. Display at 24px provides sufficient size contrast over Heading at 16px without needing 700 bold.
 
 Source: D-03 specifies "SKU em bold grande", "numero grande bold" for quantity, "texto menor cinza" for ID and labels.
 
@@ -107,7 +109,7 @@ Accent reserved for: fardo item left border only. NOT used on buttons, links, or
 +--+-----------------------------------------------+------------+-------+
 |  | SKU-EXAMPLE-001              [16px semibold]   | CONTEM     |  OK   |
 |CB| ID: IN04                     [14px gray]       | 120        |  N/E  |
-|  | pin 16PAREDE                 [14px, pin icon]  | [24px bold]|       |
+|  | pin 16PAREDE                 [14px, pin icon]  | [24px semi]|       |
 |  | [Badge: Encontrado]          (conditional)     |            |       |
 +--+-----------------------------------------------+------------+-------+
    ^--- blue left border 3px
@@ -140,7 +142,7 @@ Accent reserved for: fardo item left border only. NOT used on buttons, links, or
 ```
 
 - Inline horizontal, separated by vertical pipes or dots
-- Numbers in semibold, labels in regular weight
+- Numbers in semibold (600), labels in regular weight (400)
 - Update in realtime via Supabase subscriptions (D-29)
 
 ### SelectionBar (floating footer)
