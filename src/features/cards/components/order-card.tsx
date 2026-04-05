@@ -51,14 +51,11 @@ export function OrderCard({ card, onOpenModal, onAssign }: OrderCardProps) {
     >
       <CardContent className="p-3">
         {/* Linha 1: marketplace + tipo + importacao + spacer + atribuir */}
-        <div className="flex items-center gap-2 justify-between">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 justify-between">
+          <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
             <MarketplaceBadge grupoEnvio={card.grupo_envio} />
-            <span className="text-xs font-bold text-muted-foreground">
-              {TYPE_ABBREV[card.tipo] || card.tipo.toUpperCase()}
-            </span>
-            <span className="text-xs font-bold text-muted-foreground">
-              #{card.importacao_numero}
+            <span className="text-[11px] font-bold text-muted-foreground whitespace-nowrap truncate">
+              {TYPE_ABBREV[card.tipo] || card.tipo.toUpperCase()} #{card.importacao_numero}
             </span>
           </div>
           <button
@@ -73,7 +70,7 @@ export function OrderCard({ card, onOpenModal, onAssign }: OrderCardProps) {
           >
             <User size={16} />
             {card.atribuido_a && (
-              <span className="text-xs font-bold max-w-[60px] truncate">
+              <span className="text-[11px] font-bold max-w-[50px] truncate">
                 {card.atribuido_a.nome}
               </span>
             )}
