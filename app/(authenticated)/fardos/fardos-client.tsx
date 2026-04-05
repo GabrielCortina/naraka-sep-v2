@@ -1,12 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useCardData } from '@/features/cards/hooks/use-card-data'
-import { KanbanBoard } from '@/features/cards/components/kanban-board'
-import { ItemModal } from '@/features/cards/components/item-modal'
-import { AssignModal } from '@/features/cards/components/assign-modal'
-import type { CardData } from '@/features/cards/types'
+import { Loader2 } from 'lucide-react'
+import { useFardosData } from '@/features/fardos/hooks/use-fardos-data'
+import { FardoList } from '@/features/fardos/components/fardo-list'
 
 interface FardosClientProps {
   userId: string
@@ -17,141 +13,18 @@ interface FardosClientProps {
 export function FardosClient({
   userId,
   userRole,
+  userName,
 }: FardosClientProps) {
-  const { cards, loading, error } = useCardData(userId, userRole)
-
-  // Filter cards that have items with reservas (fardos reserved)
-  const fardoCards = cards.filter((card) =>
-    card.items.some((item) => item.reservas.length > 0),
+  const { fardos, counters, loading, error, refetch } = useFardosData(
+    userId,
+    userRole,
   )
-
-  // State for ItemModal
-  const [selectedCard, setSelectedCard] = useState<CardData | null>(null)
-  const [itemModalOpen, setItemModalOpen] = useState(false)
-
-  // State for AssignModal
-  const [assignCardKey, setAssignCardKey] = useState<string>('')
-  const [assignModalOpen, setAssignModalOpen] = useState(false)
-
-  // List of fardistas for AssignModal
-  const [fardistas, setFardistas] = useState<{ id: string; nome: string }[]>([])
-
-  useEffect(() => {
-    async function fetchFardistas() {
-      const supabase = createClient()
-      const { data } = await supabase
-        .from('users')
-        .select('id, nome')
-        .eq('role', 'fardista')
-        .eq('ativo', true)
-
-      if (data) {
-        setFardistas(data)
-      }
-    }
-    fetchFardistas()
-  }, [])
-
-  function handleOpenModal(cardKey: string) {
-    const card = fardoCards.find((c) => c.card_key === cardKey)
-    if (card) {
-      setSelectedCard(card)
-      setItemModalOpen(true)
-    }
-  }
-
-  function handleAssign(cardKey: string) {
-    setAssignCardKey(cardKey)
-    setAssignModalOpen(true)
-  }
-
-  async function handleConfirmQuantity(
-    _cardKey: string,
-    sku: string,
-    quantidade: number,
-  ) {
-    const card = fardoCards.find((c) => c.card_key === _cardKey)
-    if (!card) return
-
-    const item = card.items.find((i) => i.sku === sku)
-    if (!item) return
-
-    const status =
-      quantidade >= item.quantidade_necessaria
-        ? 'completo'
-        : quantidade > 0
-          ? 'parcial'
-          : 'pendente'
-
-    for (const pedidoId of item.pedido_ids) {
-      const response = await fetch('/api/cards/progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pedido_id: pedidoId,
-          quantidade_separada: quantidade,
-          status,
-        }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        console.error('Erro ao confirmar quantidade:', data.error)
-        return
-      }
-    }
-  }
-
-  async function handleNaoTem(_cardKey: string, sku: string) {
-    const card = fardoCards.find((c) => c.card_key === _cardKey)
-    if (!card) return
-
-    const item = card.items.find((i) => i.sku === sku)
-    if (!item) return
-
-    for (const pedidoId of item.pedido_ids) {
-      const response = await fetch('/api/cards/progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pedido_id: pedidoId,
-          quantidade_separada: 0,
-          status: 'nao_encontrado',
-        }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        console.error('Erro ao marcar como nao encontrado:', data.error)
-        return
-      }
-    }
-  }
-
-  async function handleAssignUser(cardKey: string, assignUserId: string) {
-    const response = await fetch('/api/cards/assign', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        card_key: cardKey,
-        user_id: assignUserId,
-        tipo: 'fardista',
-      }),
-    })
-
-    if (!response.ok) {
-      const data = await response.json()
-      console.error('Erro ao atribuir fardista:', data.error)
-    }
-  }
-
-  const assignCard = fardoCards.find((c) => c.card_key === assignCardKey)
-  const currentAssignedId = assignCard?.atribuido_a?.id ?? null
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-muted-foreground">Carregando pedidos...</p>
+        <Loader2 className="h-6 w-6 animate-spin mr-2" />
+        <p className="text-muted-foreground">Carregando fardos...</p>
       </div>
     )
   }
@@ -165,30 +38,13 @@ export function FardosClient({
   }
 
   return (
-    <>
-      <KanbanBoard
-        cards={fardoCards}
-        onOpenModal={handleOpenModal}
-        onAssign={handleAssign}
-      />
-
-      <ItemModal
-        open={itemModalOpen}
-        onOpenChange={setItemModalOpen}
-        card={selectedCard}
-        onConfirmQuantity={handleConfirmQuantity}
-        onNaoTem={handleNaoTem}
-      />
-
-      <AssignModal
-        open={assignModalOpen}
-        onOpenChange={setAssignModalOpen}
-        cardKey={assignCardKey}
-        filterRole="fardista"
-        users={fardistas}
-        currentUserId={currentAssignedId}
-        onAssign={handleAssignUser}
-      />
-    </>
+    <FardoList
+      fardos={fardos}
+      counters={counters}
+      userRole={userRole}
+      userId={userId}
+      userName={userName}
+      onRefetch={refetch}
+    />
   )
 }
