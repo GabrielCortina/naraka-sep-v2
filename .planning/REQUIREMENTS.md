@@ -52,9 +52,9 @@
 - [x] **CARD-04**: Card exibe contagem regressiva até o prazo de envio
 - [x] **CARD-05**: Card exibe badge de urgência (verde >2h, amarelo <2h, vermelho atrasado, verde opaco concluído)
 - [ ] **CARD-06**: Card exibe atribuição (separador/fardista responsável)
-- [ ] **CARD-07**: Cards são colapsáveis por método de envio
+- [x] **CARD-07**: Cards são colapsáveis por método de envio
 - [x] **CARD-08**: Card 100% completo vai automaticamente para seção CONCLUÍDOS
-- [ ] **CARD-09**: Seção CONCLUÍDOS é colapsável no final da lista
+- [x] **CARD-09**: Seção CONCLUÍDOS é colapsável no final da lista
 
 ### Bales (Fardos)
 
@@ -104,8 +104,8 @@
 ### UI/UX
 
 - [x] **UIUX-01**: Design minimalista preto e branco, fonte Inter
-- [ ] **UIUX-02**: Mobile first para separadores/fardistas
-- [ ] **UIUX-03**: Desktop otimizado para líder/admin
+- [x] **UIUX-02**: Mobile first para separadores/fardistas
+- [x] **UIUX-03**: Desktop otimizado para líder/admin
 - [x] **UIUX-04**: Cores por marketplace: Shopee #ee4d2d, ML #ffe600, TikTok #25F4EE, Shein #000000
 - [ ] **UIUX-05**: Modal para abrir card e trabalhar itens
 - [ ] **UIUX-06**: Popup de quantidade no mobile
@@ -176,9 +176,9 @@
 | CARD-04 | Phase 5 | Complete |
 | CARD-05 | Phase 5 | Complete |
 | CARD-06 | Phase 5 | Pending |
-| CARD-07 | Phase 5 | Pending |
+| CARD-07 | Phase 5 | Complete |
 | CARD-08 | Phase 5 | Complete |
-| CARD-09 | Phase 5 | Pending |
+| CARD-09 | Phase 5 | Complete |
 | FARD-01 | Phase 6 | Pending |
 | FARD-02 | Phase 6 | Pending |
 | FARD-03 | Phase 6 | Pending |
@@ -210,8 +210,8 @@
 | USER-02 | Phase 10 | Pending |
 | USER-03 | Phase 10 | Pending |
 | UIUX-01 | Phase 5 | Complete |
-| UIUX-02 | Phase 5 | Pending |
-| UIUX-03 | Phase 5 | Pending |
+| UIUX-02 | Phase 5 | Complete |
+| UIUX-03 | Phase 5 | Complete |
 | UIUX-04 | Phase 5 | Complete |
 | UIUX-05 | Phase 5 | Pending |
 | UIUX-06 | Phase 5 | Pending |
