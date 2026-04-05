@@ -65,6 +65,7 @@ export function PrateleiraClient({
     setDeleteModalOpen(true)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function handleConfirmDelete(_cardKey: string, _pin: string) {
     // Backend logic deferred to Phase 07
     // Will call POST /api/cards/delete with cardKey + pin
