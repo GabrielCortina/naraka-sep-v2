@@ -46,14 +46,14 @@
 
 ### Cards
 
-- [ ] **CARD-01**: Cada card agrupa pedidos por grupo_envio + tipo + importacao_numero
+- [x] **CARD-01**: Cada card agrupa pedidos por grupo_envio + tipo + importacao_numero
 - [ ] **CARD-02**: Card exibe lista de itens (SKU, endereço, quantidade, fardo ID se aplicável)
-- [ ] **CARD-03**: Card exibe barra de progresso (peças separadas / total)
-- [ ] **CARD-04**: Card exibe contagem regressiva até o prazo de envio
-- [ ] **CARD-05**: Card exibe badge de urgência (verde >2h, amarelo <2h, vermelho atrasado, verde opaco concluído)
+- [x] **CARD-03**: Card exibe barra de progresso (peças separadas / total)
+- [x] **CARD-04**: Card exibe contagem regressiva até o prazo de envio
+- [x] **CARD-05**: Card exibe badge de urgência (verde >2h, amarelo <2h, vermelho atrasado, verde opaco concluído)
 - [ ] **CARD-06**: Card exibe atribuição (separador/fardista responsável)
 - [ ] **CARD-07**: Cards são colapsáveis por método de envio
-- [ ] **CARD-08**: Card 100% completo vai automaticamente para seção CONCLUÍDOS
+- [x] **CARD-08**: Card 100% completo vai automaticamente para seção CONCLUÍDOS
 - [ ] **CARD-09**: Seção CONCLUÍDOS é colapsável no final da lista
 
 ### Bales (Fardos)
@@ -103,10 +103,10 @@
 
 ### UI/UX
 
-- [ ] **UIUX-01**: Design minimalista preto e branco, fonte Inter
+- [x] **UIUX-01**: Design minimalista preto e branco, fonte Inter
 - [ ] **UIUX-02**: Mobile first para separadores/fardistas
 - [ ] **UIUX-03**: Desktop otimizado para líder/admin
-- [ ] **UIUX-04**: Cores por marketplace: Shopee #ee4d2d, ML #ffe600, TikTok #25F4EE, Shein #000000
+- [x] **UIUX-04**: Cores por marketplace: Shopee #ee4d2d, ML #ffe600, TikTok #25F4EE, Shein #000000
 - [ ] **UIUX-05**: Modal para abrir card e trabalhar itens
 - [ ] **UIUX-06**: Popup de quantidade no mobile
 
@@ -170,14 +170,14 @@
 | STOK-05 | Phase 4 | Complete |
 | STOK-06 | Phase 4 | Complete |
 | STOK-07 | Phase 4 | Complete |
-| CARD-01 | Phase 5 | Pending |
+| CARD-01 | Phase 5 | Complete |
 | CARD-02 | Phase 5 | Pending |
-| CARD-03 | Phase 5 | Pending |
-| CARD-04 | Phase 5 | Pending |
-| CARD-05 | Phase 5 | Pending |
+| CARD-03 | Phase 5 | Complete |
+| CARD-04 | Phase 5 | Complete |
+| CARD-05 | Phase 5 | Complete |
 | CARD-06 | Phase 5 | Pending |
 | CARD-07 | Phase 5 | Pending |
-| CARD-08 | Phase 5 | Pending |
+| CARD-08 | Phase 5 | Complete |
 | CARD-09 | Phase 5 | Pending |
 | FARD-01 | Phase 6 | Pending |
 | FARD-02 | Phase 6 | Pending |
@@ -209,10 +209,10 @@
 | USER-01 | Phase 10 | Pending |
 | USER-02 | Phase 10 | Pending |
 | USER-03 | Phase 10 | Pending |
-| UIUX-01 | Phase 5 | Pending |
+| UIUX-01 | Phase 5 | Complete |
 | UIUX-02 | Phase 5 | Pending |
 | UIUX-03 | Phase 5 | Pending |
-| UIUX-04 | Phase 5 | Pending |
+| UIUX-04 | Phase 5 | Complete |
 | UIUX-05 | Phase 5 | Pending |
 | UIUX-06 | Phase 5 | Pending |
 

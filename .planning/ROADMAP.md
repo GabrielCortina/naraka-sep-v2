@@ -107,7 +107,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 05-01-PLAN.md — Design system tokens, tipos do dominio cards e logica pura card-utils com TDD
+- [x] 05-01-PLAN.md — Design system tokens, tipos do dominio cards e logica pura card-utils com TDD
 - [ ] 05-02-PLAN.md — Instalar deps shadcn/jspdf e componentes atomicos (ProgressBar, UrgencyBadge, MarketplaceBadge, OrderCard)
 - [ ] 05-03-PLAN.md — KanbanBoard, KanbanColumn e CompletedSection com layout responsivo desktop/mobile
 - [ ] 05-04-PLAN.md — Modais (ItemModal, NumpadPopup, AssignModal) e PDF generator

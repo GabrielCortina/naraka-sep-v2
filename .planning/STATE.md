@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 5 UI-SPEC approved
-last_updated: "2026-04-05T16:38:43.960Z"
+status: executing
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-04-05T17:58:55.685Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 10
   completed_phases: 4
-  total_plans: 13
-  completed_plans: 13
-  percent: 100
+  total_plans: 19
+  completed_plans: 14
+  percent: 74
 ---
 
 # Project State
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-04)
 
 **Core value:** Separadores e fardistas conseguem processar todos os pedidos do dia dentro dos prazos de envio de cada marketplace, com visibilidade em tempo real para o lider.
-**Current focus:** Phase 05 — next phase
+**Current focus:** Phase 05 — cards-e-ui-foundation
 
 ## Current Position
 
-Phase: 4 complete
-Plan: 3 of 3 complete
-Status: Phase complete — ready for verification
+Phase: 05 (cards-e-ui-foundation) — EXECUTING
+Plan: 2 of 6
+Status: Ready to execute
 Last activity: 2026-04-05
 
 Progress: [██████████] 100%
@@ -64,6 +64,7 @@ Progress: [██████████] 100%
 | Phase 04 P01 | 2min | 2 tasks | 4 files |
 | Phase 04 P02 | 4min | 2 tasks | 5 files |
 | Phase 04 P03 | 6min | 3 tasks | 11 files |
+| Phase 05-cards-e-ui-foundation P01 | 3min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,9 @@ Recent decisions affecting current work:
 - [Phase 04]: Array.from(Map) para iterar Maps -- tsconfig target compat (padrao Phase 03)
 - [Phase 04]: NFD header normalization no stock-parser -- robusto contra acentos na planilha externa
 - [Phase 04]: OK button no card de sucesso ao inves de auto-close 3s -- lider precisa de tempo para ler dados de estoque
+- [Phase 05-cards-e-ui-foundation]: getUrgencyTier aceita now opcional para testabilidade sem mock global de Date
+- [Phase 05-cards-e-ui-foundation]: CSS variables HSL sem alpha channel (formato Tailwind padrao)
+- [Phase 05-cards-e-ui-foundation]: aggregateItems status agregado: nao_encontrado > separado > parcial > pendente
 
 ### Pending Todos
 
@@ -107,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T16:38:43.957Z
-Stopped at: Phase 5 UI-SPEC approved
-Resume file: .planning/phases/05-cards-e-ui-foundation/05-UI-SPEC.md
+Last session: 2026-04-05T17:58:55.683Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None
