@@ -55,7 +55,7 @@ export function OrderCard({ card, onOpenModal, onAssign }: OrderCardProps) {
           <div className="flex items-center gap-2">
             <MarketplaceBadge grupoEnvio={card.grupo_envio} />
             <span className="text-xs font-bold text-muted-foreground">
-              {TYPE_ABBREV[card.tipo] || card.tipo}
+              {TYPE_ABBREV[card.tipo] || card.tipo.toUpperCase()}
             </span>
             <span className="text-xs font-bold text-muted-foreground">
               #{card.importacao_numero}

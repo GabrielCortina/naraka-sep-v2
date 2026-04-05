@@ -27,6 +27,9 @@ export const MARKETPLACE_COLORS: Record<string, { bg: string; text: string }> = 
 
 export const TYPE_ABBREV: Record<string, string> = {
   'Unitario': 'UNITÁRIO',
+  'unitario': 'UNITÁRIO',
   'Kit': 'KIT',
+  'kit': 'KIT',
   'Combo': 'COMBO',
+  'combo': 'COMBO',
 }

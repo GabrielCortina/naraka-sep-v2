@@ -66,7 +66,7 @@ export function ItemModal({
         <DialogContent className="sm:max-w-lg max-h-[80vh] p-0 gap-0 data-[state=open]:slide-in-from-bottom">
           <DialogHeader className="p-4 border-b pr-10">
             <DialogTitle className="flex items-center gap-2">
-              <span>{card.grupo_envio} - {TYPE_ABBREV[card.tipo] || card.tipo} #{card.importacao_numero}</span>
+              <span>{card.grupo_envio} - {TYPE_ABBREV[card.tipo] || card.tipo.toUpperCase()} #{card.importacao_numero}</span>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
