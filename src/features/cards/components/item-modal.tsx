@@ -125,18 +125,18 @@ export function ItemModal({
                       <div className="flex items-start justify-between gap-2">
                         {/* Esquerda: SKU + detalhes */}
                         <div className="min-w-0 flex-1">
-                          <span className="text-base font-bold block truncate">
+                          <span className="text-lg font-bold block truncate">
                             {item.sku}
                           </span>
                           <p className="text-xs text-muted-foreground mt-0.5">
-                            {item.quantidade_separada}/{item.quantidade_necessaria} separado
+                            {item.quantidade_separada}/{item.quantidade_necessaria}
                           </p>
                           {item.reservas.length > 0 && (
                             <div className="mt-1 flex flex-wrap gap-1">
                               {item.reservas.map((reserva) => (
                                 <span
                                   key={reserva.codigo_in}
-                                  className="inline-flex items-center text-[11px] text-muted-foreground bg-zinc-100 rounded px-1.5 py-0.5"
+                                  className="inline-flex items-center text-[11px] text-amber-800 bg-amber-100 rounded px-1.5 py-0.5"
                                 >
                                   Fardo {reserva.codigo_in} - {reserva.quantidade}un
                                   {reserva.endereco ? ` (${reserva.endereco})` : ''}
@@ -183,14 +183,14 @@ export function ItemModal({
                               <button
                                 onClick={() => openNumpad(item)}
                                 disabled={blocked}
-                                className="flex items-center justify-center h-8 w-8 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                className="flex items-center justify-center h-8 w-8 rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                               >
                                 <Check className="h-4 w-4" />
                               </button>
                               <button
                                 onClick={() => onNaoTem(card.card_key, item.sku)}
                                 disabled={blocked}
-                                className="flex items-center justify-center h-8 w-8 rounded-md border border-zinc-300 text-zinc-500 hover:bg-red-50 hover:text-red-600 hover:border-red-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                className="flex items-center justify-center h-8 w-8 rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                               >
                                 <X className="h-4 w-4" />
                               </button>
