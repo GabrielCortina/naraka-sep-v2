@@ -58,9 +58,9 @@ describe('useCountdown', () => {
 
     expect(result.current.countdown).toBe('3h 0min')
 
-    // Advance 60s => 8:01, 2h 59min
+    // advanceTimersByTime shifts fake clock from 8:00 to 8:01
+    // new Date() inside the setInterval callback sees 8:01
     act(() => {
-      vi.setSystemTime(new Date(2026, 3, 5, 8, 1, 0))
       vi.advanceTimersByTime(60000)
     })
 
