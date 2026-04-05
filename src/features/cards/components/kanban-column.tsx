@@ -17,6 +17,8 @@ interface KanbanColumnProps {
   cards: CardData[]
   onOpenModal: (cardKey: string) => void
   onAssign: (cardKey: string) => void
+  onDelete?: (cardKey: string) => void
+  userRole?: string
 }
 
 const tierOrder: Record<string, number> = {
@@ -37,6 +39,8 @@ export function KanbanColumn({
   cards,
   onOpenModal,
   onAssign,
+  onDelete,
+  userRole,
 }: KanbanColumnProps) {
   const sorted = sortByUrgency(cards)
   const defaultOpen = cards.some(
@@ -61,6 +65,8 @@ export function KanbanColumn({
               card={card}
               onOpenModal={onOpenModal}
               onAssign={onAssign}
+              onDelete={onDelete}
+              userRole={userRole}
             />
           ))}
         </div>

@@ -10,9 +10,11 @@ interface KanbanBoardProps {
   cards: CardData[]
   onOpenModal: (cardKey: string) => void
   onAssign: (cardKey: string) => void
+  onDelete?: (cardKey: string) => void
+  userRole?: string
 }
 
-export function KanbanBoard({ cards, onOpenModal, onAssign }: KanbanBoardProps) {
+export function KanbanBoard({ cards, onOpenModal, onAssign, onDelete, userRole }: KanbanBoardProps) {
   if (cards.length === 0) {
     return (
       <div className="bg-zinc-100 min-h-[calc(100vh-4rem)] rounded-lg flex items-center justify-center">
@@ -59,6 +61,8 @@ export function KanbanBoard({ cards, onOpenModal, onAssign }: KanbanBoardProps) 
               cards={byGroup.get(grupo)!}
               onOpenModal={onOpenModal}
               onAssign={onAssign}
+              onDelete={onDelete}
+              userRole={userRole}
             />
           ))}
         </div>
@@ -83,6 +87,8 @@ export function KanbanBoard({ cards, onOpenModal, onAssign }: KanbanBoardProps) 
           cards={completed}
           onOpenModal={onOpenModal}
           onAssign={onAssign}
+          onDelete={onDelete}
+          userRole={userRole}
         />
       </div>
     </div>

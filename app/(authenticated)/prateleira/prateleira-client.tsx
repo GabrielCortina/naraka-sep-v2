@@ -6,6 +6,7 @@ import { useCardData } from '@/features/cards/hooks/use-card-data'
 import { KanbanBoard } from '@/features/cards/components/kanban-board'
 import { ItemModal } from '@/features/cards/components/item-modal'
 import { AssignModal } from '@/features/cards/components/assign-modal'
+import { DeleteCardModal } from '@/features/cards/components/delete-card-modal'
 import type { CardData } from '@/features/cards/types'
 
 interface PrateleiraClientProps {
@@ -27,6 +28,10 @@ export function PrateleiraClient({
   // State for AssignModal
   const [assignCardKey, setAssignCardKey] = useState<string>('')
   const [assignModalOpen, setAssignModalOpen] = useState(false)
+
+  // State for DeleteCardModal
+  const [deleteCardKey, setDeleteCardKey] = useState<string>('')
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
   // List of separadores for AssignModal
   const [separadores, setSeparadores] = useState<{ id: string; nome: string }[]>([])
@@ -53,6 +58,17 @@ export function PrateleiraClient({
       setSelectedCard(card)
       setItemModalOpen(true)
     }
+  }
+
+  function handleDelete(cardKey: string) {
+    setDeleteCardKey(cardKey)
+    setDeleteModalOpen(true)
+  }
+
+  function handleConfirmDelete(_cardKey: string, _pin: string) {
+    // Backend logic deferred to Phase 07
+    // Will call POST /api/cards/delete with cardKey + pin
+    setDeleteModalOpen(false)
   }
 
   function handleAssign(cardKey: string) {
@@ -169,6 +185,8 @@ export function PrateleiraClient({
         cards={cards}
         onOpenModal={handleOpenModal}
         onAssign={handleAssign}
+        onDelete={handleDelete}
+        userRole={userRole}
       />
 
       <ItemModal
@@ -187,6 +205,17 @@ export function PrateleiraClient({
         users={separadores}
         currentUserId={currentAssignedId}
         onAssign={handleAssignUser}
+      />
+
+      <DeleteCardModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        cardKey={deleteCardKey}
+        cardLabel={(() => {
+          const c = cards.find((x) => x.card_key === deleteCardKey)
+          return c ? `${c.grupo_envio} - ${c.tipo.toUpperCase()} #${c.importacao_numero}` : ''
+        })()}
+        onConfirm={handleConfirmDelete}
       />
     </>
   )

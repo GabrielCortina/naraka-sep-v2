@@ -15,12 +15,16 @@ interface CompletedSectionProps {
   cards: CardData[]
   onOpenModal: (cardKey: string) => void
   onAssign: (cardKey: string) => void
+  onDelete?: (cardKey: string) => void
+  userRole?: string
 }
 
 export function CompletedSection({
   cards,
   onOpenModal,
   onAssign,
+  onDelete,
+  userRole,
 }: CompletedSectionProps) {
   const [open, setOpen] = useState(false)
 
@@ -55,6 +59,8 @@ export function CompletedSection({
               card={card}
               onOpenModal={onOpenModal}
               onAssign={onAssign}
+              onDelete={onDelete}
+              userRole={userRole}
             />
           ))}
         </div>
