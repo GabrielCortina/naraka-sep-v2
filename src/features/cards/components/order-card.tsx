@@ -103,10 +103,10 @@ export function OrderCard({ card, onOpenModal, onAssign, onDelete, userRole }: O
                   e.stopPropagation()
                   onDelete(card.card_key)
                 }}
-                className="text-muted-foreground/40 hover:text-red-500 transition-colors p-0.5 rounded"
+                className="text-zinc-400 hover:text-red-500 transition-colors p-0.5 rounded"
                 aria-label="Excluir card"
               >
-                <Trash2 size={12} />
+                <Trash2 size={14} />
               </button>
             )}
           </div>
