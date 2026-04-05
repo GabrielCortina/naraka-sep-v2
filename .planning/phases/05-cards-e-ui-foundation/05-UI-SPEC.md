@@ -5,6 +5,7 @@ status: draft
 shadcn_initialized: true
 preset: default (neutral base color, CSS variables, RSC)
 created: 2026-04-05
+revised: 2026-04-05
 ---
 
 # Phase 5 — UI Design Contract
@@ -21,7 +22,7 @@ created: 2026-04-05
 | Preset | default, neutral baseColor, cssVariables: true |
 | Component library | Radix UI (via shadcn) |
 | Icon library | Lucide React (shadcn default) |
-| Font | Inter (400, 600, 700) |
+| Font | Inter (400, 700) |
 
 ---
 
@@ -52,16 +53,18 @@ Exceptions:
 |------|------|--------|-------------|--------|
 | Body | 14px (0.875rem) | 400 (Regular) | 1.5 | Default |
 | Badge/Label | 12px (0.75rem) | 700 (Bold) | 1.4 | D-50, D-51 |
-| Countdown | 14px (0.875rem) | 600 (Semibold) | 1.2 | D-52 |
+| Countdown | 14px (0.875rem) | 700 (Bold) | 1.2 | D-52 |
 | Pieces count | 12px (0.75rem) | 400 (Regular) | 1.4 | D-53, muted color |
 
-Font weight budget: 3 weights allowed for this phase (400, 600, 700) per D-46.
+Font weight budget: 2 weights for this phase (400, 700).
 
 Additional rules:
 - Badge metodo de envio: uppercase, 700, 0.75rem (D-50)
-- Numero importacao (#1, #2): 600, 0.75rem, text-muted-foreground (D-51)
-- Contagem regressiva: 600, color matches urgency tier (D-52)
+- Numero importacao (#1, #2): 700, 0.75rem, text-muted-foreground (D-51)
+- Contagem regressiva: 700, color matches urgency tier (D-52)
 - Pecas "300/900 pecas": 400, 0.75rem, text-muted-foreground (D-53)
+
+Note: D-46 originally declared 3 weights (400, 600, 700). Semibold (600) dropped to comply with the 2-weight maximum. All roles previously using 600 now use 700 (Bold). Visual distinction is maintained through color and size rather than a third weight.
 
 ---
 
@@ -257,8 +260,9 @@ Display: shows "Quantidade necessaria: X" as reference.
 | Completed section label | "CONCLUIDOS" | PT-BR |
 | Overdue text | "ATRASADO" | PT-BR |
 | Blocked item badge | "AGUARDAR FARDISTA" | PT-BR |
-| Assign button tooltip | "Atribuir" | PT-BR |
-| Print button | "Imprimir" | PT-BR |
+| Assign button tooltip (prateleira) | "Atribuir Separador" | PT-BR |
+| Assign button tooltip (fardo) | "Atribuir Fardista" | PT-BR |
+| Print button | "Imprimir Checklist" | PT-BR |
 | Numpad reference | "Quantidade necessaria: {n}" | PT-BR |
 | Pieces counter | "{done}/{total} pecas" | PT-BR |
 | Countdown format | "{h}h {m}min" | PT-BR |
@@ -314,7 +318,7 @@ Usage: `bg-shopee`, `text-ml`, `border-l-urgency-overdue`, etc.
 | Size | Full-screen (inset-0) | max-w-lg, centered, max-h-[80vh] |
 | Scroll | Internal ScrollArea for item list | Internal ScrollArea for item list |
 | Close | X button top-right + swipe down | X button top-right + click overlay |
-| Footer | Sticky: "Imprimir" button | Sticky: "Imprimir" button |
+| Footer | Sticky: "Imprimir Checklist" button | Sticky: "Imprimir Checklist" button |
 
 ### NumpadPopup
 
@@ -323,8 +327,8 @@ Usage: `bg-shopee`, `text-ml`, `border-l-urgency-overdue`, etc.
 | Size | max-w-xs, centered (both mobile and desktop) |
 | Grid | 3 columns x 4 rows (1-9, backspace-0-confirmar) |
 | Button size | minimum 48px x 48px touch target |
-| Confirmar button | Full-width bottom row, bg-green-600, text-white, font-weight 600 |
-| Display | Shows typed value large (24px, 600) + "Quantidade necessaria: X" muted below |
+| Confirmar button | Full-width bottom row, bg-green-600, text-white, font-weight 700 |
+| Display | Shows typed value large (24px, 700) + "Quantidade necessaria: X" muted below |
 
 ### AssignModal
 
