@@ -7,6 +7,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -41,6 +44,13 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        shopee: "hsl(var(--shopee))",
+        ml: "hsl(var(--ml))",
+        tiktok: "hsl(var(--tiktok))",
+        shein: "hsl(var(--shein))",
+        "urgency-overdue": "hsl(var(--urgency-overdue))",
+        "urgency-warning": "hsl(var(--urgency-warning))",
+        "urgency-ok": "hsl(var(--urgency-ok))",
       },
       borderRadius: {
         lg: "var(--radius)",

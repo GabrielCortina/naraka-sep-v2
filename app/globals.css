@@ -24,6 +24,16 @@
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
     --radius: 0.5rem;
+    /* Marketplace colors (D-38 a D-41) */
+    --shopee: 14 89% 55%;
+    --ml: 54 100% 50%;
+    --tiktok: 178 89% 55%;
+    --shein: 0 0% 0%;
+    /* Urgency colors (D-42 a D-45) */
+    --urgency-overdue: 0 72% 51%;
+    --urgency-warning: 45 93% 47%;
+    --urgency-ok: 142 71% 45%;
+    --urgency-done: 142 71% 45%;
   }
 
   .dark {
