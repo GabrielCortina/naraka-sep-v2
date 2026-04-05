@@ -128,7 +128,7 @@ Plans:
 
 Plans:
 - [x] 06-01-PLAN.md — Migration trafego_fardos, tipos do dominio fardos e hook useFardosData
-- [ ] 06-02-PLAN.md — API routes fluxo OK (planilha + trafego) e N/E (alternativo ou prateleira)
+- [x] 06-02-PLAN.md — API routes fluxo OK (planilha + trafego) e N/E (alternativo ou prateleira)
 - [ ] 06-03-PLAN.md — UI lista plana, filtros, contadores, PDF, atribuicao em lote e schema push
 
 ### Phase 7: Lista de Prateleira e Cascata

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-04-05T23:41:21.205Z"
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-04-05T23:48:35.403Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 10
   completed_phases: 5
   total_plans: 22
-  completed_plans: 20
-  percent: 91
+  completed_plans: 21
+  percent: 95
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 06 (lista-de-fardos) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -71,6 +71,7 @@ Progress: [██████████] 100%
 | Phase 05 P04 | 3min | 2 tasks | 5 files |
 | Phase 05 P06 | 2min | 2 tasks | 3 files |
 | Phase 06 P01 | 4min | 2 tasks | 4 files |
+| Phase 06 P02 | 5min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -117,6 +118,8 @@ Recent decisions affecting current work:
 - [Phase 06]: Counters calculated from full list before role filtering (fardista sees global counts)
 - [Phase 06]: card_key derived from pedidos via SKU+importacao_numero lookup (not stored on reservas)
 - [Phase 06]: is_cascata defaults to false for all fardos in Phase 06 (cascata logic deferred to Phase 07)
+- [Phase 06]: Reserva status not updated to encontrado in OK flow -- DB CHECK only allows reservado|cancelado; tracked via trafego_fardos
+- [Phase 06]: Duplicate OPERADOR header handled via indexOf/lastIndexOf for col K and col N
 
 ### Pending Todos
 
@@ -128,6 +131,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T23:41:21.202Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-04-05T23:48:35.401Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None

@@ -59,8 +59,8 @@
 ### Bales (Fardos)
 
 - [x] **FARD-01**: Fardista vê lista de fardos agrupados por card com info: endereço, código IN, SKU, quantidade
-- [ ] **FARD-02**: Fardista pode marcar fardo como OK (encontrado, entra no tráfego)
-- [ ] **FARD-03**: Fardista pode marcar fardo como N/E (não encontrado) — sistema busca alternativo; se não achar, libera linha na prateleira
+- [x] **FARD-02**: Fardista pode marcar fardo como OK (encontrado, entra no tráfego)
+- [x] **FARD-03**: Fardista pode marcar fardo como N/E (não encontrado) — sistema busca alternativo; se não achar, libera linha na prateleira
 - [x] **FARD-04**: Lista de fardos atualiza em tempo real via Supabase subscription
 - [ ] **FARD-05**: Líder pode atribuir fardistas a cards de fardos
 - [ ] **FARD-06**: Botão "Imprimir Fardos" gera PDF com código IN, SKU, endereço, quantidade, para quem entregar
@@ -180,8 +180,8 @@
 | CARD-08 | Phase 5 | Complete |
 | CARD-09 | Phase 5 | Complete |
 | FARD-01 | Phase 6 | Complete |
-| FARD-02 | Phase 6 | Pending |
-| FARD-03 | Phase 6 | Pending |
+| FARD-02 | Phase 6 | Complete |
+| FARD-03 | Phase 6 | Complete |
 | FARD-04 | Phase 6 | Complete |
 | FARD-05 | Phase 6 | Pending |
 | FARD-06 | Phase 6 | Pending |
