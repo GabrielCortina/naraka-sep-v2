@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-04-05T00:39:20.545Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-04-05T00:46:13.766Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 10
   completed_phases: 2
   total_plans: 10
-  completed_plans: 7
-  percent: 70
+  completed_plans: 8
+  percent: 80
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 03 (upload-e-processamento) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -58,6 +58,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02-autenticacao P02 | 4min | 2 tasks | 11 files |
 | Phase 02-autenticacao P03 | 3min | 2 tasks | 10 files |
 | Phase 03-upload-e-processamento P01 | 5min | 3 tasks | 12 files |
+| Phase 03-upload-e-processamento P02 | 4min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,8 @@ Recent decisions affecting current work:
 - [Phase 02-autenticacao]: returnTo validado contra open redirect (/ obrigatorio, :// proibido)
 - [Phase 02-autenticacao]: AppShell server component filtra NAV_ITEMS por role, layout usa getUser() + users table
 - [Phase 03-upload-e-processamento]: COLUMN_MAP convertido para JSDoc comment (lint error em variavel nao utilizada)
+- [Phase 03-upload-e-processamento]: Virada de dia deleta 4 tabelas (atribuicoes, progresso, reservas, pedidos), preserva 3 (trafego_fardos, baixados, fardos_nao_encontrados)
+- [Phase 03-upload-e-processamento]: Array.from(new Set()) ao inves de spread para compatibilidade com tsconfig target
 
 ### Pending Todos
 
@@ -88,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T00:39:20.543Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-04-05T00:46:13.764Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
