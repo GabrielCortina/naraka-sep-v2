@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       atribuicoes: {
@@ -109,26 +134,48 @@ export type Database = {
       fardos_nao_encontrados: {
         Row: {
           codigo_in: string
+          endereco: string | null
+          fardista_id: string | null
+          fardista_nome: string | null
           id: string
+          quantidade: number | null
           reportado_em: string
           reportado_por: string
-          trafego_id: string
+          sku: string | null
+          trafego_id: string | null
         }
         Insert: {
           codigo_in: string
+          endereco?: string | null
+          fardista_id?: string | null
+          fardista_nome?: string | null
           id?: string
+          quantidade?: number | null
           reportado_em?: string
           reportado_por: string
-          trafego_id: string
+          sku?: string | null
+          trafego_id?: string | null
         }
         Update: {
           codigo_in?: string
+          endereco?: string | null
+          fardista_id?: string | null
+          fardista_nome?: string | null
           id?: string
+          quantidade?: number | null
           reportado_em?: string
           reportado_por?: string
-          trafego_id?: string
+          sku?: string | null
+          trafego_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fardos_nao_encontrados_fardista_id_fkey"
+            columns: ["fardista_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "fardos_nao_encontrados_reportado_por_fkey"
             columns: ["reportado_por"]
@@ -272,37 +319,73 @@ export type Database = {
       }
       trafego_fardos: {
         Row: {
+          altura: string | null
+          clicked_at: string | null
           codigo_in: string
           created_at: string
+          data_entrada: string | null
+          data_transferencia: string | null
           endereco: string | null
           fardista_id: string | null
+          fardista_nome: string | null
+          hora_entrada: string | null
           id: string
+          operador: string | null
+          operador_transferencia: string | null
+          posicao: string | null
+          prateleira: string | null
+          prioridade: string | null
           quantidade: number
           reserva_id: string
           sku: string
           status: string
+          transferencia: string | null
         }
         Insert: {
+          altura?: string | null
+          clicked_at?: string | null
           codigo_in: string
           created_at?: string
+          data_entrada?: string | null
+          data_transferencia?: string | null
           endereco?: string | null
           fardista_id?: string | null
+          fardista_nome?: string | null
+          hora_entrada?: string | null
           id?: string
+          operador?: string | null
+          operador_transferencia?: string | null
+          posicao?: string | null
+          prateleira?: string | null
+          prioridade?: string | null
           quantidade: number
           reserva_id: string
           sku: string
           status?: string
+          transferencia?: string | null
         }
         Update: {
+          altura?: string | null
+          clicked_at?: string | null
           codigo_in?: string
           created_at?: string
+          data_entrada?: string | null
+          data_transferencia?: string | null
           endereco?: string | null
           fardista_id?: string | null
+          fardista_nome?: string | null
+          hora_entrada?: string | null
           id?: string
+          operador?: string | null
+          operador_transferencia?: string | null
+          posicao?: string | null
+          prateleira?: string | null
+          prioridade?: string | null
           quantidade?: number
           reserva_id?: string
           sku?: string
           status?: string
+          transferencia?: string | null
         }
         Relationships: [
           {
@@ -482,6 +565,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },
