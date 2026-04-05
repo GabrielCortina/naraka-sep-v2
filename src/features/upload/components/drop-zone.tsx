@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { Upload, FileSpreadsheet, Loader2, X } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import { CloudUpload, FileSpreadsheet, Loader2, X, FolderOpen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { UploadStep } from '@/features/upload/hooks/use-upload'
 
@@ -99,141 +98,152 @@ export function DropZone({
   if (!showDropZone) return null
 
   return (
-    <Card className="max-w-2xl mx-auto">
-      <CardContent className="p-0">
-        <div
-          role="button"
-          tabIndex={0}
-          aria-label="Zona de upload de planilha .xlsx"
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onKeyDown={onKeyDown}
-          className={`
-            relative flex flex-col items-center justify-center gap-4
-            min-h-[200px] py-12 px-6
-            rounded-lg transition-all duration-150 ease-in-out
-            outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-            ${step === 'idle' && !isDragOver && !isInvalidDrag
-              ? 'border-2 border-dashed border-border cursor-pointer'
-              : ''
-            }
-            ${isDragOver
-              ? 'border-2 border-dashed border-primary bg-primary/5'
-              : ''
-            }
-            ${isInvalidDrag
-              ? 'border-2 border-dashed border-destructive animate-[shake_300ms_ease-in-out]'
-              : ''
-            }
-            ${step === 'file-selected' || step === 'parsing'
-              ? 'border-2 border-solid border-border'
-              : ''
-            }
-          `}
-        >
-          {/* Estado idle */}
-          {step === 'idle' && !isDragOver && (
-            <>
-              <Upload
-                className="h-12 w-12 text-muted-foreground transition-transform duration-200"
-                aria-hidden="true"
-              />
-              <div className="text-center space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Arraste o arquivo .xlsx aqui ou
-                </p>
-                <Button
-                  variant="secondary"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    inputRef.current?.click()
-                  }}
-                  disabled={isProcessing}
-                >
-                  Selecionar arquivo
-                </Button>
-              </div>
-            </>
-          )}
-
-          {/* Estado drag-over */}
-          {step === 'idle' && isDragOver && (
-            <Upload
-              className="h-12 w-12 text-primary scale-110 transition-transform duration-200"
+    <div>
+      <div
+        role="button"
+        tabIndex={0}
+        aria-label="Zona de upload de planilha .xlsx"
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onKeyDown={onKeyDown}
+        className={`
+          relative flex flex-col items-center justify-center gap-5
+          min-h-[280px] py-14 px-6
+          rounded-xl transition-all duration-150 ease-in-out
+          outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+          ${step === 'idle' && !isDragOver && !isInvalidDrag
+            ? 'border-2 border-dashed border-border/60 bg-muted/30 cursor-pointer hover:bg-muted/50 hover:border-border'
+            : ''
+          }
+          ${isDragOver
+            ? 'border-2 border-dashed border-primary bg-primary/5 scale-[1.01]'
+            : ''
+          }
+          ${isInvalidDrag
+            ? 'border-2 border-dashed border-destructive animate-[shake_300ms_ease-in-out]'
+            : ''
+          }
+          ${step === 'file-selected' || step === 'parsing'
+            ? 'border-2 border-solid border-border bg-muted/20'
+            : ''
+          }
+        `}
+      >
+        {/* Estado idle */}
+        {step === 'idle' && !isDragOver && (
+          <>
+            <CloudUpload
+              className="h-16 w-16 text-muted-foreground/60"
+              strokeWidth={1.5}
               aria-hidden="true"
             />
-          )}
-
-          {/* Estado file-selected */}
-          {step === 'file-selected' && file && (
-            <>
-              <FileSpreadsheet
-                className="h-12 w-12 text-primary"
-                aria-hidden="true"
-              />
-              <div className="text-center space-y-1">
-                <p className="font-medium text-sm">
-                  {file.name}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {formatFileSize(file.size)}
-                </p>
-              </div>
-              <Button
-                ref={processButtonRef}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleProcess()
-                }}
-              >
-                Processar planilha
-              </Button>
-            </>
-          )}
-
-          {/* Estado parsing/processing */}
-          {step === 'parsing' && (
-            <>
-              <Loader2
-                className="h-12 w-12 text-primary animate-spin"
-                aria-hidden="true"
-              />
-              <p
-                className="text-sm text-muted-foreground"
-                aria-live="polite"
-                aria-busy="true"
-              >
-                Processando arquivo...
+            <div className="text-center space-y-1.5">
+              <p className="text-lg font-semibold text-foreground">
+                Arraste o arquivo Excel aqui
               </p>
-            </>
-          )}
-        </div>
-
-        {/* Input file hidden */}
-        <input
-          type="file"
-          accept=".xlsx"
-          ref={inputRef}
-          onChange={handleFileSelect}
-          className="hidden"
-          tabIndex={-1}
-        />
-
-        {/* Botao voltar */}
-        {step !== 'idle' && (
-          <div className="flex justify-center pb-4">
+              <p className="text-sm text-muted-foreground">
+                ou clique para selecionar
+              </p>
+            </div>
             <Button
-              variant="ghost"
-              onClick={handleReset}
+              className="mt-2 uppercase tracking-wide font-semibold"
+              onClick={(e) => {
+                e.stopPropagation()
+                inputRef.current?.click()
+              }}
               disabled={isProcessing}
             >
-              <X className="h-4 w-4 mr-1" aria-hidden="true" />
-              Voltar ao upload
+              <FolderOpen className="h-4 w-4 mr-2" aria-hidden="true" />
+              Enviar Arquivo
             </Button>
-          </div>
+          </>
         )}
-      </CardContent>
-    </Card>
+
+        {/* Estado drag-over */}
+        {step === 'idle' && isDragOver && (
+          <>
+            <CloudUpload
+              className="h-16 w-16 text-primary scale-110 transition-transform duration-200"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
+            <p className="text-sm font-medium text-primary">Solte o arquivo aqui</p>
+          </>
+        )}
+
+        {/* Estado file-selected */}
+        {step === 'file-selected' && file && (
+          <>
+            <FileSpreadsheet
+              className="h-14 w-14 text-primary"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
+            <div className="text-center space-y-1">
+              <p className="font-semibold text-sm">
+                {file.name}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {formatFileSize(file.size)}
+              </p>
+            </div>
+            <Button
+              ref={processButtonRef}
+              className="mt-1"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleProcess()
+              }}
+            >
+              Processar planilha
+            </Button>
+          </>
+        )}
+
+        {/* Estado parsing/processing */}
+        {step === 'parsing' && (
+          <>
+            <Loader2
+              className="h-14 w-14 text-primary animate-spin"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
+            <p
+              className="text-sm text-muted-foreground"
+              aria-live="polite"
+              aria-busy="true"
+            >
+              Processando arquivo...
+            </p>
+          </>
+        )}
+      </div>
+
+      {/* Input file hidden */}
+      <input
+        type="file"
+        accept=".xlsx"
+        ref={inputRef}
+        onChange={handleFileSelect}
+        className="hidden"
+        tabIndex={-1}
+      />
+
+      {/* Botao voltar */}
+      {step !== 'idle' && (
+        <div className="flex justify-center pt-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleReset}
+            disabled={isProcessing}
+          >
+            <X className="h-4 w-4 mr-1" aria-hidden="true" />
+            Voltar ao upload
+          </Button>
+        </div>
+      )}
+    </div>
   )
 }

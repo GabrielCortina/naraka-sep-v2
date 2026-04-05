@@ -50,7 +50,7 @@ export function Sidebar({
         <span className="text-xl font-semibold">NARAKA</span>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3">
+      <nav className="flex-1 overflow-y-auto px-3 pt-4">
         {items.map((item) => {
           const Icon = iconMap[item.icon]
           const isActive = pathname === item.href

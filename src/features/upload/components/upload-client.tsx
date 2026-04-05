@@ -33,9 +33,7 @@ export function UploadClient({ initialImports }: UploadClientProps) {
   const isProcessing = step === 'confirming'
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <h1 className="text-xl font-semibold">Upload</h1>
-
+    <div className="max-w-2xl mx-auto space-y-6 pt-8 md:pt-12">
       {error && (
         <p className="text-sm text-destructive" role="alert">
           {error}

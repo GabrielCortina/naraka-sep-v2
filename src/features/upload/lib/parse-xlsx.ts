@@ -39,9 +39,9 @@ export interface ParseResult {
 
 const FULLFILMENT_REGEX = /full|fulfillment/i
 
-/** Remove acentos e converte para lowercase para comparação de headers */
+/** Remove acentos, ordinal indicators e converte para lowercase para comparação de headers */
 function normalizeKey(key: string): string {
-  return key.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  return key.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u00ba/g, 'o').replace(/\u00aa/g, 'a')
 }
 
 /** Busca valor numa row usando header normalizado (aceita com ou sem acento) */
@@ -93,6 +93,11 @@ export function parseXlsx(buffer: ArrayBuffer): ParseResult {
     }
 
     rows.push(row)
+  }
+
+  console.log(`[parseXlsx] total_raw=${total_raw} filtered_status=${filtered_status} filtered_envio=${filtered_envio} valid=${rows.length}`)
+  if (rawRows.length > 0) {
+    console.log(`[parseXlsx] headers da planilha:`, Object.keys(rawRows[0]))
   }
 
   return { rows, filtered_status, filtered_envio, total_raw }

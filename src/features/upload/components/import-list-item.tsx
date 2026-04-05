@@ -6,6 +6,18 @@ import { Badge } from '@/components/ui/badge'
 import { Clock, Trash2 } from 'lucide-react'
 import type { ImportRecord } from '@/features/upload/types'
 
+function formatHorario(iso: string): string {
+  try {
+    return new Date(iso).toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'America/Sao_Paulo',
+    })
+  } catch {
+    return iso
+  }
+}
+
 const TIPO_LABELS: Record<string, string> = {
   unitario: 'Unitarios',
   kit: 'Kits',
@@ -41,7 +53,7 @@ export function ImportListItem({
             </span>
             <span className="flex items-center gap-1 text-sm text-muted-foreground">
               <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-              {record.horario}
+              {formatHorario(record.horario)}
             </span>
             <span className="text-sm text-muted-foreground">
               {record.total_pedidos} pedidos

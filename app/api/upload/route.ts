@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createAuthClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { classifyOrders, generateCardKey } from '@/features/upload/lib/classify'
 import { classifyEnvio } from '@/features/upload/lib/envio-groups'
 import type { ParsedRow } from '@/features/upload/lib/parse-xlsx'
@@ -11,20 +12,26 @@ function getTodayBrasilia(): string {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
+  const authSupabase = await createAuthClient()
 
   // 1. Autenticacao
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await authSupabase.auth.getUser()
   if (authError || !user) {
     return Response.json({ error: 'Nao autorizado' }, { status: 401 })
   }
 
   // 2. Verificar role (admin ou lider)
-  const { data: userData } = await supabase
+  const { data: userData } = await authSupabase
     .from('users').select('role').eq('id', user.id).single()
   if (!userData || !['admin', 'lider'].includes(userData.role)) {
     return Response.json({ error: 'Sem permissao' }, { status: 403 })
   }
+
+  // Service role client para operações de escrita (bypassa RLS)
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
   // 3. Validar body
   let body: { rows: ParsedRow[]; filtered_status: number; filtered_envio: number }
@@ -144,7 +151,7 @@ export async function POST(request: NextRequest) {
         numero_pedido_plataforma: item.numero_pedido_plataforma,
         plataforma: item.plataforma,
         loja: item.loja,
-        prazo_envio: item.prazo_envio,
+        prazo_envio: item.prazo_envio || null,
         sku: item.sku,
         quantidade: item.quantidade,
         variacao: item.variacao,
@@ -160,12 +167,19 @@ export async function POST(request: NextRequest) {
   }
 
   // 10. Persistir no Supabase (chunked insert de 500)
+  console.log(`[upload] Inserindo ${records.length} registros em chunks de 500`)
+  console.log(`[upload] Primeiro registro:`, JSON.stringify(records[0], null, 2))
   for (let i = 0; i < records.length; i += 500) {
     const chunk = records.slice(i, i + 500)
     const { error: insertError } = await supabase.from('pedidos').insert(chunk)
     if (insertError) {
+      console.error(`[upload] ERRO ao inserir chunk ${i / 500 + 1}:`, insertError)
+      console.error(`[upload] Código:`, insertError.code)
+      console.error(`[upload] Mensagem:`, insertError.message)
+      console.error(`[upload] Detalhes:`, insertError.details)
+      console.error(`[upload] Hint:`, insertError.hint)
       return Response.json(
-        { error: 'Erro ao inserir pedidos', details: insertError.message },
+        { error: 'Erro ao inserir pedidos', details: insertError.message, code: insertError.code, hint: insertError.hint },
         { status: 500 }
       )
     }
