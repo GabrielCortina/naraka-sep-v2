@@ -5,13 +5,12 @@ const mockSave = vi.fn()
 const mockSetFontSize = vi.fn()
 
 vi.mock('jspdf', () => {
-  return {
-    default: vi.fn().mockImplementation(() => ({
-      text: mockText,
-      save: mockSave,
-      setFontSize: mockSetFontSize,
-    })),
-  }
+  const MockJsPDF = vi.fn(function (this: Record<string, unknown>) {
+    this.text = mockText
+    this.save = mockSave
+    this.setFontSize = mockSetFontSize
+  })
+  return { default: MockJsPDF }
 })
 
 const mockAutoTable = vi.fn()
