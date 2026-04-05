@@ -89,7 +89,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Migration SQL, tipos do dominio fardos e algoritmo subset sum com TDD
+- [x] 04-01-PLAN.md — Migration SQL, tipos do dominio fardos e algoritmo subset sum com TDD
 - [ ] 04-02-PLAN.md — Cache, stock-parser com retry, e reservation engine com testes
 - [ ] 04-03-PLAN.md — Integracao no upload route, endpoint re-reserva, feedback UI e schema push
 
@@ -192,7 +192,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 1. Infraestrutura | 3/3 | Complete   | 2026-04-04 |
 | 2. Autenticacao | 0/3 | Not started | - |
 | 3. Upload e Processamento | 0/4 | Not started | - |
-| 4. Estoque e Reserva de Fardos | 0/3 | Not started | - |
+| 4. Estoque e Reserva de Fardos | 1/3 | In Progress|  |
 | 5. Cards e UI Foundation | 0/? | Not started | - |
 | 6. Lista de Fardos | 0/? | Not started | - |
 | 7. Lista de Prateleira e Cascata | 0/? | Not started | - |

@@ -40,9 +40,9 @@
 - [ ] **STOK-02**: Sistema identifica fardos disponíveis (código IN, SKU, quantidade, endereço)
 - [ ] **STOK-03**: SKU com >= 50 peças no dia vai para lista de fardos
 - [ ] **STOK-04**: SKU com < 50 peças no dia vai para lista de prateleira
-- [ ] **STOK-05**: Reserva de fardos usa algoritmo subset sum para encontrar combinação ótima com margem máxima de 20%
+- [x] **STOK-05**: Reserva de fardos usa algoritmo subset sum para encontrar combinação ótima com margem máxima de 20%
 - [ ] **STOK-06**: Cada fardo físico (código IN) só pode ser reservado uma vez globalmente
-- [ ] **STOK-07**: Se não cobrir dentro de 20%, reserva o máximo disponível
+- [x] **STOK-07**: Se não cobrir dentro de 20%, reserva o máximo disponível
 
 ### Cards
 
@@ -167,9 +167,9 @@
 | STOK-02 | Phase 4 | Pending |
 | STOK-03 | Phase 4 | Pending |
 | STOK-04 | Phase 4 | Pending |
-| STOK-05 | Phase 4 | Pending |
+| STOK-05 | Phase 4 | Complete |
 | STOK-06 | Phase 4 | Pending |
-| STOK-07 | Phase 4 | Pending |
+| STOK-07 | Phase 4 | Complete |
 | CARD-01 | Phase 5 | Pending |
 | CARD-02 | Phase 5 | Pending |
 | CARD-03 | Phase 5 | Pending |
