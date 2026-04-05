@@ -122,6 +122,10 @@ None - no external service configuration required.
 - Plan 05-05 can now consume /api/cards/progress and /api/cards/assign endpoints
 - RLS policies ready for deployment via supabase db push
 
+## Self-Check: PASSED
+
+All 3 created files verified on disk. Both task commits (0d971a0, a647166) found in git log.
+
 ---
 *Phase: 05-cards-e-ui-foundation*
 *Completed: 2026-04-05*
