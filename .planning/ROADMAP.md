@@ -123,11 +123,13 @@ Plans:
   2. Fardista marca fardo como OK (entra no trafego) ou N/E (sistema busca alternativo; se nao achar, libera na prateleira)
   3. Lider pode atribuir fardistas a cards de fardos e a lista atualiza em tempo real
   4. Botao Imprimir Fardos gera PDF com codigo IN, SKU, endereco, quantidade e para quem entregar
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 06-01: TBD
+- [ ] 06-01-PLAN.md — Migration trafego_fardos, tipos do dominio fardos e hook useFardosData
+- [ ] 06-02-PLAN.md — API routes fluxo OK (planilha + trafego) e N/E (alternativo ou prateleira)
+- [ ] 06-03-PLAN.md — UI lista plana, filtros, contadores, PDF, atribuicao em lote e schema push
 
 ### Phase 7: Lista de Prateleira e Cascata
 **Goal**: Separador pode trabalhar itens da prateleira com acoes Confirmar/Parcial/NE e cascata automatica para fardos ou Transformacao
@@ -199,7 +201,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 3. Upload e Processamento | 0/4 | Not started | - |
 | 4. Estoque e Reserva de Fardos | 1/3 | In Progress|  |
 | 5. Cards e UI Foundation | 0/6 | Not started | - |
-| 6. Lista de Fardos | 0/? | Not started | - |
+| 6. Lista de Fardos | 0/3 | Not started | - |
 | 7. Lista de Prateleira e Cascata | 0/? | Not started | - |
 | 8. Baixa de Fardos | 0/? | Not started | - |
 | 9. Dashboard | 0/? | Not started | - |
