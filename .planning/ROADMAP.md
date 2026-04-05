@@ -103,11 +103,15 @@ Plans:
   3. Cards sao colapsiveis por metodo de envio e cards 100% completos vao para secao CONCLUIDOS colapsavel
   4. Design minimalista preto e branco com cores por marketplace; mobile first para separadores/fardistas, desktop para lider/admin
   5. Modal abre card para trabalhar itens; popup de quantidade funciona no mobile
-**Plans**: TBD
+**Plans**: 5 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md — Design system tokens, tipos do dominio cards e logica pura card-utils com TDD
+- [ ] 05-02-PLAN.md — Instalar deps shadcn/jspdf e componentes atomicos (ProgressBar, UrgencyBadge, MarketplaceBadge, OrderCard)
+- [ ] 05-03-PLAN.md — KanbanBoard, KanbanColumn e CompletedSection com layout responsivo desktop/mobile
+- [ ] 05-04-PLAN.md — Modais (ItemModal, NumpadPopup, AssignModal) e PDF generator
+- [ ] 05-05-PLAN.md — Hooks de dados (realtime, countdown, card-data), migration SQL e wiring nas paginas /prateleira e /fardos
 
 ### Phase 6: Lista de Fardos
 **Goal**: Fardista pode ver, trabalhar e imprimir sua lista de fardos com acoes OK e N/E em tempo real
@@ -193,7 +197,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 2. Autenticacao | 0/3 | Not started | - |
 | 3. Upload e Processamento | 0/4 | Not started | - |
 | 4. Estoque e Reserva de Fardos | 1/3 | In Progress|  |
-| 5. Cards e UI Foundation | 0/? | Not started | - |
+| 5. Cards e UI Foundation | 0/5 | Not started | - |
 | 6. Lista de Fardos | 0/? | Not started | - |
 | 7. Lista de Prateleira e Cascata | 0/? | Not started | - |
 | 8. Baixa de Fardos | 0/? | Not started | - |
