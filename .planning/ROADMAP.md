@@ -83,13 +83,15 @@ Plans:
 **Requirements**: STOK-01, STOK-02, STOK-03, STOK-04, STOK-05, STOK-06, STOK-07
 **Success Criteria** (what must be TRUE):
   1. Apos upload, sistema le planilha de estoque e identifica fardos disponiveis com codigo IN, SKU, quantidade e endereco
-  2. SKUs com >= 50 pecas no dia sao direcionados para lista de fardos; < 50 pecas para lista de prateleira
+  2. SKUs com fardo disponivel no estoque externo vao para lista de fardos; SKUs sem fardo vao para lista de prateleira (regra corrigida por D-06)
   3. Reserva de fardos seleciona combinacao otima via subset sum sem exceder 20% de margem; cada fardo fisico e reservado apenas uma vez
   4. Se nao cobrir dentro de 20%, sistema reserva o maximo disponivel sem travar
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md — Migration SQL, tipos do dominio fardos e algoritmo subset sum com TDD
+- [ ] 04-02-PLAN.md — Cache, stock-parser com retry, e reservation engine com testes
+- [ ] 04-03-PLAN.md — Integracao no upload route, endpoint re-reserva, feedback UI e schema push
 
 ### Phase 5: Cards e UI Foundation
 **Goal**: Pedidos processados aparecem organizados em cards com progresso, urgencia e design system completo do sistema
@@ -183,14 +185,14 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infraestrutura | 3/3 | Complete   | 2026-04-04 |
 | 2. Autenticacao | 0/3 | Not started | - |
 | 3. Upload e Processamento | 0/4 | Not started | - |
-| 4. Estoque e Reserva de Fardos | 0/? | Not started | - |
+| 4. Estoque e Reserva de Fardos | 0/3 | Not started | - |
 | 5. Cards e UI Foundation | 0/? | Not started | - |
 | 6. Lista de Fardos | 0/? | Not started | - |
 | 7. Lista de Prateleira e Cascata | 0/? | Not started | - |
