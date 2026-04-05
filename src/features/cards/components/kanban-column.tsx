@@ -47,7 +47,7 @@ export function KanbanColumn({
   return (
     <>
       {/* Desktop */}
-      <div className="hidden md:block w-[240px] min-w-[240px] flex-shrink-0">
+      <div className="hidden md:block min-w-0">
         <div className="flex items-center gap-1 mb-2">
           <MarketplaceBadge grupoEnvio={grupoEnvio} />
           <span className="text-xs text-muted-foreground ml-1">

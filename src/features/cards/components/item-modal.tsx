@@ -7,7 +7,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -18,6 +17,7 @@ import { Badge } from '@/components/ui/badge'
 import type { CardData, CardItem } from '../types'
 import { TYPE_ABBREV } from '../lib/deadline-config'
 import { generateChecklist } from '../lib/pdf-generator'
+import { ProgressBar } from './progress-bar'
 import { NumpadPopup } from './numpad-popup'
 
 interface ItemModalProps {
@@ -66,12 +66,35 @@ export function ItemModal({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-lg max-h-[80vh] p-0 gap-0 data-[state=open]:slide-in-from-bottom">
           <DialogHeader className="p-4 border-b">
-            <DialogTitle>
-              {card.grupo_envio} - {TYPE_ABBREV[card.tipo] || card.tipo} #{card.importacao_numero}
-            </DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle>
+                {card.grupo_envio} - {TYPE_ABBREV[card.tipo] || card.tipo} #{card.importacao_numero}
+              </DialogTitle>
+              <button
+                onClick={() => generateChecklist(card)}
+                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-accent/50"
+                aria-label="Imprimir checklist"
+              >
+                <Printer className="h-4 w-4" />
+              </button>
+            </div>
             <DialogDescription className="sr-only">
               Lista de itens do card para separacao
             </DialogDescription>
+            <div className="mt-2">
+              <ProgressBar
+                percent={card.total_pecas === 0 ? 0 : Math.round((card.pecas_separadas / card.total_pecas) * 100)}
+                urgency={card.urgency}
+              />
+              <div className="flex justify-between mt-1">
+                <span className="text-xs font-bold">
+                  {card.total_pecas === 0 ? 0 : Math.round((card.pecas_separadas / card.total_pecas) * 100)}%
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {card.pecas_separadas}/{card.total_pecas} peças
+                </span>
+              </div>
+            </div>
           </DialogHeader>
 
           <ScrollArea className="flex-1 px-4">
@@ -145,16 +168,6 @@ export function ItemModal({
             </div>
           </ScrollArea>
 
-          <DialogFooter className="p-4 border-t">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => generateChecklist(card)}
-            >
-              <Printer className="w-4 h-4 mr-2" />
-              Imprimir Checklist
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 

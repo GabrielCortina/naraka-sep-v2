@@ -1,7 +1,6 @@
 'use client'
 
 import { Package } from 'lucide-react'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import type { CardData } from '../types'
 import { COLUMN_ORDER } from '../lib/deadline-config'
 import { KanbanColumn } from './kanban-column'
@@ -46,21 +45,23 @@ export function KanbanBoard({ cards, onOpenModal, onAssign }: KanbanBoardProps) 
   return (
     <div className="bg-zinc-100 min-h-[calc(100vh-4rem)] rounded-lg">
       {/* Desktop */}
-      <div className="hidden md:block">
-        <ScrollArea className="w-full">
-          <div className="flex gap-6 p-4">
-            {visibleColumns.map((grupo) => (
-              <KanbanColumn
-                key={grupo}
-                grupoEnvio={grupo}
-                cards={byGroup.get(grupo)!}
-                onOpenModal={onOpenModal}
-                onAssign={onAssign}
-              />
-            ))}
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+      <div className="hidden md:block p-4">
+        <div
+          className="grid gap-4"
+          style={{
+            gridTemplateColumns: `repeat(${visibleColumns.length}, minmax(180px, 1fr))`,
+          }}
+        >
+          {visibleColumns.map((grupo) => (
+            <KanbanColumn
+              key={grupo}
+              grupoEnvio={grupo}
+              cards={byGroup.get(grupo)!}
+              onOpenModal={onOpenModal}
+              onAssign={onAssign}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Mobile */}
