@@ -4,6 +4,7 @@ export interface StockItem {
   sku: string
   quantidade: number
   endereco: string
+  posicao: string
 }
 
 /** Resultado do algoritmo subset sum para um SKU */

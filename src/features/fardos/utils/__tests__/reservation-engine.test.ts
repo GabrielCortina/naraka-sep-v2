@@ -61,7 +61,7 @@ describe('reservation-engine', () => {
 
   it('Test 1: SKU com fardo -> skus_fardo, SKU sem fardo -> skus_prateleira', async () => {
     const stock: StockItem[] = [
-      { codigo_in: 'IN-001', sku: 'ABC', quantidade: 500, endereco: 'A1' },
+      { codigo_in: 'IN-001', sku: 'ABC', quantidade: 500, endereco: 'A1', posicao: '' },
     ]
     mockedFetchStock.mockResolvedValue(stock)
 
@@ -87,7 +87,7 @@ describe('reservation-engine', () => {
 
   it('Test 2: demanda agregada - 3 pedidos mesmo SKU', async () => {
     const stock: StockItem[] = [
-      { codigo_in: 'IN-001', sku: 'ABC', quantidade: 500, endereco: 'A1' },
+      { codigo_in: 'IN-001', sku: 'ABC', quantidade: 500, endereco: 'A1', posicao: '' },
     ]
     mockedFetchStock.mockResolvedValue(stock)
 
@@ -121,8 +121,8 @@ describe('reservation-engine', () => {
 
   it('Test 3: visao global - fardo ja reservado nao aparece nos disponiveis', async () => {
     const stock: StockItem[] = [
-      { codigo_in: 'IN-001', sku: 'ABC', quantidade: 500, endereco: 'A1' },
-      { codigo_in: 'IN-002', sku: 'ABC', quantidade: 300, endereco: 'A2' },
+      { codigo_in: 'IN-001', sku: 'ABC', quantidade: 500, endereco: 'A1', posicao: '' },
+      { codigo_in: 'IN-002', sku: 'ABC', quantidade: 300, endereco: 'A2', posicao: '' },
     ]
     mockedFetchStock.mockResolvedValue(stock)
 
@@ -149,8 +149,8 @@ describe('reservation-engine', () => {
 
   it('Test 4: cobertura parcial inclui SKU em parciais', async () => {
     const stock: StockItem[] = [
-      { codigo_in: 'IN-001', sku: 'ABC', quantidade: 300, endereco: 'A1' },
-      { codigo_in: 'IN-002', sku: 'ABC', quantidade: 300, endereco: 'A2' },
+      { codigo_in: 'IN-001', sku: 'ABC', quantidade: 300, endereco: 'A1', posicao: '' },
+      { codigo_in: 'IN-002', sku: 'ABC', quantidade: 300, endereco: 'A2', posicao: '' },
     ]
     mockedFetchStock.mockResolvedValue(stock)
 
@@ -178,10 +178,10 @@ describe('reservation-engine', () => {
     // ABC reserva IN-001, DEF deve ter IN-002 e IN-003 disponiveis (IN-001 nao e SKU DEF)
     // Cenario real de unicidade: ABC e DEF compartilham IN-SHARED
     const stock: StockItem[] = [
-      { codigo_in: 'IN-001', sku: 'ABC', quantidade: 500, endereco: 'A1' },
-      { codigo_in: 'IN-SHARED', sku: 'ABC', quantidade: 200, endereco: 'A2' },
-      { codigo_in: 'IN-SHARED', sku: 'DEF', quantidade: 200, endereco: 'A2' },
-      { codigo_in: 'IN-002', sku: 'DEF', quantidade: 300, endereco: 'B1' },
+      { codigo_in: 'IN-001', sku: 'ABC', quantidade: 500, endereco: 'A1', posicao: '' },
+      { codigo_in: 'IN-SHARED', sku: 'ABC', quantidade: 200, endereco: 'A2', posicao: '' },
+      { codigo_in: 'IN-SHARED', sku: 'DEF', quantidade: 200, endereco: 'A2', posicao: '' },
+      { codigo_in: 'IN-002', sku: 'DEF', quantidade: 300, endereco: 'B1', posicao: '' },
     ]
     mockedFetchStock.mockResolvedValue(stock)
 
@@ -245,7 +245,7 @@ describe('reservation-engine', () => {
   })
 
   it('Test 7: fardos selecionados sao inseridos com status reservado e importacao_numero', async () => {
-    const fardo: StockItem = { codigo_in: 'IN-001', sku: 'ABC', quantidade: 500, endereco: 'A1' }
+    const fardo: StockItem = { codigo_in: 'IN-001', sku: 'ABC', quantidade: 500, endereco: 'A1', posicao: '' }
     mockedFetchStock.mockResolvedValue([fardo])
 
     setupSupabaseMock({
@@ -288,7 +288,7 @@ describe('reservation-engine', () => {
   })
 
   it('Test 9: erro 23505 unique_violation no insert pula o fardo', async () => {
-    const fardo: StockItem = { codigo_in: 'IN-001', sku: 'ABC', quantidade: 500, endereco: 'A1' }
+    const fardo: StockItem = { codigo_in: 'IN-001', sku: 'ABC', quantidade: 500, endereco: 'A1', posicao: '' }
     mockedFetchStock.mockResolvedValue([fardo])
 
     setupSupabaseMock({

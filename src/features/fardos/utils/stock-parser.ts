@@ -4,15 +4,22 @@ import type { StockItem } from '../types'
 
 const STOCK_CACHE_KEY = 'estoque'
 
+/** Remove acentos e converte para lowercase para comparação de headers (mesmo padrão do parse-xlsx) */
+function normalizeHeader(key: string): string {
+  return key.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
 /**
- * Colunas esperadas da planilha de estoque (por nome do header, uppercase).
- * SKU, QUANTIDADE, CODIGO UPSELLER (codigo IN / fardo ID), ENDERECO
+ * Colunas esperadas da planilha de estoque (normalizadas sem acento, lowercase).
+ * Headers reais: PRIORIDADE, PRATELEIRA, POSIÇÃO, ALTURA, ENDEREÇO, SKU, QUANTIDADE,
+ * CODIGO UPSELLER, DATA ENTRADA, HORA ENTRADA, OPERADOR, TRANFERENCIA, DATA TRANFERENCIA, OPERADOR
  */
 const REQUIRED_COLUMNS = {
-  sku: 'SKU',
-  quantidade: 'QUANTIDADE',
-  codigo_in: 'CODIGO UPSELLER',
-  endereco: 'ENDERECO',
+  sku: 'sku',
+  quantidade: 'quantidade',
+  codigo_in: 'codigo upseller',
+  endereco: 'endereco',
+  posicao: 'posicao',
 } as const
 
 /**
@@ -58,19 +65,19 @@ export async function fetchStock(forceRefresh = false): Promise<StockItem[]> {
   const rows = await withRetry(() => getSheetData('Estoque'))
   if (!rows || rows.length < 2) return []
 
-  // Mapear headers por nome (case-insensitive com trim)
-  const headers = rows[0].map((h: string) => h?.toString().trim().toUpperCase())
+  // Mapear headers por nome normalizado (sem acentos, lowercase, trim — mesmo padrão do parse-xlsx)
+  const headers = rows[0].map((h: string) => normalizeHeader(h?.toString() ?? ''))
   const colIndex = {
     sku: headers.indexOf(REQUIRED_COLUMNS.sku),
     quantidade: headers.indexOf(REQUIRED_COLUMNS.quantidade),
     codigo_in: headers.indexOf(REQUIRED_COLUMNS.codigo_in),
     endereco: headers.indexOf(REQUIRED_COLUMNS.endereco),
+    posicao: headers.indexOf(REQUIRED_COLUMNS.posicao),
   }
 
-  // Validar colunas obrigatorias
-  const missing = Object.entries(colIndex)
-    .filter(([, idx]) => idx === -1)
-    .map(([name]) => name)
+  // Validar colunas obrigatorias (posicao é opcional)
+  const requiredKeys = ['sku', 'quantidade', 'codigo_in', 'endereco'] as const
+  const missing = requiredKeys.filter(k => colIndex[k] === -1)
   if (missing.length > 0) {
     console.error(`[estoque] Colunas faltando: ${missing.join(', ')}`)
     return []
@@ -84,11 +91,14 @@ export async function fetchStock(forceRefresh = false): Promise<StockItem[]> {
     const sku = row[colIndex.sku]?.toString().trim()
     const quantidade = Number(row[colIndex.quantidade])
     const endereco = row[colIndex.endereco]?.toString().trim() ?? ''
+    const posicao = colIndex.posicao !== -1
+      ? row[colIndex.posicao]?.toString().trim() ?? ''
+      : ''
 
     // Pular linhas invalidas
     if (!codigo_in || !sku || isNaN(quantidade) || quantidade <= 0) continue
 
-    items.push({ codigo_in, sku, quantidade, endereco })
+    items.push({ codigo_in, sku, quantidade, endereco, posicao })
   }
 
   // Cachear resultado (D-05)

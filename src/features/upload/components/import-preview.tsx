@@ -181,6 +181,12 @@ export function ImportPreview({
                 )}
               </div>
             )}
+
+            <div className="flex justify-end pt-2">
+              <Button onClick={onReset} className="w-full sm:w-auto">
+                OK
+              </Button>
+            </div>
           </>
         )}
       </CardContent>

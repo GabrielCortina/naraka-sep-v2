@@ -3,7 +3,7 @@ import { findOptimalCombination } from '../subset-sum'
 import type { StockItem } from '../../types'
 
 function makeFardo(codigo_in: string, quantidade: number): StockItem {
-  return { codigo_in, sku: 'SKU-TEST', quantidade, endereco: 'A-01' }
+  return { codigo_in, sku: 'SKU-TEST', quantidade, endereco: 'A-01', posicao: '' }
 }
 
 describe('findOptimalCombination', () => {

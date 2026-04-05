@@ -154,17 +154,6 @@ export function useUpload(initialImports: ImportRecord[] = []) {
       )
 
       setStep('success')
-
-      // Retornar ao idle apos 3s
-      setTimeout(() => {
-        setStep('idle')
-        setFile(null)
-        setParseResult(null)
-        setSummary(null)
-        setImportacaoNumero(null)
-        setEstoque(null)
-        setDayReset(false)
-      }, 3000)
     } catch (err) {
       const message = err instanceof Error
         ? err.message

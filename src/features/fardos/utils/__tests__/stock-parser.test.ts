@@ -29,12 +29,12 @@ describe('stock-parser', () => {
   })
 
   describe('fetchStock', () => {
-    it('Test 1: parse valido com 3 data rows retorna 3 StockItem', async () => {
+    it('Test 1: parse valido com headers reais da planilha retorna StockItems', async () => {
       mockedGetSheetData.mockResolvedValue([
-        ['SKU', 'QUANTIDADE', 'CODIGO UPSELLER', 'ENDERECO'],
-        ['ABC-001', '100', 'IN-001', 'A1-01'],
-        ['DEF-002', '200', 'IN-002', 'B2-03'],
-        ['GHI-003', '50', 'IN-003', 'C3-05'],
+        ['PRIORIDADE', 'PRATELEIRA', 'POSIÇÃO', 'ALTURA', 'ENDEREÇO', 'SKU', 'QUANTIDADE', 'CODIGO UPSELLER', 'DATA ENTRADA', 'HORA ENTRADA', 'OPERADOR', 'TRANFERENCIA', 'DATA TRANFERENCIA', 'OPERADOR'],
+        ['1', 'P1', 'A', '2', 'A1-01', 'ABC-001', '100', 'IN-001', '01/01', '08:00', 'João', '', '', ''],
+        ['2', 'P2', 'B', '3', 'B2-03', 'DEF-002', '200', 'IN-002', '01/01', '09:00', 'Maria', '', '', ''],
+        ['3', 'P3', 'C', '1', 'C3-05', 'GHI-003', '50', 'IN-003', '01/01', '10:00', 'Pedro', '', '', ''],
       ])
 
       const result = await fetchStock()
@@ -45,24 +45,27 @@ describe('stock-parser', () => {
         quantidade: 100,
         codigo_in: 'IN-001',
         endereco: 'A1-01',
+        posicao: 'A',
       })
       expect(result[1]).toEqual({
         sku: 'DEF-002',
         quantidade: 200,
         codigo_in: 'IN-002',
         endereco: 'B2-03',
+        posicao: 'B',
       })
       expect(result[2]).toEqual({
         sku: 'GHI-003',
         quantidade: 50,
         codigo_in: 'IN-003',
         endereco: 'C3-05',
+        posicao: 'C',
       })
     })
 
     it('Test 2: colunas faltando retorna array vazio', async () => {
       mockedGetSheetData.mockResolvedValue([
-        ['QUANTIDADE', 'CODIGO UPSELLER', 'ENDERECO'],
+        ['QUANTIDADE', 'CODIGO UPSELLER', 'ENDEREÇO'],
         ['100', 'IN-001', 'A1-01'],
       ])
 
@@ -73,10 +76,10 @@ describe('stock-parser', () => {
 
     it('Test 3: linhas invalidas sao ignoradas', async () => {
       mockedGetSheetData.mockResolvedValue([
-        ['SKU', 'QUANTIDADE', 'CODIGO UPSELLER', 'ENDERECO'],
-        ['ABC-001', 'NaN', 'IN-001', 'A1-01'],   // quantidade NaN
-        ['DEF-002', '200', '', 'B2-03'],           // codigo_in vazio
-        ['GHI-003', '50', 'IN-003', 'C3-05'],     // valido
+        ['SKU', 'QUANTIDADE', 'CODIGO UPSELLER', 'ENDEREÇO', 'POSIÇÃO'],
+        ['ABC-001', 'NaN', 'IN-001', 'A1-01', 'A'],   // quantidade NaN
+        ['DEF-002', '200', '', 'B2-03', 'B'],           // codigo_in vazio
+        ['GHI-003', '50', 'IN-003', 'C3-05', 'C'],     // valido
       ])
 
       const result = await fetchStock()
@@ -85,10 +88,10 @@ describe('stock-parser', () => {
       expect(result[0].sku).toBe('GHI-003')
     })
 
-    it('Test 4: headers case insensitive funciona', async () => {
+    it('Test 4: headers com acentos e case misto funciona (normalização NFD)', async () => {
       mockedGetSheetData.mockResolvedValue([
-        ['sku', 'quantidade', 'codigo upseller', 'endereco'],
-        ['ABC-001', '100', 'IN-001', 'A1-01'],
+        ['Sku', 'Quantidade', 'Codigo Upseller', 'ENDEREÇO', 'Posição'],
+        ['ABC-001', '100', 'IN-001', 'A1-01', 'A'],
       ])
 
       const result = await fetchStock()
@@ -99,6 +102,7 @@ describe('stock-parser', () => {
         quantidade: 100,
         codigo_in: 'IN-001',
         endereco: 'A1-01',
+        posicao: 'A',
       })
     })
 
@@ -117,8 +121,8 @@ describe('stock-parser', () => {
     it('Test 6: cache expired chama getSheetData novamente', async () => {
       mockedGetCached.mockReturnValue(null) // expired
       mockedGetSheetData.mockResolvedValue([
-        ['SKU', 'QUANTIDADE', 'CODIGO UPSELLER', 'ENDERECO'],
-        ['FRESH-001', '300', 'IN-FRESH', 'D4-07'],
+        ['SKU', 'QUANTIDADE', 'CODIGO UPSELLER', 'ENDEREÇO', 'POSIÇÃO'],
+        ['FRESH-001', '300', 'IN-FRESH', 'D4-07', 'D'],
       ])
 
       const result = await fetchStock()
@@ -131,8 +135,8 @@ describe('stock-parser', () => {
 
     it('Test 7: forceRefresh invalida cache antes de buscar', async () => {
       mockedGetSheetData.mockResolvedValue([
-        ['SKU', 'QUANTIDADE', 'CODIGO UPSELLER', 'ENDERECO'],
-        ['FORCE-001', '150', 'IN-FORCE', 'E5-09'],
+        ['SKU', 'QUANTIDADE', 'CODIGO UPSELLER', 'ENDEREÇO', 'POSIÇÃO'],
+        ['FORCE-001', '150', 'IN-FORCE', 'E5-09', 'E'],
       ])
 
       await fetchStock(true)
