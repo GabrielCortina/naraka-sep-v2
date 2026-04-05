@@ -39,6 +39,23 @@ export interface ParseResult {
 
 const FULLFILMENT_REGEX = /full|fulfillment/i
 
+/** Remove acentos e converte para lowercase para comparação de headers */
+function normalizeKey(key: string): string {
+  return key.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
+/** Busca valor numa row usando header normalizado (aceita com ou sem acento) */
+function col(raw: Record<string, unknown>, target: string): unknown {
+  // Tenta chave exata primeiro (mais rápido)
+  if (target in raw) return raw[target]
+  // Fallback: busca por header normalizado
+  const normalized = normalizeKey(target)
+  for (const key of Object.keys(raw)) {
+    if (normalizeKey(key) === normalized) return raw[key]
+  }
+  return undefined
+}
+
 export function parseXlsx(buffer: ArrayBuffer): ParseResult {
   const workbook = read(buffer, { type: 'array', cellDates: true })
   const sheet = workbook.Sheets[workbook.SheetNames[0]]
@@ -50,28 +67,28 @@ export function parseXlsx(buffer: ArrayBuffer): ParseResult {
   const total_raw = rawRows.length
 
   for (const raw of rawRows) {
-    const estado = String(raw['Estado do Pedido'] ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    const estado = String(col(raw, 'Estado do Pedido') ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     if (estado !== 'em processo') {
       filtered_status++
       continue
     }
 
-    const metodoEnvio = String(raw['Metodo de Envio'] ?? '')
+    const metodoEnvio = String(col(raw, 'Método de Envio') ?? '')
     if (FULLFILMENT_REGEX.test(metodoEnvio)) {
       filtered_envio++
       continue
     }
 
     const row: ParsedRow = {
-      numero_pedido_plataforma: String(raw['No de Pedido da Plataforma'] ?? ''),
-      numero_pedido: String(raw['No de Pedido'] ?? ''),
-      plataforma: String(raw['Plataformas'] ?? ''),
-      loja: String(raw['Nome da Loja no UpSeller'] ?? ''),
-      prazo_envio: raw['Prazo de Envio'] != null ? String(raw['Prazo de Envio']) : null,
-      sku: String(raw['SKU (Armazem)'] ?? ''),
-      quantidade: Number(raw['Quantidade de Produtos']) || 0,
-      variacao: raw['Variacao'] != null ? String(raw['Variacao']) : null,
-      nome_produto: raw['Nome do Produto'] != null ? String(raw['Nome do Produto']) : null,
+      numero_pedido_plataforma: String(col(raw, 'No de Pedido da Plataforma') ?? ''),
+      numero_pedido: String(col(raw, 'No de Pedido') ?? ''),
+      plataforma: String(col(raw, 'Plataformas') ?? ''),
+      loja: String(col(raw, 'Nome da Loja no UpSeller') ?? ''),
+      prazo_envio: col(raw, 'Prazo de Envio') != null ? String(col(raw, 'Prazo de Envio')) : null,
+      sku: String(col(raw, 'SKU (Armazém)') ?? ''),
+      quantidade: Number(col(raw, 'Quantidade de Produtos')) || 0,
+      variacao: col(raw, 'Variação') != null ? String(col(raw, 'Variação')) : null,
+      nome_produto: col(raw, 'Nome do Produto') != null ? String(col(raw, 'Nome do Produto')) : null,
       metodo_envio: metodoEnvio,
     }
 
