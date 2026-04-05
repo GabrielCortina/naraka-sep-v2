@@ -1,24 +1,21 @@
 import { read, utils } from 'xlsx'
 
 /**
- * Mapeamento das 13 colunas do ERP UpSeller para nomes internos.
- * Colunas marcadas com null sao usadas para filtro ou descartadas.
+ * Mapeamento das 13 colunas do ERP UpSeller para nomes internos:
+ * 'No de Pedido da Plataforma' -> numero_pedido_plataforma
+ * 'No de Pedido' -> numero_pedido
+ * 'Plataformas' -> plataforma
+ * 'Nome da Loja no UpSeller' -> loja
+ * 'Estado do Pedido' -> estado_pedido (filtro, nao no output)
+ * 'Prazo de Envio' -> prazo_envio
+ * 'SKU (Armazem)' -> sku
+ * 'Quantidade de Produtos' -> quantidade
+ * 'Quantidade Mapeada' -> descartado
+ * 'Variacao' -> variacao
+ * 'Nome do Produto' -> nome_produto
+ * 'Metodo de Envio' -> metodo_envio
+ * 'Etiqueta' -> descartado
  */
-const COLUMN_MAP: Record<string, string | null> = {
-  'No de Pedido da Plataforma': 'numero_pedido_plataforma',
-  'No de Pedido': 'numero_pedido',
-  'Plataformas': 'plataforma',
-  'Nome da Loja no UpSeller': 'loja',
-  'Estado do Pedido': 'estado_pedido', // usado para filtro, nao no output
-  'Prazo de Envio': 'prazo_envio',
-  'SKU (Armazem)': 'sku',
-  'Quantidade de Produtos': 'quantidade',
-  'Quantidade Mapeada': null, // descartado
-  'Variacao': 'variacao',
-  'Nome do Produto': 'nome_produto',
-  'Metodo de Envio': 'metodo_envio',
-  'Etiqueta': null, // descartado
-}
 
 export interface ParsedRow {
   numero_pedido_plataforma: string
