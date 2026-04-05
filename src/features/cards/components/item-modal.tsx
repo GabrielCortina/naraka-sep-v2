@@ -103,44 +103,53 @@ export function ItemModal({
               {sortedItems.map((item) => (
                 <div
                   key={item.sku}
-                  className="flex items-center justify-between py-3 border-b last:border-0"
+                  className="py-3 border-b last:border-0"
                 >
-                  <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                    <span className="text-sm font-bold truncate">{item.sku}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {item.quantidade_separada}/{item.quantidade_necessaria}
-                    </span>
-                    {isBlocked(item) && (
-                      <Badge variant="outline" className="text-xs w-fit">
-                        AGUARDAR FARDISTA
-                      </Badge>
-                    )}
-                    {item.status === 'parcial' && (
-                      <Badge variant="secondary" className="text-xs w-fit">
-                        Parcial
-                      </Badge>
-                    )}
-                    {item.status === 'nao_encontrado' && (
-                      <Badge variant="destructive" className="text-xs w-fit">
-                        Nao encontrado
-                      </Badge>
-                    )}
-                    {item.reservas.length > 0 && (
-                      <div className="mt-1 space-y-0.5">
-                        {item.reservas.map((reserva) => (
-                          <p
-                            key={reserva.codigo_in}
-                            className="text-xs text-muted-foreground"
-                          >
-                            Fardo {reserva.codigo_in} - {reserva.quantidade} un
-                            {reserva.endereco ? ` (${reserva.endereco})` : ''}
-                          </p>
-                        ))}
-                      </div>
-                    )}
+                  {/* Linha 1: SKU à esquerda, quantidade necessária à direita */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold">{item.sku}</span>
+                    <span className="text-sm font-bold">{item.quantidade_necessaria}</span>
                   </div>
 
-                  <div className="flex items-center gap-2 ml-2 shrink-0">
+                  {/* Linha 2: progresso atual */}
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {item.quantidade_separada}/{item.quantidade_necessaria}
+                  </p>
+
+                  {/* Linha 3: fardos reservados */}
+                  {item.reservas.length > 0 && (
+                    <div className="mt-0.5 space-y-0.5">
+                      {item.reservas.map((reserva) => (
+                        <p
+                          key={reserva.codigo_in}
+                          className="text-xs text-muted-foreground"
+                        >
+                          Fardo {reserva.codigo_in} - {reserva.quantidade} un
+                          {reserva.endereco ? ` (${reserva.endereco})` : ''}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Badges de status */}
+                  {isBlocked(item) && (
+                    <Badge variant="outline" className="text-xs w-fit mt-1">
+                      AGUARDAR FARDISTA
+                    </Badge>
+                  )}
+                  {item.status === 'parcial' && (
+                    <Badge variant="secondary" className="text-xs w-fit mt-1">
+                      Parcial
+                    </Badge>
+                  )}
+                  {item.status === 'nao_encontrado' && (
+                    <Badge variant="destructive" className="text-xs w-fit mt-1">
+                      Nao encontrado
+                    </Badge>
+                  )}
+
+                  {/* Botões de ação */}
+                  <div className="flex items-center gap-2 mt-2">
                     {isDone(item) ? (
                       <Check className="h-5 w-5 text-green-600" />
                     ) : (
