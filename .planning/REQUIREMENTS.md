@@ -36,12 +36,12 @@
 
 ### Stock Integration
 
-- [ ] **STOK-01**: Sistema lê planilha externa de estoque via Google Sheets API no momento do upload
-- [ ] **STOK-02**: Sistema identifica fardos disponíveis (código IN, SKU, quantidade, endereço)
-- [ ] **STOK-03**: SKU com >= 50 peças no dia vai para lista de fardos
-- [ ] **STOK-04**: SKU com < 50 peças no dia vai para lista de prateleira
+- [x] **STOK-01**: Sistema lê planilha externa de estoque via Google Sheets API no momento do upload
+- [x] **STOK-02**: Sistema identifica fardos disponíveis (código IN, SKU, quantidade, endereço)
+- [x] **STOK-03**: SKU com >= 50 peças no dia vai para lista de fardos
+- [x] **STOK-04**: SKU com < 50 peças no dia vai para lista de prateleira
 - [x] **STOK-05**: Reserva de fardos usa algoritmo subset sum para encontrar combinação ótima com margem máxima de 20%
-- [ ] **STOK-06**: Cada fardo físico (código IN) só pode ser reservado uma vez globalmente
+- [x] **STOK-06**: Cada fardo físico (código IN) só pode ser reservado uma vez globalmente
 - [x] **STOK-07**: Se não cobrir dentro de 20%, reserva o máximo disponível
 
 ### Cards
@@ -163,12 +163,12 @@
 | UPLD-08 | Phase 3 | Complete |
 | UPLD-09 | Phase 3 | Complete |
 | UPLD-10 | Phase 3 | Complete |
-| STOK-01 | Phase 4 | Pending |
-| STOK-02 | Phase 4 | Pending |
-| STOK-03 | Phase 4 | Pending |
-| STOK-04 | Phase 4 | Pending |
+| STOK-01 | Phase 4 | Complete |
+| STOK-02 | Phase 4 | Complete |
+| STOK-03 | Phase 4 | Complete |
+| STOK-04 | Phase 4 | Complete |
 | STOK-05 | Phase 4 | Complete |
-| STOK-06 | Phase 4 | Pending |
+| STOK-06 | Phase 4 | Complete |
 | STOK-07 | Phase 4 | Complete |
 | CARD-01 | Phase 5 | Pending |
 | CARD-02 | Phase 5 | Pending |

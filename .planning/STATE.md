@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-04-05T14:25:57.196Z"
-last_activity: 2026-04-05 -- Completed 04-01-PLAN.md
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-04-05T14:32:07.596Z"
+last_activity: 2026-04-05
 progress:
   total_phases: 10
   completed_phases: 3
   total_plans: 13
-  completed_plans: 11
-  percent: 85
+  completed_plans: 12
+  percent: 92
 ---
 
 # Project State
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 4
-Plan: 1 of 3 complete
-Status: Executing
-Last activity: 2026-04-05 -- Completed 04-01-PLAN.md
+Plan: 2 of 3 complete
+Status: Ready to execute
+Last activity: 2026-04-05
 
 Progress: [█████████░] 85%
 
@@ -62,6 +62,7 @@ Progress: [█████████░] 85%
 | Phase 03-upload-e-processamento P02 | 4min | 2 tasks | 2 files |
 | Phase 03-upload-e-processamento P03 | 6min | 2 tasks | 6 files |
 | Phase 04 P01 | 2min | 2 tasks | 4 files |
+| Phase 04 P02 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,9 @@ Recent decisions affecting current work:
 - [Phase 03-upload-e-processamento]: Array.from(new Set()) ao inves de spread para compatibilidade com tsconfig target
 - [Phase 03-upload-e-processamento]: RefObject<HTMLInputElement> sem | null para compatibilidade com Next.js 14 legacy ref types
 - [Phase 04]: Algoritmo DP com Map<soma, DpEntry> para subset sum -- eficiente para somas esparsas com 20-50 fardos
+- [Phase 04]: withRetry generico com backoff exponencial (1s, 2s, 4s) reutilizavel para Google Sheets
+- [Phase 04]: Header mapping case-insensitive com trim para robustez contra variacoes na planilha
+- [Phase 04]: Unicidade intra-execucao via Set de codigos_in atualizado entre iteracoes de SKU
 
 ### Pending Todos
 
@@ -96,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T14:25:57.194Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-04-05T14:32:07.594Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
