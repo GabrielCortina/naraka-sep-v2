@@ -527,19 +527,19 @@ function generateCardKey(grupo_envio: string, tipo: TipoPedido, importacao_numer
 | A2 | Vercel hobby tem timeout de 10s em Route Handlers | Project Constraints | Se planilha for muito grande, timeout pode ocorrer — mas volumes tipicos de armazem (<1000 linhas) devem ser OK |
 | A3 | SheetJS 0.20.3 funciona com Next.js 14 sem config especial de bundler | Standard Stack | Se bundler tiver problema, pode precisar de ajuste em next.config.js |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Volume tipico de linhas por planilha**
+1. **Volume tipico de linhas por planilha** — RESOLVED: Chunked insert (500 por batch) implementado em P02-T1
    - What we know: Sistema de armazem processando pedidos diarios de 4 marketplaces
    - What's unclear: Se pode chegar a milhares de linhas em uma unica planilha
    - Recommendation: Implementar chunked insert (500 por batch) por seguranca. Se volume for consistentemente <200 linhas, batch unico e suficiente
 
-2. **Timezone para virada de dia**
+2. **Timezone para virada de dia** — RESOLVED: America/Sao_Paulo usado em P02-T1
    - What we know: D-14 compara data da ultima importacao com "data de hoje"
    - What's unclear: Se usa UTC ou timezone local (Brasilia GMT-3)
    - Recommendation: Usar timezone de Brasilia (America/Sao_Paulo) ja que operacao e local. Usar `new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })` para formato YYYY-MM-DD
 
-3. **Fallback para metodos de envio nao mapeados**
+3. **Fallback para metodos de envio nao mapeados** — RESOLVED: return 'Outro' em classifyEnvio (P01-T3)
    - What we know: 6 grupos definidos (Shopee SPX, ML Flex, TikTok, ML Coleta, Shein, Shopee Xpress)
    - What's unclear: O que fazer com metodo de envio que nao bate em nenhum regex
    - Recommendation: Classificar como "Outro" e alertar no preview. Lider pode decidir se importa ou nao
