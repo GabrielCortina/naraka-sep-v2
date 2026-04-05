@@ -110,6 +110,22 @@ describe('parseXlsx', () => {
     expect(result.rows[0].nome_produto).toBeNull()
   })
 
+  it('aceita variacoes de casing, acento e espacos no estado do pedido', () => {
+    const rows = [
+      makeRow({ 'Estado do Pedido': 'Em processo' }),
+      makeRow({ 'No de Pedido': 'PED-002', 'Estado do Pedido': 'Em Processo' }),
+      makeRow({ 'No de Pedido': 'PED-003', 'Estado do Pedido': 'EM PROCESSO' }),
+      makeRow({ 'No de Pedido': 'PED-004', 'Estado do Pedido': ' em processo ' }),
+      makeRow({ 'No de Pedido': 'PED-005', 'Estado do Pedido': 'Cancelado' }),
+    ]
+    vi.mocked(utils.sheet_to_json).mockReturnValue(rows)
+
+    const result = parseXlsx(new ArrayBuffer(0))
+
+    expect(result.rows).toHaveLength(4)
+    expect(result.filtered_status).toBe(1)
+  })
+
   it('total_raw conta todas as linhas brutas', () => {
     const rows = [
       makeRow(),

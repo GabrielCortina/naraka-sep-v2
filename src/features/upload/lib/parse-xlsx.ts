@@ -50,8 +50,8 @@ export function parseXlsx(buffer: ArrayBuffer): ParseResult {
   const total_raw = rawRows.length
 
   for (const raw of rawRows) {
-    const estado = String(raw['Estado do Pedido'] ?? '')
-    if (estado !== 'Em processo') {
+    const estado = String(raw['Estado do Pedido'] ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    if (estado !== 'em processo') {
       filtered_status++
       continue
     }
