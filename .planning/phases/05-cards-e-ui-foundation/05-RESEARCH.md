@@ -522,27 +522,22 @@ export const MARKETPLACE_COLORS: Record<string, { bg: string; text: string }> = 
 | A5 | card_key formato `${grupo_envio}::${tipo}::${importacao_numero}` | Pattern 1 | Parsing errado se formato diferente -- verificar upload processor |
 | A6 | Inter font nao esta configurada ainda no projeto | Code Examples | Passo desnecessario se ja configurada |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Formato exato do card_key**
-   - What we know: Campo `card_key` existe em `pedidos` (database.types.ts, tipo string)
-   - What's unclear: Formato exato da string (separador :: ou outro?)
-   - Recommendation: Verificar no upload processor como card_key e gerado antes de implementar parsing
+1. **Formato exato do card_key** — RESOLVED
+   - Formato confirmado: `${grupo_envio}::${tipo}::${importacao_numero}` (campo string na tabela pedidos)
+   - Verificado via upload processor no codebase. Plan 05-01 usa card_key como chave de agrupamento sem parsing
 
-2. **RLS policies para Realtime**
-   - What we know: Supabase Realtime exige RLS habilitado + policy SELECT [CITED: supabase docs]
-   - What's unclear: Se as tabelas `progresso` e `atribuicoes` ja tem RLS configurado
-   - Recommendation: Verificar e criar policies se necessario como task 0
+2. **RLS policies para Realtime** — RESOLVED
+   - Tabelas progresso e atribuicoes ja tem RLS habilitado com policies SELECT para autenticados (00001_initial_schema.sql)
+   - Plan 05-06 adiciona policies INSERT/UPDATE/DELETE necessarias para escrita
 
-3. **Fonte Inter no Next.js**
-   - What we know: D-46 exige Inter com pesos 400 e 700
-   - What's unclear: Se Inter ja esta configurada via `next/font` no layout.tsx
-   - Recommendation: Verificar `app/layout.tsx` -- se nao configurada, adicionar
+3. **Fonte Inter no Next.js** — RESOLVED
+   - Inter NAO estava configurada. Plan 05-01 Task 1 agora inclui configuracao via next/font/google em app/layout.tsx (per D-46)
 
-4. **Tabela atribuicoes -- coluna tipo**
-   - What we know: `atribuicoes` tem campo `tipo` (string) alem de `card_key` e `user_id`
-   - What's unclear: Valores esperados do campo `tipo` (separador/fardista? prateleira/fardo?)
-   - Recommendation: Definir convencao e documentar na types
+4. **Tabela atribuicoes -- coluna tipo** — RESOLVED
+   - Valores definidos: 'separador' ou 'fardista' (CHECK constraint no schema: `tipo IN ('separador', 'fardista')`)
+   - Plan 05-06 API route /api/cards/assign valida tipo contra esta whitelist
 
 ## Environment Availability
 
