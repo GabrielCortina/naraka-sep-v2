@@ -18,7 +18,7 @@ export function MarketplaceBadge({ grupoEnvio }: MarketplaceBadgeProps) {
     <Badge
       variant="outline"
       className={cn(
-        'uppercase font-bold text-xs border-0',
+        'uppercase font-bold text-xs border-0 whitespace-nowrap',
         colors.bg,
         colors.text,
       )}

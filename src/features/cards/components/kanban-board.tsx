@@ -49,7 +49,7 @@ export function KanbanBoard({ cards, onOpenModal, onAssign }: KanbanBoardProps) 
         <div
           className="grid gap-4"
           style={{
-            gridTemplateColumns: `repeat(${visibleColumns.length}, minmax(180px, 1fr))`,
+            gridTemplateColumns: `repeat(${visibleColumns.length}, 1fr)`,
           }}
         >
           {visibleColumns.map((grupo) => (

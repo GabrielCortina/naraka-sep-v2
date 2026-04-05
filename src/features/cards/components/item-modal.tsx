@@ -65,19 +65,20 @@ export function ItemModal({
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-lg max-h-[80vh] p-0 gap-0 data-[state=open]:slide-in-from-bottom">
-          <DialogHeader className="p-4 border-b">
-            <div className="flex items-center justify-between">
-              <DialogTitle>
-                {card.grupo_envio} - {TYPE_ABBREV[card.tipo] || card.tipo} #{card.importacao_numero}
-              </DialogTitle>
+          <DialogHeader className="p-4 border-b pr-10">
+            <DialogTitle className="flex items-center gap-2">
+              <span>{card.grupo_envio} - {TYPE_ABBREV[card.tipo] || card.tipo} #{card.importacao_numero}</span>
               <button
-                onClick={() => generateChecklist(card)}
-                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-accent/50"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  generateChecklist(card)
+                }}
+                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-accent/50 shrink-0"
                 aria-label="Imprimir checklist"
               >
                 <Printer className="h-4 w-4" />
               </button>
-            </div>
+            </DialogTitle>
             <DialogDescription className="sr-only">
               Lista de itens do card para separacao
             </DialogDescription>
