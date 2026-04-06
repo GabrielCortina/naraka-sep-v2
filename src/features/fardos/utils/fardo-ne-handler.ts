@@ -12,10 +12,16 @@ export function findAlternativeBale(
   sku: string,
   quantidade: number,
   reservedCodigosIn: Set<string>,
-  isCascata: boolean
+  isCascata: boolean,
+  currentCodigoIn?: string,
+  naoEncontradosCodigosIn?: Set<string>
 ): StockItem | null {
   const disponiveis = stock.filter(
-    item => item.sku === sku && !reservedCodigosIn.has(item.codigo_in)
+    item =>
+      item.sku === sku &&
+      !reservedCodigosIn.has(item.codigo_in) &&
+      item.codigo_in !== currentCodigoIn &&
+      !(naoEncontradosCodigosIn?.has(item.codigo_in))
   )
 
   if (disponiveis.length === 0) return null

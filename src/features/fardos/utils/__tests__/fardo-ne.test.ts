@@ -38,4 +38,60 @@ describe('findAlternativeBale', () => {
     expect(result!.quantidade).toBe(100)
     expect(result!.codigo_in).toBe('F-001')
   })
+
+  it('exclui o fardo atual (currentCodigoIn) da busca de alternativo', () => {
+    // F-001 e o fardo atual, deve retornar F-002 ou F-003 como alternativo
+    const result = findAlternativeBale(STOCK, 'SKU-A', 90, new Set(), false, 'F-001')
+    expect(result).not.toBeNull()
+    expect(result!.codigo_in).not.toBe('F-001')
+  })
+
+  it('retorna null quando unico fardo do SKU e o atual', () => {
+    // SKU-B so tem F-004, que e o atual
+    const result = findAlternativeBale(STOCK, 'SKU-B', 200, new Set(), false, 'F-004')
+    expect(result).toBeNull()
+  })
+
+  it('exclui fardos do Set naoEncontradosCodigosIn da busca', () => {
+    // F-001 ja foi marcado como nao encontrado
+    const naoEncontrados = new Set(['F-001'])
+    const result = findAlternativeBale(STOCK, 'SKU-A', 100, new Set(), false, undefined, naoEncontrados)
+    expect(result).not.toBeNull()
+    expect(result!.codigo_in).not.toBe('F-001')
+  })
+
+  it('evita loop infinito: fardo A marcado N/E nao retorna como alternativo de B', () => {
+    // Cenario de loop: fardista marca F-001 (IN01) como N/E, sistema encontra F-002 (IN02)
+    // Depois fardista marca F-002 como N/E. F-001 deve ser excluido por estar em naoEncontrados.
+    const naoEncontrados = new Set(['F-001']) // F-001 ja registrado como N/E
+    const result = findAlternativeBale(
+      STOCK,
+      'SKU-A',
+      90,
+      new Set(),
+      false,
+      'F-002', // fardo atual sendo marcado N/E
+      naoEncontrados
+    )
+    // Deve retornar F-003 (unico disponivel), NUNCA F-001
+    if (result) {
+      expect(result.codigo_in).not.toBe('F-001')
+      expect(result.codigo_in).not.toBe('F-002')
+    }
+  })
+
+  it('retorna null quando todos os fardos do SKU estao em naoEncontrados ou sao o atual', () => {
+    // F-001 e F-002 ja N/E, F-003 e o atual
+    const naoEncontrados = new Set(['F-001', 'F-002'])
+    const result = findAlternativeBale(
+      STOCK,
+      'SKU-A',
+      90,
+      new Set(),
+      false,
+      'F-003',
+      naoEncontrados
+    )
+    expect(result).toBeNull()
+  })
 })

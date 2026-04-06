@@ -21,15 +21,15 @@ interface FardoListProps {
   userId: string
   userName: string
   onRefetch: () => void
+  onUpdateFardos: (updater: (prev: FardoItemType[]) => FardoItemType[]) => void
 }
 
 export function FardoList({
   fardos,
   counters,
   userRole,
-  userId,
-  userName,
   onRefetch,
+  onUpdateFardos,
 }: FardoListProps) {
   const isLeader = userRole === 'admin' || userRole === 'lider'
 
@@ -104,7 +104,7 @@ export function FardoList({
     return result
   }, [fardos, filters])
 
-  // Handlers
+  // Handlers with optimistic updates
   const handleOk = useCallback(
     async (fardo: FardoItemType) => {
       const response = await fetch('/api/fardos/ok', {
@@ -122,9 +122,24 @@ export function FardoList({
         throw new Error(data.error)
       }
 
-      toast.success(`Fardo ${fardo.codigo_in} encontrado`)
+      const result = await response.json()
+
+      // Optimistic update: mark as encontrado immediately
+      onUpdateFardos((prev) =>
+        prev.map((f) =>
+          f.reserva_id === fardo.reserva_id
+            ? { ...f, status: 'encontrado' as const }
+            : f
+        ),
+      )
+
+      if (result.sheet_cleared === false) {
+        toast.warning(`Fardo ${fardo.codigo_in} registrado, mas erro ao apagar da planilha de estoque`)
+      } else {
+        toast.success(`Fardo ${fardo.codigo_in} encontrado`)
+      }
     },
-    [],
+    [onUpdateFardos],
   )
 
   const handleNe = useCallback(
@@ -146,16 +161,30 @@ export function FardoList({
 
       const result = await response.json()
       if (result.found_alternative) {
-        toast.success(
-          `Fardo ${fardo.codigo_in} substituido — novo fardo reservado`,
+        // Remove old fardo, refetch will bring the new one
+        onUpdateFardos((prev) =>
+          prev.filter((f) => f.reserva_id !== fardo.reserva_id),
         )
+        toast.success(
+          `Fardo ${fardo.codigo_in} substituido — novo fardo ${result.novo_codigo_in} reservado`,
+        )
+        // Refetch to load the new alternative fardo into the list
+        onRefetch()
       } else {
+        // Optimistic update: mark as nao_encontrado immediately
+        onUpdateFardos((prev) =>
+          prev.map((f) =>
+            f.reserva_id === fardo.reserva_id
+              ? { ...f, status: 'nao_encontrado' as const }
+              : f
+          ),
+        )
         toast.info(
           `Fardo ${fardo.codigo_in} nao encontrado — liberado para prateleira`,
         )
       }
     },
-    [],
+    [onUpdateFardos, onRefetch],
   )
 
   function handleSelect(id: string) {
@@ -206,8 +235,20 @@ export function FardoList({
     }
 
     const targetUser = fardistas.find((u) => u.id === assignUserId)
+    const targetNome = targetUser?.nome ?? 'fardista'
+
+    // Optimistic update: set fardista on selected fardos
+    onUpdateFardos((prev) =>
+      prev.map((f) => {
+        if (f.card_key && uniqueCardKeys.includes(f.card_key)) {
+          return { ...f, fardista_id: assignUserId, fardista_nome: targetNome }
+        }
+        return f
+      }),
+    )
+
     toast.success(
-      `${uniqueCardKeys.length} fardos atribuidos para ${targetUser?.nome ?? 'fardista'}`,
+      `${uniqueCardKeys.length} fardos atribuidos para ${targetNome}`,
     )
     setSelectedIds(new Set())
   }

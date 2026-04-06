@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MapPin, Loader2 } from 'lucide-react'
+import { MapPin, Loader2, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -41,7 +41,7 @@ export function FardoItem({
     setProcessing('ok')
     try {
       await onOk(fardo)
-    } catch {
+    } finally {
       setProcessing(null)
     }
   }
@@ -50,7 +50,7 @@ export function FardoItem({
     setProcessing('ne')
     try {
       await onNe(fardo)
-    } catch {
+    } finally {
       setProcessing(null)
     }
   }
@@ -100,6 +100,12 @@ export function FardoItem({
           >
             Nao Encontrado
           </Badge>
+        )}
+        {fardo.fardista_nome && (
+          <span className="inline-flex items-center gap-1 w-fit bg-blue-100 text-blue-700 font-medium text-[12px] rounded-full px-2 py-0.5">
+            <User className="h-3 w-3 text-blue-500 shrink-0" />
+            {fardo.fardista_nome}
+          </span>
         )}
       </div>
 
