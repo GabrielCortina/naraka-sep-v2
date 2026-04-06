@@ -101,6 +101,14 @@ export function FardoItem({
             Nao Encontrado
           </Badge>
         )}
+        {fardo.is_cascata && (
+          <Badge
+            className="w-fit bg-orange-500 text-white hover:bg-orange-500"
+            aria-live="polite"
+          >
+            CASCATA
+          </Badge>
+        )}
         {fardo.fardista_nome && (
           <span className="inline-flex items-center gap-1 w-fit bg-blue-100 text-blue-700 font-medium text-[12px] rounded-full px-2 py-0.5">
             <User className="h-3 w-3 text-blue-500 shrink-0" />

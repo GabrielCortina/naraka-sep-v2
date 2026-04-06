@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { Package } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { useCardData } from '@/features/cards/hooks/use-card-data'
@@ -8,6 +9,7 @@ import { KanbanBoard } from '@/features/cards/components/kanban-board'
 import { ItemModal } from '@/features/cards/components/item-modal'
 import { AssignModal } from '@/features/cards/components/assign-modal'
 import { DeleteCardModal } from '@/features/cards/components/delete-card-modal'
+import { PrateleiraHeader } from '@/features/prateleira/components/prateleira-header'
 import type { CardData } from '@/features/cards/types'
 
 interface PrateleiraClientProps {
@@ -39,6 +41,34 @@ export function PrateleiraClient({
 
   // Cascade loading state per SKU
   const [loadingItems, setLoadingItems] = useState<Set<string>>(new Set())
+
+  // Search state with debounce
+  const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300)
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  // Counters computed from all cards (before filtering per D-23)
+  const counters = useMemo(() => {
+    let totalPecas = 0, separadas = 0, pendentes = 0, concluidos = 0
+    for (const card of cards) {
+      totalPecas += card.total_pecas
+      separadas += card.pecas_separadas
+      if (card.urgency === 'done') concluidos++
+      else pendentes++
+    }
+    return { totalPecas, separadas, pendentes, concluidos }
+  }, [cards])
+
+  // Filter cards by debouncedSearch (per D-24)
+  const filteredCards = useMemo(() => {
+    if (!debouncedSearch) return cards
+    const term = debouncedSearch.toLowerCase()
+    return cards.filter(card => card.items.some(item => item.sku.toLowerCase().includes(term)))
+  }, [cards, debouncedSearch])
 
   useEffect(() => {
     async function fetchSeparadores() {
@@ -263,10 +293,33 @@ export function PrateleiraClient({
     )
   }
 
+  if (cards.length === 0) {
+    return (
+      <div className="bg-zinc-100 min-h-[calc(100vh-4rem)] rounded-lg flex items-center justify-center">
+        <div className="text-center">
+          <Package size={48} className="mx-auto text-muted-foreground mb-4" />
+          <h2 className="font-semibold text-lg">Nenhum card de prateleira</h2>
+          <p className="text-muted-foreground mt-1">
+            Nenhum pedido precisa de separacao por prateleira no momento. Aguarde o proximo upload.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <>
+      <PrateleiraHeader
+        totalPecas={counters.totalPecas}
+        separadas={counters.separadas}
+        pendentes={counters.pendentes}
+        concluidos={counters.concluidos}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+      />
+
       <KanbanBoard
-        cards={cards}
+        cards={filteredCards}
         onOpenModal={handleOpenModal}
         onAssign={handleAssign}
         onDelete={handleDelete}
