@@ -15,7 +15,7 @@ export function FardosClient({
   userRole,
   userName,
 }: FardosClientProps) {
-  const { fardos, counters, loading, error, refetch } = useFardosData(
+  const { fardos, counters, loading, error, refetch, updateFardos } = useFardosData(
     userId,
     userRole,
   )
@@ -45,6 +45,7 @@ export function FardosClient({
       userId={userId}
       userName={userName}
       onRefetch={refetch}
+      onUpdateFardos={updateFardos}
     />
   )
 }

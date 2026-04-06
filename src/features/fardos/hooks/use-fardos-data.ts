@@ -185,5 +185,27 @@ export function useFardosData(userId: string, userRole: string) {
   // Realtime subscription: refetch on any change
   useCardsRealtime(fetchFardos)
 
-  return { fardos, counters, loading, error, refetch: fetchFardos }
+  const updateFardos = useCallback(
+    (updater: (prev: FardoItem[]) => FardoItem[]) => {
+      setFardos((prev) => {
+        const updated = updater(prev)
+        // Recalculate counters
+        const newCounters: FardoCounters = {
+          pendentes: 0,
+          encontrados: 0,
+          nao_encontrados: 0,
+        }
+        for (const f of updated) {
+          if (f.status === 'pendente') newCounters.pendentes++
+          else if (f.status === 'encontrado') newCounters.encontrados++
+          else if (f.status === 'nao_encontrado') newCounters.nao_encontrados++
+        }
+        setCounters(newCounters)
+        return updated
+      })
+    },
+    [],
+  )
+
+  return { fardos, counters, loading, error, refetch: fetchFardos, updateFardos }
 }

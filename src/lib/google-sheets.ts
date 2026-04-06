@@ -48,6 +48,7 @@ export async function clearSheetRange(range: string) {
   const response = await sheets.spreadsheets.values.clear({
     spreadsheetId: process.env.GOOGLE_SHEET_ID!,
     range,
+    requestBody: {},
   })
 
   return response.data
