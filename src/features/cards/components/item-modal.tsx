@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Check, X, Printer } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Check, X, Printer, Loader2 } from 'lucide-react'
 
 import {
   Dialog,
@@ -25,6 +25,7 @@ interface ItemModalProps {
   card: CardData | null
   onConfirmQuantity: (cardKey: string, sku: string, quantidade: number) => void
   onNaoTem: (cardKey: string, sku: string) => void
+  loadingSkus?: Set<string>
 }
 
 export function ItemModal({
@@ -33,13 +34,42 @@ export function ItemModal({
   card,
   onConfirmQuantity,
   onNaoTem,
+  loadingSkus,
 }: ItemModalProps) {
   const [numpadOpen, setNumpadOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<CardItem | null>(null)
+  const [fadingItems, setFadingItems] = useState<Set<string>>(new Set())
+
+  // Track items transitioning to transformacao for fade-out animation
+  const handleFadeOut = useCallback((sku: string) => {
+    setFadingItems((prev) => new Set(prev).add(sku))
+    setTimeout(() => {
+      setFadingItems((prev) => {
+        const next = new Set(prev)
+        next.delete(sku)
+        return next
+      })
+    }, 300)
+  }, [])
+
+  // Watch for items that become transformacao and trigger fade
+  useEffect(() => {
+    if (!card) return
+    for (const item of card.items) {
+      if (item.status === 'transformacao' && !fadingItems.has(item.sku)) {
+        handleFadeOut(item.sku)
+      }
+    }
+  }, [card, fadingItems, handleFadeOut])
 
   if (!card) return null
 
-  const sortedItems = [...card.items].sort((a, b) => {
+  // Filter out transformacao items (they disappear), but keep fading ones briefly
+  const visibleItems = card.items.filter(
+    (item) => item.status !== 'transformacao' || fadingItems.has(item.sku),
+  )
+
+  const sortedItems = [...visibleItems].sort((a, b) => {
     if (a.status === 'aguardar_fardista' && b.status !== 'aguardar_fardista') return 1
     if (a.status !== 'aguardar_fardista' && b.status === 'aguardar_fardista') return -1
     return 0
@@ -59,6 +89,7 @@ export function ItemModal({
 
   const isBlocked = (item: CardItem) => item.status === 'aguardar_fardista'
   const isDone = (item: CardItem) => item.status === 'separado'
+  const isLoading = (item: CardItem) => loadingSkus?.has(item.sku) ?? false
 
   return (
     <>
@@ -91,7 +122,7 @@ export function ItemModal({
                   {card.total_pecas === 0 ? 0 : Math.round((card.pecas_separadas / card.total_pecas) * 100)}%
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {card.pecas_separadas}/{card.total_pecas} peças
+                  {card.pecas_separadas}/{card.total_pecas} pecas
                 </span>
               </div>
             </div>
@@ -102,12 +133,15 @@ export function ItemModal({
               {sortedItems.map((item) => {
                 const blocked = isBlocked(item)
                 const done = isDone(item)
+                const itemLoading = isLoading(item)
+                const isFading = item.status === 'transformacao' && fadingItems.has(item.sku)
                 return (
                   <div
                     key={item.sku}
-                    className={`flex items-stretch gap-3 py-3 border-b border-zinc-200 last:border-0 ${
+                    className={`flex items-stretch gap-3 py-3 border-b border-zinc-200 last:border-0 transition-all duration-300 ${
                       blocked ? 'bg-zinc-50' : ''
-                    }`}
+                    } ${isFading ? 'opacity-0 h-0 overflow-hidden' : ''}`}
+                    aria-hidden={isFading ? 'true' : undefined}
                   >
                     {/* Borda lateral colorida */}
                     <div
@@ -120,7 +154,7 @@ export function ItemModal({
                       }`}
                     />
 
-                    {/* Conteúdo principal */}
+                    {/* Conteudo principal */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         {/* Esquerda: SKU + detalhes */}
@@ -156,14 +190,14 @@ export function ItemModal({
                           )}
                           {item.status === 'nao_encontrado' && (
                             <Badge variant="destructive" className="text-[10px] mt-1">
-                              NÃO ENCONTRADO
+                              NAO ENCONTRADO
                             </Badge>
                           )}
                         </div>
 
-                        {/* Direita: quantidade PEGAR + botões */}
+                        {/* Direita: quantidade PEGAR + botoes */}
                         <div className="flex items-center gap-2 shrink-0">
-                          {!done && (
+                          {!done && !itemLoading && (
                             <div className="text-right mr-1">
                               <span className="text-[10px] uppercase text-muted-foreground leading-none block">
                                 Pegar
@@ -174,7 +208,11 @@ export function ItemModal({
                             </div>
                           )}
 
-                          {done ? (
+                          {itemLoading ? (
+                            <div className="flex items-center justify-center h-8 w-8">
+                              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-label="Processando cascata..." />
+                            </div>
+                          ) : done ? (
                             <div className="flex items-center justify-center h-8 w-8 rounded-full bg-green-100">
                               <Check className="h-4 w-4 text-green-600" />
                             </div>

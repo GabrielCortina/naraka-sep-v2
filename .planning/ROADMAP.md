@@ -140,13 +140,11 @@ Plans:
   2. Separador pode Confirmar quantidade, marcar Parcial ou N/E — Parcial e N/E disparam cascata automatica
   3. Cascata busca fardo alternativo no estoque externo; se achar, cria linha "AGUARDAR FARDISTA" e adiciona na lista de fardos; se nao, envia para Transformacao
   4. Lider pode atribuir separadores a cards; lista atualiza em tempo real; botao Imprimir Lista gera PDF
-**Plans**: 3 plans
+**Plans**: TBD
 **UI hint**: yes
 
 Plans:
-- [ ] 07-01-PLAN.md — Migration transformacoes + is_cascata, cascade engine TDD e calcProgress com exclusao de transformacao
-- [ ] 07-02-PLAN.md — API route /api/prateleira/cascata, hooks realtime/data atualizados e schema push
-- [ ] 07-03-PLAN.md — Frontend: cascade handlers, spinner/toast, header contadores/busca e badge CASCATA
+- [ ] 07-01: TBD
 
 ### Phase 8: Baixa de Fardos
 **Goal**: Fardista pode escanear ou digitar codigo IN para dar baixa no fardo, removendo do trafego e atualizando a planilha de estoque
@@ -204,7 +202,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 4. Estoque e Reserva de Fardos | 1/3 | In Progress|  |
 | 5. Cards e UI Foundation | 0/6 | Not started | - |
 | 6. Lista de Fardos | 0/3 | Not started | - |
-| 7. Lista de Prateleira e Cascata | 0/3 | Not started | - |
+| 7. Lista de Prateleira e Cascata | 0/? | Not started | - |
 | 8. Baixa de Fardos | 0/? | Not started | - |
 | 9. Dashboard | 0/? | Not started | - |
 | 10. Gestao de Usuarios | 0/? | Not started | - |

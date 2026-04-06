@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { useCardData } from '@/features/cards/hooks/use-card-data'
 import { KanbanBoard } from '@/features/cards/components/kanban-board'
@@ -36,6 +37,9 @@ export function PrateleiraClient({
   // List of separadores for AssignModal
   const [separadores, setSeparadores] = useState<{ id: string; nome: string }[]>([])
 
+  // Cascade loading state per SKU
+  const [loadingItems, setLoadingItems] = useState<Set<string>>(new Set())
+
   useEffect(() => {
     async function fetchSeparadores() {
       const supabase = createClient()
@@ -51,6 +55,33 @@ export function PrateleiraClient({
     }
     fetchSeparadores()
   }, [])
+
+  // Realtime toast for leader when cascade bale is created (D-15)
+  useEffect(() => {
+    if (userRole !== 'lider' && userRole !== 'admin') return
+
+    const supabase = createClient()
+    const channel = supabase
+      .channel('prateleira-cascata-toast')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'trafego_fardos',
+        },
+        (payload) => {
+          if (payload.new && (payload.new as Record<string, unknown>).is_cascata === true) {
+            toast.info('Novo fardo de cascata adicionado -- atribuir fardista')
+          }
+        },
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [userRole])
 
   function handleOpenModal(cardKey: string) {
     const card = cards.find((c) => c.card_key === cardKey)
@@ -78,68 +109,120 @@ export function PrateleiraClient({
   }
 
   async function handleConfirmQuantity(
-    _cardKey: string,
+    cardKey: string,
     sku: string,
     quantidade: number,
   ) {
-    // Find pedido_ids for this SKU in the card
-    const card = cards.find((c) => c.card_key === _cardKey)
+    const card = cards.find((c) => c.card_key === cardKey)
     if (!card) return
 
     const item = card.items.find((i) => i.sku === sku)
     if (!item) return
 
-    // Determine status based on quantity
-    const status =
-      quantidade >= item.quantidade_necessaria
-        ? 'completo'
-        : quantidade > 0
-          ? 'parcial'
-          : 'pendente'
+    if (quantidade >= item.quantidade_necessaria) {
+      // Full confirm (PRAT-02) -- call /api/cards/progress as before
+      const status = 'completo'
+      for (const pedidoId of item.pedido_ids) {
+        const response = await fetch('/api/cards/progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pedido_id: pedidoId,
+            quantidade_separada: quantidade,
+            status,
+          }),
+        })
 
-    // Call API route for each pedido_id in this SKU group
-    for (const pedidoId of item.pedido_ids) {
-      const response = await fetch('/api/cards/progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pedido_id: pedidoId,
-          quantidade_separada: quantidade,
-          status,
-        }),
-      })
+        if (!response.ok) {
+          const data = await response.json()
+          console.error('Erro ao confirmar quantidade:', data.error)
+          return
+        }
+      }
+    } else {
+      // Parcial (PRAT-03, D-02) -- call cascade API
+      setLoadingItems((prev) => new Set(prev).add(sku))
 
-      if (!response.ok) {
-        const data = await response.json()
-        console.error('Erro ao confirmar quantidade:', data.error)
-        return
+      try {
+        const response = await fetch('/api/prateleira/cascata', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pedido_ids: item.pedido_ids,
+            sku: item.sku,
+            quantidade_confirmada: quantidade,
+            quantidade_restante: item.quantidade_necessaria - quantidade,
+            tipo: 'parcial',
+            card_key: card.card_key,
+          }),
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          if (data.found_alternative) {
+            toast.success('Fardo alternativo reservado -- AGUARDAR FARDISTA')
+          }
+          if (data.transformacao) {
+            toast.info('Sem fardo disponivel -- enviado para Transformacao')
+          }
+        } else {
+          const data = await response.json()
+          console.error('Erro na cascata:', data.error)
+          toast.error(data.error || 'Erro ao processar cascata')
+        }
+      } finally {
+        setLoadingItems((prev) => {
+          const next = new Set(prev)
+          next.delete(sku)
+          return next
+        })
       }
     }
   }
 
-  async function handleNaoTem(_cardKey: string, sku: string) {
-    const card = cards.find((c) => c.card_key === _cardKey)
+  async function handleNaoTem(cardKey: string, sku: string) {
+    const card = cards.find((c) => c.card_key === cardKey)
     if (!card) return
 
     const item = card.items.find((i) => i.sku === sku)
     if (!item) return
 
-    for (const pedidoId of item.pedido_ids) {
-      const response = await fetch('/api/cards/progress', {
+    // NE (PRAT-04, D-03) -- call cascade API
+    setLoadingItems((prev) => new Set(prev).add(sku))
+
+    try {
+      const response = await fetch('/api/prateleira/cascata', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          pedido_id: pedidoId,
-          quantidade_separada: 0,
-          status: 'nao_encontrado',
+          pedido_ids: item.pedido_ids,
+          sku: item.sku,
+          quantidade_confirmada: 0,
+          quantidade_restante: item.quantidade_necessaria,
+          tipo: 'ne',
+          card_key: card.card_key,
         }),
       })
 
-      if (!response.ok) {
+      if (response.ok) {
         const data = await response.json()
-        console.error('Erro ao marcar como nao encontrado:', data.error)
-        return
+        if (data.found_alternative) {
+          toast.success('Fardo alternativo reservado -- AGUARDAR FARDISTA')
+        }
+        if (data.transformacao) {
+          toast.info('Sem fardo disponivel -- enviado para Transformacao')
+        }
+      } else {
+        const data = await response.json()
+        console.error('Erro na cascata:', data.error)
+        toast.error(data.error || 'Erro ao processar cascata')
       }
+    } finally {
+      setLoadingItems((prev) => {
+        const next = new Set(prev)
+        next.delete(sku)
+        return next
+      })
     }
   }
 
@@ -196,6 +279,7 @@ export function PrateleiraClient({
         card={selectedCard}
         onConfirmQuantity={handleConfirmQuantity}
         onNaoTem={handleNaoTem}
+        loadingSkus={loadingItems}
       />
 
       <AssignModal
