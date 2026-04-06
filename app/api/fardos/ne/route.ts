@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { fetchStock } from '@/features/fardos/utils/stock-parser'
 import { findAlternativeBale } from '@/features/fardos/utils/fardo-ne-handler'
+import { findCascadeBales } from '@/features/prateleira/utils/cascade-engine'
 
 export async function POST(request: NextRequest) {
   // 1. Auth: createClient -> getUser -> role check
@@ -54,6 +55,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Reserva nao encontrada ou ja cancelada' }, { status: 404 })
   }
 
+  // 3b. Detect if this bale is a cascade bale
+  const { data: trafegoEntry } = await supabaseAdmin
+    .from('trafego_fardos')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .select('is_cascata, card_key' as any)
+    .eq('codigo_in', codigo_in as string)
+    .single()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isCascataBale = (trafegoEntry as any)?.is_cascata === true
+
   // 4. Buscar estoque atualizado (forceRefresh para dados frescos)
   let stock
   try {
@@ -85,7 +97,137 @@ export async function POST(request: NextRequest) {
     (naoEncontradosHoje ?? []).map(r => r.codigo_in)
   )
 
-  // 6. Buscar alternativo (is_cascata=false na Phase 6)
+  // 6. Register original bale as nao encontrado BEFORE searching for alternative
+  // (D-10: ensures exclusion from future searches, prevents loops)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const neDataOriginal: Record<string, any> = {
+    codigo_in: codigo_in,
+    trafego_id: null,
+    reportado_por: user.id,
+    sku: reserva.sku,
+    quantidade: reserva.quantidade,
+    endereco: reserva.endereco,
+    fardista_nome: userData.nome,
+    fardista_id: user.id,
+  }
+
+  const { error: neOrigError } = await supabaseAdmin
+    .from('fardos_nao_encontrados')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .insert(neDataOriginal as any)
+
+  if (neOrigError) {
+    console.error('[fardos/ne] Erro ao registrar N/E do fardo original:', neOrigError)
+  }
+
+  // Refresh naoEncontradosSet after registering current bale
+  naoEncontradosSet.add(codigo_in as string)
+
+  if (isCascataBale) {
+    // === CASCADE CHAIN PATH (D-09/D-10/D-11) ===
+    // Use findCascadeBales instead of findAlternativeBale for cascade bales
+    const cascadeResult = findCascadeBales(
+      stock,
+      reserva.sku,
+      reserva.quantidade,
+      reservedSet,
+      naoEncontradosSet,
+    )
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cascadeCardKey = (trafegoEntry as any)?.card_key ?? null
+
+    if (cascadeResult.fardos.length > 0) {
+      // Found cascade alternative bales
+      for (const bale of cascadeResult.fardos) {
+        const { data: newReserva, error: insertError } = await supabaseAdmin
+          .from('reservas')
+          .insert({
+            codigo_in: bale.codigo_in,
+            sku: bale.sku,
+            quantidade: bale.quantidade,
+            endereco: bale.endereco,
+            status: 'reservado',
+            importacao_numero: reserva.importacao_numero,
+          })
+          .select('id')
+          .single()
+
+        if (insertError) {
+          console.error('[fardos/ne] Erro ao inserir reserva cascata:', insertError)
+          return NextResponse.json({ error: 'Erro ao reservar fardo cascata' }, { status: 500 })
+        }
+
+        // Insert trafego_fardos with is_cascata=true
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await supabaseAdmin.from('trafego_fardos').insert({
+          codigo_in: bale.codigo_in,
+          sku: bale.sku,
+          quantidade: bale.quantidade,
+          endereco: bale.endereco,
+          status: 'pendente',
+          reserva_id: newReserva.id,
+          is_cascata: true,
+          card_key: cascadeCardKey,
+        } as any)
+      }
+
+      // Cancel original reserva
+      const { error: cancelError } = await supabaseAdmin
+        .from('reservas')
+        .update({ status: 'cancelado' })
+        .eq('id', reserva_id)
+
+      if (cancelError) {
+        console.error('[fardos/ne] Erro ao cancelar reserva original:', cancelError)
+      }
+
+      return NextResponse.json({
+        found_alternative: true,
+        novo_codigo_in: cascadeResult.fardos[0].codigo_in,
+      })
+    }
+
+    // D-11: No bales left -- create transformacao record
+    if (cascadeResult.quantidade_transformacao > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabaseAdmin as any).from('transformacoes').insert({
+        sku: reserva.sku,
+        quantidade: cascadeResult.quantidade_transformacao,
+        card_key: cascadeCardKey,
+        status: 'pendente',
+      } as any)
+
+      // Update progresso for pedidos with this SKU to 'transformacao'
+      const { data: pedidos } = await supabaseAdmin
+        .from('pedidos')
+        .select('id')
+        .eq('sku', reserva.sku)
+
+      if (pedidos?.length) {
+        await supabaseAdmin
+          .from('progresso')
+          .update({ status: 'transformacao' as any, updated_at: new Date().toISOString() })
+          .in('pedido_id', pedidos.map(p => p.id))
+          .eq('status', 'aguardar_fardista')
+      }
+    }
+
+    // Cancel original reserva
+    const { error: cancelError } = await supabaseAdmin
+      .from('reservas')
+      .update({ status: 'cancelado' })
+      .eq('id', reserva_id)
+
+    if (cancelError) {
+      console.error('[fardos/ne] Erro ao cancelar reserva cascata:', cancelError)
+    }
+
+    return NextResponse.json({ found_alternative: false, transformacao: true })
+  }
+
+  // === NORMAL (NON-CASCADE) PATH ===
+  // 6b. Buscar alternativo (is_cascata=false -- Phase 6 flow)
   const alternativo = findAlternativeBale(
     stock,
     reserva.sku,
@@ -98,28 +240,6 @@ export async function POST(request: NextRequest) {
 
   if (alternativo) {
     // 6a. Encontrou alternativo (D-21)
-
-    // SEMPRE registrar fardo original como nao encontrado (evita loop infinito)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const neDataOriginal: Record<string, any> = {
-      codigo_in: codigo_in,
-      trafego_id: null,
-      reportado_por: user.id,
-      sku: reserva.sku,
-      quantidade: reserva.quantidade,
-      endereco: reserva.endereco,
-      fardista_nome: userData.nome,
-      fardista_id: user.id,
-    }
-
-    const { error: neOrigError } = await supabaseAdmin
-      .from('fardos_nao_encontrados')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .insert(neDataOriginal as any)
-
-    if (neOrigError) {
-      console.error('[fardos/ne] Erro ao registrar N/E do fardo original:', neOrigError)
-    }
 
     // Inserir nova reserva com o fardo alternativo
     const { error: insertError } = await supabaseAdmin
@@ -155,29 +275,7 @@ export async function POST(request: NextRequest) {
   }
 
   // 7. NAO encontrou alternativo (D-22)
-
-  // 7a. Registrar em fardos_nao_encontrados (migration 00005: trafego_id nullable)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const naoEncontradoData: Record<string, any> = {
-    codigo_in: codigo_in,
-    trafego_id: null,
-    reportado_por: user.id,
-    sku: reserva.sku,
-    quantidade: reserva.quantidade,
-    endereco: reserva.endereco,
-    fardista_nome: userData.nome,
-    fardista_id: user.id,
-  }
-
-  const { error: neError } = await supabaseAdmin
-    .from('fardos_nao_encontrados')
-    // Migration 00005 columns not yet in generated types
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .insert(naoEncontradoData as any)
-
-  if (neError) {
-    console.error('[fardos/ne] Erro ao registrar N/E:', neError)
-  }
+  // N/E already registered above (before alternative search)
 
   // 7b. Cancelar reserva
   const { error: cancelError } = await supabaseAdmin
