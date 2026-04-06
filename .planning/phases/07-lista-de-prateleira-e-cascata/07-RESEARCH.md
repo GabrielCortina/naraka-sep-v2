@@ -450,17 +450,19 @@ interface PrateleiraHeaderProps {
 | A1 | Greedy descending sort is adequate for Priority 3 multi-bale selection (vs optimal subset sum) | Cascade Engine | Suboptimal bale selection. Mitigated: D-06 says no 20% rule, any combination works. Greedy maximizes coverage simply [ASSUMED] |
 | A2 | numero_pedido in transformacoes can be populated by looking up pedidos by sku+card_key | Migration | If mapping is ambiguous (multiple pedidos per SKU in card), may need comma-separated or first-match. Low risk [ASSUMED] |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Partial cascade: what status should the original progresso record get?**
    - What we know: separador confirms 30 of 50. Progress updated to 30/50 status='parcial'. Cascade searches for remainder of 20.
    - What's unclear: If cascade finds a bale for the 20, does the progresso status change to 'aguardar_fardista' or stay 'parcial'?
    - Recommendation: The confirmed 30 pieces stay as 'parcial' status with quantidade_separada=30. The cascaded remainder is tracked through the new reserva + trafego_fardos entry. The item in the modal should show both: the partially confirmed quantity AND an AGUARDAR FARDISTA badge for the remainder. D-20 says AGUARDAR FARDISTA does NOT count as progress, so the 30 confirmed pieces count but the pending 20 do not.
+   - RESOLVED: Implemented in Plan 07-02 Task 1 — status stays 'parcial' with quantidade_separada=confirmed_qty; AGUARDAR FARDISTA display driven by trafego_fardos entry
 
 2. **Multiple pedido_ids per SKU in a card: how does cascade handle them?**
    - What we know: aggregateItems groups multiple pedidos by SKU. A combo card might have 3 pedidos for same SKU.
    - What's unclear: When cascading, should we cascade the full remainder or per-pedido?
    - Recommendation: Cascade at the aggregate SKU level (total needed - total confirmed = remainder for cascade). This matches the UI which shows one line per SKU. The cascade API receives sku + card_key + quantidade_faltante, not individual pedido_ids.
+   - RESOLVED: Implemented in Plan 07-02 Task 1 — cascade at aggregate SKU level with quantidade_restante
 
 ## Validation Architecture
 
