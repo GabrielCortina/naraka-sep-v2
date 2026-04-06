@@ -34,6 +34,11 @@ export function useCardsRealtime(onUpdate: () => void) {
         { event: '*', schema: 'public', table: 'trafego_fardos' },
         () => onUpdate(),
       )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'transformacoes' },
+        () => onUpdate(),
+      )
       .subscribe()
 
     return () => {

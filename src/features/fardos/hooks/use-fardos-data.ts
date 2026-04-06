@@ -43,7 +43,8 @@ export function useFardosData(userId: string, userRole: string) {
           .eq('status', 'reservado'),
         supabase
           .from('trafego_fardos')
-          .select('id, reserva_id, codigo_in, status, fardista_id'),
+          // is_cascata from migration 00006 not yet in generated types
+          .select('id, reserva_id, codigo_in, status, fardista_id, is_cascata') as any,
         supabase
           .from('atribuicoes')
           .select('card_key, user_id, tipo, users(nome)'),
@@ -68,11 +69,13 @@ export function useFardosData(userId: string, userRole: string) {
       const pedidos = pedidosRes.data
 
       // Build trafego lookup by codigo_in
-      const trafegoMap = new Map<string, { status: string; fardista_id: string | null }>()
+      const trafegoMap = new Map<string, { status: string; fardista_id: string | null; is_cascata: boolean }>()
       for (const t of trafego) {
         trafegoMap.set(t.codigo_in, {
           status: t.status,
           fardista_id: t.fardista_id,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          is_cascata: (t as any).is_cascata ?? false,
         })
       }
 
@@ -136,7 +139,7 @@ export function useFardosData(userId: string, userRole: string) {
           card_key: cardKey,
           separador_nome: separadorInfo?.nome ?? null,
           importacao_numero: r.importacao_numero ?? 0,
-          is_cascata: false,
+          is_cascata: trafegoEntry?.is_cascata ?? false,
         })
       }
 

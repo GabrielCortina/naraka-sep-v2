@@ -36,23 +36,35 @@ export function useCardData(
       const supabase = createClient()
 
       // Fetch all required data in parallel
-      const [pedidosRes, progressoRes, reservasRes, atribuicoesRes] =
+      const [pedidosRes, progressoRes, reservasRes, atribuicoesRes, transformacoesRes] =
         await Promise.all([
           supabase.from('pedidos').select('*'),
           supabase.from('progresso').select('*'),
           supabase.from('reservas').select('*'),
           supabase.from('atribuicoes').select('*, users(nome)'),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (supabase as any).from('transformacoes').select('*'),
         ])
 
       if (pedidosRes.error) throw pedidosRes.error
       if (progressoRes.error) throw progressoRes.error
       if (reservasRes.error) throw reservasRes.error
       if (atribuicoesRes.error) throw atribuicoesRes.error
+      if (transformacoesRes.error) throw transformacoesRes.error
 
       const pedidos = pedidosRes.data
       const progresso = progressoRes.data
       const reservas = reservasRes.data
       const atribuicoes = atribuicoesRes.data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const transformacoes = (transformacoesRes.data ?? []) as any[]
+
+      // Build transformacao totals by card_key
+      const transformacaoByCard = new Map<string, number>()
+      for (const t of transformacoes) {
+        const current = transformacaoByCard.get(t.card_key) ?? 0
+        transformacaoByCard.set(t.card_key, current + (t.quantidade as number))
+      }
 
       // Build atribuicoes lookup by card_key
       const atribMap = new Map<
@@ -105,12 +117,14 @@ export function useCardData(
       for (const [cardKey, groupPedidos] of entries) {
         const first = groupPedidos[0]
         const items = aggregateItems(groupPedidos, progressMap, reservasBySku)
+        const transformTotal = transformacaoByCard.get(cardKey) ?? 0
         const progress = calcProgress(
           groupPedidos.map((p) => ({
             quantidade: p.quantidade,
             quantidade_separada:
               progressMap.get(p.id)?.quantidade_separada ?? 0,
           })),
+          transformTotal,
         )
 
         const atrib = atribMap.get(cardKey)
