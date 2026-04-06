@@ -176,6 +176,41 @@ describe('calcProgress', () => {
   })
 })
 
+describe('calcProgress with transformacao', () => {
+  it('backward compatible: no transformacaoTotal arg returns same as before', () => {
+    const items = [
+      { quantidade: 10, quantidade_separada: 5 },
+      { quantidade: 10, quantidade_separada: 5 },
+    ]
+    const result = calcProgress(items)
+    expect(result.total).toBe(20)
+    expect(result.separadas).toBe(10)
+    expect(result.percent).toBe(50)
+  })
+
+  it('subtracts transformacaoTotal from denominator', () => {
+    const items = [
+      { quantidade: 50, quantidade_separada: 30 },
+      { quantidade: 50, quantidade_separada: 30 },
+    ]
+    // total=100, sep=60, transf=20 -> effective total=80, percent=60/80=75
+    const result = calcProgress(items, 20)
+    expect(result.total).toBe(80)
+    expect(result.separadas).toBe(60)
+    expect(result.percent).toBe(75)
+  })
+
+  it('handles all items in transformacao: total=0, percent=0', () => {
+    const items = [
+      { quantidade: 50, quantidade_separada: 0 },
+    ]
+    const result = calcProgress(items, 50)
+    expect(result.total).toBe(0)
+    expect(result.separadas).toBe(0)
+    expect(result.percent).toBe(0)
+  })
+})
+
 describe('isCardComplete', () => {
   it('returns true when percent is 100', () => {
     expect(isCardComplete({ percent: 100 })).toBe(true)

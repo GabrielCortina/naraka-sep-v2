@@ -54,6 +54,7 @@ export function getUrgencyTier(
  */
 export function calcProgress(
   items: { quantidade: number; quantidade_separada: number }[],
+  transformacaoTotal: number = 0,
 ): { total: number; separadas: number; percent: number } {
   let total = 0
   let separadas = 0
@@ -61,6 +62,8 @@ export function calcProgress(
     total += item.quantidade
     separadas += item.quantidade_separada
   }
+  // D-21: Transformation pieces removed from denominator
+  total = Math.max(0, total - transformacaoTotal)
   const percent = total === 0 ? 0 : Math.round((separadas / total) * 100)
   return { total, separadas, percent }
 }
@@ -134,9 +137,12 @@ export function aggregateItems(
     }))
 
     // Determine aggregate status
+    // Priority: nao_encontrado > transformacao > separado > parcial > pendente
     let status: CardItem['status']
     if (data.statuses.some((s) => s === 'nao_encontrado')) {
       status = 'nao_encontrado'
+    } else if (data.statuses.every((s) => s === 'transformacao')) {
+      status = 'transformacao'
     } else if (
       data.quantidade_separada >= data.quantidade_necessaria &&
       data.quantidade_necessaria > 0

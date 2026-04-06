@@ -12,7 +12,7 @@ export interface CardItem {
   sku: string
   quantidade_necessaria: number
   quantidade_separada: number
-  status: 'pendente' | 'separado' | 'parcial' | 'nao_encontrado' | 'aguardar_fardista'
+  status: 'pendente' | 'separado' | 'parcial' | 'nao_encontrado' | 'aguardar_fardista' | 'transformacao'
   pedido_ids: string[]
   reservas: {
     codigo_in: string
