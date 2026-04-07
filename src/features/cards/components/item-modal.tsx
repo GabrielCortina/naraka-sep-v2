@@ -69,7 +69,36 @@ export function ItemModal({
     (item) => item.status !== 'transformacao' || fadingItems.has(item.sku),
   )
 
-  const sortedItems = [...visibleItems].sort((a, b) => {
+  // Split items that have confirmed pieces + aguardar_fardista into two display rows:
+  // 1. Confirmed portion → separado (green)
+  // 2. Remaining portion → aguardar_fardista (blocked)
+  const displayItems = visibleItems.flatMap((item) => {
+    if (
+      item.status === 'aguardar_fardista' &&
+      item.quantidade_separada > 0 &&
+      item.quantidade_separada < item.quantidade_necessaria
+    ) {
+      return [
+        {
+          ...item,
+          quantidade_necessaria: item.quantidade_separada,
+          quantidade_separada: item.quantidade_separada,
+          status: 'separado' as const,
+          _displayKey: `${item.sku}-separado`,
+        },
+        {
+          ...item,
+          quantidade_necessaria: item.quantidade_necessaria - item.quantidade_separada,
+          quantidade_separada: 0,
+          status: 'aguardar_fardista' as const,
+          _displayKey: `${item.sku}-aguardar`,
+        },
+      ]
+    }
+    return [{ ...item, _displayKey: item.sku }]
+  })
+
+  const sortedItems = [...displayItems].sort((a, b) => {
     if (a.status === 'aguardar_fardista' && b.status !== 'aguardar_fardista') return 1
     if (a.status !== 'aguardar_fardista' && b.status === 'aguardar_fardista') return -1
     return 0
@@ -115,7 +144,7 @@ export function ItemModal({
             <div className="mt-2">
               <ProgressBar
                 percent={card.total_pecas === 0 ? 0 : Math.round((card.pecas_separadas / card.total_pecas) * 100)}
-                urgency={card.urgency}
+                urgency="ok"
               />
               <div className="flex justify-between mt-1">
                 <span className="text-xs font-bold">
@@ -137,7 +166,7 @@ export function ItemModal({
                 const isFading = item.status === 'transformacao' && fadingItems.has(item.sku)
                 return (
                   <div
-                    key={item.sku}
+                    key={(item as { _displayKey?: string })._displayKey ?? item.sku}
                     className={`flex items-stretch gap-3 py-3 border-b border-zinc-200 last:border-0 transition-all duration-300 ${
                       blocked ? 'bg-zinc-50' : ''
                     } ${isFading ? 'opacity-0 h-0 overflow-hidden' : ''}`}

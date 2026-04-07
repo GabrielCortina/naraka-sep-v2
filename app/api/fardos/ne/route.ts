@@ -134,8 +134,14 @@ export async function POST(request: NextRequest) {
       naoEncontradosSet,
     )
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const cascadeCardKey = (trafegoEntry as any)?.card_key ?? null
+    // Derive card_key from pedidos for this SKU (trafego_fardos has no card_key column)
+    const { data: cascadePedido } = await supabaseAdmin
+      .from('pedidos')
+      .select('card_key')
+      .eq('sku', reserva.sku)
+      .limit(1)
+      .single()
+    const cascadeCardKey = cascadePedido?.card_key ?? null
 
     if (cascadeResult.fardos.length > 0) {
       // Found cascade alternative bales
@@ -159,6 +165,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Insert trafego_fardos with is_cascata=true
+        // Note: trafego_fardos has no card_key column
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await supabaseAdmin.from('trafego_fardos').insert({
           codigo_in: bale.codigo_in,
@@ -168,7 +175,6 @@ export async function POST(request: NextRequest) {
           status: 'pendente',
           reserva_id: newReserva.id,
           is_cascata: true,
-          card_key: cascadeCardKey,
         } as any)
       }
 

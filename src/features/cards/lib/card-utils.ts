@@ -143,6 +143,8 @@ export function aggregateItems(
       status = 'nao_encontrado'
     } else if (data.statuses.every((s) => s === 'transformacao')) {
       status = 'transformacao'
+    } else if (data.statuses.some((s) => s === 'aguardar_fardista')) {
+      status = 'aguardar_fardista'
     } else if (
       data.quantidade_separada >= data.quantidade_necessaria &&
       data.quantidade_necessaria > 0

@@ -96,15 +96,38 @@ export async function POST(request: NextRequest) {
 
   // Step 1 - Update progresso for each pedido_id
   // Distribute quantidade_confirmada proportionally across pedido_ids
-  for (const pid of pedido_ids as string[]) {
+  // using floor + remainder to preserve exact total
+  const pids = pedido_ids as string[]
+  const confirmada = (quantidade_confirmada as number)
+
+  // Fetch each pedido's quantidade for proportional distribution
+  const pedidoQtds: { pid: string; quantidade: number }[] = []
+  for (const pid of pids) {
+    const { data: ped } = await supabaseAdmin
+      .from('pedidos')
+      .select('quantidade')
+      .eq('id', pid)
+      .single()
+    pedidoQtds.push({ pid, quantidade: ped?.quantidade ?? 0 })
+  }
+  const totalPedidoQtd = pedidoQtds.reduce((s, p) => s + p.quantidade, 0)
+
+  // Proportional distribution: floor each share, give remainders to largest pedidos first
+  let distributed = 0
+  const shares = pedidoQtds.map((p, i) => {
+    if (tipo !== 'parcial') return { pid: p.pid, qSeparada: 0 }
+    const isLast = i === pedidoQtds.length - 1
+    const share = isLast
+      ? confirmada - distributed
+      : totalPedidoQtd > 0
+        ? Math.floor((p.quantidade / totalPedidoQtd) * confirmada)
+        : Math.floor(confirmada / pids.length)
+    distributed += share
+    return { pid: p.pid, qSeparada: share }
+  })
+
+  for (const { pid, qSeparada } of shares) {
     const progressStatus = tipo === 'parcial' ? 'parcial' : 'nao_encontrado'
-    // For parcial, distribute confirmada evenly; for NE, quantidade_separada=0
-    const qSeparada =
-      tipo === 'parcial'
-        ? Math.round(
-            (quantidade_confirmada as number) / (pedido_ids as string[]).length,
-          )
-        : 0
 
     // Select-then-insert/update pattern (no UNIQUE on pedido_id)
     const { data: existing } = await supabaseAdmin
@@ -212,6 +235,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Insert trafego_fardos with is_cascata=true (cast as any for migration 00006 cols)
+      // Note: trafego_fardos has no card_key column — card_key lives on pedidos/atribuicoes
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await supabaseAdmin.from('trafego_fardos').insert({
         codigo_in: bale.codigo_in,
@@ -221,7 +245,6 @@ export async function POST(request: NextRequest) {
         status: 'pendente',
         reserva_id: newReserva.id,
         is_cascata: true,
-        card_key: card_key as string,
       } as any)
     }
 

@@ -144,7 +144,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 07-01: TBD
+- [x] 07-01: TBD
 
 ### Phase 8: Baixa de Fardos
 **Goal**: Fardista pode escanear ou digitar codigo IN para dar baixa no fardo, removendo do trafego e atualizando a planilha de estoque

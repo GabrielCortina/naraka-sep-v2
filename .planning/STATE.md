@@ -124,6 +124,7 @@ Recent decisions affecting current work:
 ### Pending Todos
 
 - [Phase 07] **Backend exclusão de card** — DeleteCardModal (visual) criado em Phase 05, lógica pendente: verificar PIN via bcrypt, apagar pedidos/progresso por card_key, cancelar reservas exclusivas de fardos (se fardo reservado só para este card → cancelar reserva + liberar fardo; se compartilhado → manter), liberar fardos cancelados como disponíveis. Componente visual: `src/features/cards/components/delete-card-modal.tsx`. API route necessária: `POST /api/cards/delete`.
+- [Deferred] **PDF prateleira: agrupar SKUs e coluna fardo** — No PDF do modal de prateleira (generateChecklist), agrupar linhas do mesmo SKU em uma linha única com quantidade total (ex: "20 separado" + "4 aguardar" → "SKU | 24 peças"). Adicionar coluna com código IN e endereço do fardo quando houver reserva associada. Arquivo: `src/features/cards/lib/pdf-generator.ts`.
 
 ### Blockers/Concerns
 

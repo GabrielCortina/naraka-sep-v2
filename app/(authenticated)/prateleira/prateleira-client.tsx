@@ -138,6 +138,15 @@ export function PrateleiraClient({
     setAssignModalOpen(true)
   }
 
+  // Keep selectedCard in sync with realtime card updates
+  useEffect(() => {
+    if (selectedCard) {
+      const updated = cards.find((c) => c.card_key === selectedCard.card_key)
+      if (updated) setSelectedCard(updated)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cards])
+
   async function handleConfirmQuantity(
     cardKey: string,
     sku: string,
@@ -169,6 +178,21 @@ export function PrateleiraClient({
           return
         }
       }
+
+      // Optimistic update: immediately reflect confirmed state in modal
+      setSelectedCard((prev) => {
+        if (!prev) return prev
+        const updatedItems = prev.items.map((i) =>
+          i.sku === sku
+            ? { ...i, quantidade_separada: quantidade, status: 'separado' as const }
+            : i,
+        )
+        const newSeparadas = updatedItems.reduce(
+          (sum, i) => sum + i.quantidade_separada,
+          0,
+        )
+        return { ...prev, items: updatedItems, pecas_separadas: newSeparadas }
+      })
     } else {
       // Parcial (PRAT-03, D-02) -- call cascade API
       setLoadingItems((prev) => new Set(prev).add(sku))
@@ -195,6 +219,25 @@ export function PrateleiraClient({
           if (data.transformacao) {
             toast.info('Sem fardo disponivel -- enviado para Transformacao')
           }
+
+          // Optimistic update for Parcial
+          setSelectedCard((prev) => {
+            if (!prev) return prev
+            const qTransf = data.quantidade_transformacao ?? 0
+            const updatedItems = prev.items.map((i) => {
+              if (i.sku !== sku) return i
+              if (data.found_alternative) {
+                return { ...i, quantidade_separada: quantidade, status: 'aguardar_fardista' as const }
+              }
+              if (data.transformacao && !data.found_alternative) {
+                return { ...i, quantidade_separada: quantidade, status: 'transformacao' as const }
+              }
+              return { ...i, quantidade_separada: quantidade, status: 'parcial' as const }
+            })
+            const newSeparadas = updatedItems.reduce((sum, i) => sum + i.quantidade_separada, 0)
+            const newTotal = Math.max(0, prev.total_pecas - qTransf)
+            return { ...prev, items: updatedItems, pecas_separadas: newSeparadas, total_pecas: newTotal }
+          })
         } else {
           const data = await response.json()
           console.error('Erro na cascata:', data.error)
@@ -242,6 +285,24 @@ export function PrateleiraClient({
         if (data.transformacao) {
           toast.info('Sem fardo disponivel -- enviado para Transformacao')
         }
+
+        // Optimistic update for NE
+        setSelectedCard((prev) => {
+          if (!prev) return prev
+          const qTransf = data.quantidade_transformacao ?? 0
+          const updatedItems = prev.items.map((i) => {
+            if (i.sku !== sku) return i
+            if (data.found_alternative) {
+              return { ...i, status: 'aguardar_fardista' as const }
+            }
+            if (data.transformacao) {
+              return { ...i, status: 'transformacao' as const }
+            }
+            return { ...i, status: 'nao_encontrado' as const }
+          })
+          const newTotal = Math.max(0, prev.total_pecas - qTransf)
+          return { ...prev, items: updatedItems, total_pecas: newTotal }
+        })
       } else {
         const data = await response.json()
         console.error('Erro na cascata:', data.error)

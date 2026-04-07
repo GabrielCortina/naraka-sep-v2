@@ -87,7 +87,7 @@ export function OrderCard({ card, onOpenModal, onAssign, onDelete, userRole }: O
 
         {/* Linha 4: barra de progresso */}
         <div className="mt-1.5">
-          <ProgressBar percent={percent} urgency={card.urgency} />
+          <ProgressBar percent={percent} urgency={percent > 0 ? 'ok' : card.urgency} />
         </div>
 
         {/* Linha 5: percentual + peças + lixeira */}
