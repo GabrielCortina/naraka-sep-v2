@@ -175,6 +175,7 @@ export async function POST(request: NextRequest) {
           status: 'pendente',
           reserva_id: newReserva.id,
           is_cascata: true,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any)
       }
 
@@ -202,6 +203,7 @@ export async function POST(request: NextRequest) {
         quantidade: cascadeResult.quantidade_transformacao,
         card_key: cascadeCardKey,
         status: 'pendente',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any)
 
       // Update progresso for pedidos with this SKU to 'transformacao'
@@ -213,6 +215,7 @@ export async function POST(request: NextRequest) {
       if (pedidos?.length) {
         await supabaseAdmin
           .from('progresso')
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .update({ status: 'transformacao' as any, updated_at: new Date().toISOString() })
           .in('pedido_id', pedidos.map(p => p.id))
           .eq('status', 'aguardar_fardista')

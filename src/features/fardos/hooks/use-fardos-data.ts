@@ -44,6 +44,7 @@ export function useFardosData(userId: string, userRole: string) {
         supabase
           .from('trafego_fardos')
           // is_cascata from migration 00006 not yet in generated types
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .select('id, reserva_id, codigo_in, status, fardista_id, is_cascata') as any,
         supabase
           .from('atribuicoes')

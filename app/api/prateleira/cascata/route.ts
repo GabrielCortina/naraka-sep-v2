@@ -245,6 +245,7 @@ export async function POST(request: NextRequest) {
         status: 'pendente',
         reserva_id: newReserva.id,
         is_cascata: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any)
     }
 
@@ -292,6 +293,7 @@ export async function POST(request: NextRequest) {
       separador_id: separadorId,
       separador_nome: separadorNome,
       status: 'pendente',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any)
 
     // Update progresso status for pedido_ids
