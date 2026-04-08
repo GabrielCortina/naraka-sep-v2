@@ -22,7 +22,7 @@ interface TransformacaoModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   card: TransformacaoCardData | null
-  onConfirmQuantity: (transformacaoId: string, quantidade: number, sku: string) => Promise<boolean>
+  onConfirmQuantity: (transformacaoId: string, quantidade: number) => Promise<boolean>
   loadingItems?: Set<string>
 }
 
@@ -54,7 +54,7 @@ export function TransformacaoModal({
       toast.error(`Quantidade deve ser exatamente ${selectedItem.quantidade}`)
       return
     }
-    const success = await onConfirmQuantity(selectedItem.id, quantidade, selectedItem.sku)
+    const success = await onConfirmQuantity(selectedItem.id, quantidade)
     if (success) {
       toast.success(`Transformacao concluida: ${selectedItem.sku}`)
     }
