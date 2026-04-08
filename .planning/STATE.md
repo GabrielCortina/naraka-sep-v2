@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-04-05T23:48:35.403Z"
+stopped_at: Phase 7.1 context gathered
+last_updated: "2026-04-08T14:09:37.364Z"
 last_activity: 2026-04-05
 progress:
-  total_phases: 10
-  completed_phases: 5
-  total_plans: 22
-  completed_plans: 21
-  percent: 95
+  total_phases: 11
+  completed_phases: 6
+  total_plans: 25
+  completed_plans: 24
+  percent: 96
 ---
 
 # Project State
@@ -126,12 +126,16 @@ Recent decisions affecting current work:
 - [Phase 07] **Backend exclusão de card** — DeleteCardModal (visual) criado em Phase 05, lógica pendente: verificar PIN via bcrypt, apagar pedidos/progresso por card_key, cancelar reservas exclusivas de fardos (se fardo reservado só para este card → cancelar reserva + liberar fardo; se compartilhado → manter), liberar fardos cancelados como disponíveis. Componente visual: `src/features/cards/components/delete-card-modal.tsx`. API route necessária: `POST /api/cards/delete`.
 - [Deferred] **PDF prateleira: agrupar SKUs e coluna fardo** — No PDF do modal de prateleira (generateChecklist), agrupar linhas do mesmo SKU em uma linha única com quantidade total (ex: "20 separado" + "4 aguardar" → "SKU | 24 peças"). Adicionar coluna com código IN e endereço do fardo quando houver reserva associada. Arquivo: `src/features/cards/lib/pdf-generator.ts`.
 
+### Roadmap Evolution
+
+- Phase 07.1 inserted after Phase 7: Aba de Transformacao (URGENT) — fluxo proprio de lider/separador para itens que passaram por cascata sem fardo disponivel
+
 ### Blockers/Concerns
 
 None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T23:48:35.401Z
-Stopped at: Completed 06-02-PLAN.md
-Resume file: None
+Last session: 2026-04-08T14:09:37.360Z
+Stopped at: Phase 7.1 context gathered
+Resume file: .planning/phases/07.1-aba-de-transformacao/07.1-CONTEXT.md
