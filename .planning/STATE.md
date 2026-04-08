@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 7.1 UI-SPEC approved
-last_updated: "2026-04-08T15:46:16.190Z"
-last_activity: 2026-04-08 -- Phase 07.1 execution started
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-04-08T17:11:47.925Z"
+last_activity: 2026-04-08
 progress:
   total_phases: 10
-  completed_phases: 5
-  total_plans: 22
-  completed_plans: 21
-  percent: 95
+  completed_phases: 6
+  total_plans: 25
+  completed_plans: 24
+  percent: 96
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 
 ## Current Position
 
-Phase: 07.1 (aba-de-transformacao) — EXECUTING
-Plan: 1 of 3
+Phase: 8
+Plan: Not started
 Status: Executing Phase 07.1
-Last activity: 2026-04-08 -- Phase 07.1 execution started
+Last activity: 2026-04-08
 
 Progress: [██████████] 100%
 
@@ -36,7 +36,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 13
+- Total plans completed: 16
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -47,6 +47,7 @@ Progress: [██████████] 100%
 | 01 | 3 | - | - |
 | 03 | 4 | - | - |
 | 05 | 6 | - | - |
+| 07.1 | 3 | - | - |
 
 **Recent Trend:**
 
@@ -125,6 +126,7 @@ Recent decisions affecting current work:
 
 - [Phase 07] **Backend exclusão de card** — DeleteCardModal (visual) criado em Phase 05, lógica pendente: verificar PIN via bcrypt, apagar pedidos/progresso por card_key, cancelar reservas exclusivas de fardos (se fardo reservado só para este card → cancelar reserva + liberar fardo; se compartilhado → manter), liberar fardos cancelados como disponíveis. Componente visual: `src/features/cards/components/delete-card-modal.tsx`. API route necessária: `POST /api/cards/delete`.
 - [Deferred] **PDF prateleira: agrupar SKUs e coluna fardo** — No PDF do modal de prateleira (generateChecklist), agrupar linhas do mesmo SKU em uma linha única com quantidade total (ex: "20 separado" + "4 aguardar" → "SKU | 24 peças"). Adicionar coluna com código IN e endereço do fardo quando houver reserva associada. Arquivo: `src/features/cards/lib/pdf-generator.ts`.
+- [Deferred] **Instrução do líder por SKU no modal de transformação** — Botão por linha de SKU no modal (apenas líder/admin) abre popup com 4 opções: TRANSFORMAÇÃO LIBERADA (verde), SKU VAI CHEGAR (amarelo), PEGAR NA VALERIA (azul), PEGAR NA LOJA (roxo). Badge colorido aparece ao lado do SKU visível para todos. Requer: nova coluna/tabela para persistir instrução, API route, realtime sync. Componente alvo: `src/features/transformacao/components/transformacao-modal.tsx`.
 
 ### Blockers/Concerns
 
