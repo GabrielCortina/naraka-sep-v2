@@ -11,4 +11,4 @@ export type TipoPedido = 'unitario' | 'kit' | 'combo'
 export type StatusProgresso = 'pendente' | 'parcial' | 'completo' | 'nao_encontrado' | 'aguardar_fardista' | 'transformacao'
 
 // Status de fardo no trafego
-export type StatusTrafego = 'pendente' | 'encontrado' | 'nao_encontrado'
+export type StatusTrafego = 'pendente' | 'encontrado' | 'nao_encontrado' | 'baixado'
