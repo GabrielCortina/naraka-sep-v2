@@ -146,18 +146,6 @@ Plans:
 Plans:
 - [x] 07-01: TBD
 
-### Phase 07.1: Aba de Transformacao (INSERTED)
-
-**Goal:** Nova aba dedicada para gerenciar itens enviados para transformacao (quando cascata nao encontra fardo disponivel), com kanban por metodo de envio, modal com validacao exata de quantidade, fluxo lider atribui separador completa, cards sequenciais por card_key, contadores, busca por SKU e realtime completo
-**Requirements**: D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12, D-13, D-14, D-15, D-16, D-17, D-18, D-19, D-20, D-21
-**Depends on:** Phase 7
-**Plans:** 3 plans
-
-Plans:
-- [ ] 07.1-01-PLAN.md — Migration numero_transformacao, tipos, navegacao e update cascata INSERT
-- [ ] 07.1-02-PLAN.md — UI completa: data hook, header, card, modal com validacao estrita, page e client
-- [ ] 07.1-03-PLAN.md — API routes confirm/assign, schema push e verificacao end-to-end
-
 ### Phase 8: Baixa de Fardos
 **Goal**: Fardista pode escanear ou digitar codigo IN para dar baixa no fardo, removendo do trafego e atualizando a planilha de estoque
 **Depends on**: Phase 7
@@ -215,7 +203,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 5. Cards e UI Foundation | 0/6 | Not started | - |
 | 6. Lista de Fardos | 0/3 | Not started | - |
 | 7. Lista de Prateleira e Cascata | 0/? | Not started | - |
-| 7.1. Aba de Transformacao | 0/3 | Not started | - |
 | 8. Baixa de Fardos | 0/? | Not started | - |
 | 9. Dashboard | 0/? | Not started | - |
 | 10. Gestao de Usuarios | 0/? | Not started | - |
