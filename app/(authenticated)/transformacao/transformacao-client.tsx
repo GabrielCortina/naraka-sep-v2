@@ -351,6 +351,7 @@ export function TransformacaoClient({
         card={selectedCard}
         onConfirmQuantity={handleConfirmQuantity}
         loadingItems={loadingItems}
+        userRole={userRole}
       />
 
       <AssignModal

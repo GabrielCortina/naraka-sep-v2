@@ -17,6 +17,8 @@ import type { TransformacaoCardData, TransformacaoItem } from '../types'
 import { TYPE_ABBREV } from '@/features/cards/lib/deadline-config'
 import { ProgressBar } from '@/features/cards/components/progress-bar'
 import { NumpadPopup } from '@/features/cards/components/numpad-popup'
+import { InstrucaoPopover } from './instrucao-popover'
+import { InstrucaoBadge } from './instrucao-badge'
 
 interface TransformacaoModalProps {
   open: boolean
@@ -24,6 +26,7 @@ interface TransformacaoModalProps {
   card: TransformacaoCardData | null
   onConfirmQuantity: (transformacaoId: string, quantidade: number) => Promise<boolean>
   loadingItems?: Set<string>
+  userRole: string
 }
 
 export function TransformacaoModal({
@@ -32,6 +35,7 @@ export function TransformacaoModal({
   card,
   onConfirmQuantity,
   loadingItems,
+  userRole,
 }: TransformacaoModalProps) {
   const [numpadOpen, setNumpadOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<TransformacaoItem | null>(null)
@@ -108,6 +112,10 @@ export function TransformacaoModal({
                           <span className="text-2xl font-bold block truncate">
                             {item.sku}
                           </span>
+                          {/* Instrucao badge - visivel para todos (per D-03) */}
+                          {item.instrucao_lider && (
+                            <InstrucaoBadge instrucao={item.instrucao_lider} />
+                          )}
                           <p className="text-xs text-muted-foreground mt-0.5">
                             {done ? item.quantidade : 0}/{item.quantidade}
                           </p>
@@ -115,6 +123,14 @@ export function TransformacaoModal({
 
                         {/* Right: action/status */}
                         <div className="flex items-center gap-2 shrink-0">
+                          {/* Instrucao popover - apenas lider/admin (per D-01) */}
+                          {(userRole === 'admin' || userRole === 'lider') && !done && (
+                            <InstrucaoPopover
+                              transformacaoId={item.id}
+                              instrucaoAtual={item.instrucao_lider}
+                            />
+                          )}
+
                           {!done && !itemLoading && (
                             <div className="text-right mr-1">
                               <span className="text-[10px] uppercase text-muted-foreground leading-none block">
