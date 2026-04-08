@@ -109,6 +109,7 @@ app/(authenticated)/baixa/
 app/api/baixa/
   buscar/route.ts             # GET: lookup fardo by codigo_in in trafego
   confirmar/route.ts          # POST: execute baixa (3-step DB operation)
+  hoje/route.ts               # GET: today's baixados with full entregas data
 ```
 
 ### Pattern 1: API Route Auth (established project pattern)
@@ -344,7 +345,7 @@ const { error: baixaError } = await supabaseAdmin
 
 // Step 2: Update trafego_fardos (mark as 'baixado' or delete)
 // NOTE: StatusTrafego currently has 'pendente' | 'encontrado' | 'nao_encontrado'
-// Need to decide: add 'baixado' status or delete the row
+// Need to decide: add 'baixado' status or physically delete the row
 // Recommendation: update status to differentiate from active trafego
 await supabaseAdmin
   .from('trafego_fardos')
@@ -372,22 +373,19 @@ await supabaseAdmin
 | A3 | @yudiel/react-qr-scanner works well with 1D barcodes in warehouse lighting conditions | Standard Stack | May need html5-qrcode as fallback if detection rate is poor |
 | A4 | BT scanners used in this warehouse send Enter after barcode | Pitfall 6 | If scanners don't send Enter, may need configurable delimiter or timeout-based detection |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **trafego_fardos status on baixa: update or delete?**
+1. **trafego_fardos status on baixa: update or delete?** -- RESOLVED
    - What we know: D-19 says "remover/atualizar fardo do trafego_fardos". StatusTrafego enum currently has 'pendente' | 'encontrado' | 'nao_encontrado'
-   - What's unclear: Does the DB have a CHECK constraint limiting status values? Should we add 'baixado' status or physically delete the row?
-   - Recommendation: Update status to 'baixado' (preserves audit trail). If CHECK constraint exists, a migration adding 'baixado' is needed. Planner should include a migration task
+   - Resolution: Update status to 'baixado' (preserves audit trail). Migration 00009 adds 'baixado' to the CHECK constraint. Plan 01 Task 1 creates this migration.
 
-2. **Edge case: fardo in trafego but no reserva linked**
+2. **Edge case: fardo in trafego but no reserva linked** -- RESOLVED
    - What we know: D-10 says lookup via reservas. Claude's discretion includes handling this edge case
-   - What's unclear: Can a trafego_fardos record exist without a matching reserva? (e.g., cascata fardos)
-   - Recommendation: If no reservas found, still show the fardo details but with empty "Entregar para" section. Allow baixa to proceed -- the physical delivery still happens
+   - Resolution: If no reservas found, still show the fardo details but with empty "Entregar para" section. Allow baixa to proceed -- the physical delivery still happens. Implemented in Plan 01 Task 2 buscar route (Step 7).
 
-3. **Marketplace color for modal border**
+3. **Marketplace color for modal border** -- RESOLVED
    - What we know: D-06 specifies marketplace-colored border. The grupo_envio field contains the marketplace info
-   - What's unclear: Is grupo_envio stored on trafego_fardos, or do we need to trace back through reservas -> pedidos -> grupo_envio?
-   - Recommendation: Trace through reservas -> pedidos to get grupo_envio. Return it in the buscar API response
+   - Resolution: Trace through reservas -> pedidos to get grupo_envio. Return marketplace_color in the buscar API response via getMarketplaceColor(). Implemented in Plan 01 Task 1 (utility) and Task 2 (buscar route Step 6).
 
 ## Validation Architecture
 
