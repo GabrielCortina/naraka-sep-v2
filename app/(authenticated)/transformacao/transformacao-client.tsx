@@ -189,7 +189,7 @@ export function TransformacaoClient({
   async function handleConfirmQuantity(
     transformacaoId: string,
     quantidade: number,
-    sku: string,
+    _sku: string,
   ): Promise<boolean> {
     setLoadingItems((prev) => new Set(prev).add(transformacaoId))
     try {
