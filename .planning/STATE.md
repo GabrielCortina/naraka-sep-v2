@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-04-08T17:11:47.925Z"
-last_activity: 2026-04-08
+stopped_at: Phase 8 context gathered
+last_updated: "2026-04-08T19:56:28.173Z"
+last_activity: 2026-04-08 -- Phase 07.2 execution started
 progress:
-  total_phases: 10
-  completed_phases: 6
-  total_plans: 25
-  completed_plans: 24
+  total_phases: 11
+  completed_phases: 7
+  total_plans: 27
+  completed_plans: 26
   percent: 96
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-04)
 
 **Core value:** Separadores e fardistas conseguem processar todos os pedidos do dia dentro dos prazos de envio de cada marketplace, com visibilidade em tempo real para o lider.
-**Current focus:** Phase 07.1 — aba-de-transformacao
+**Current focus:** Phase 07.2 — instrucao-do-lider-por-sku-no-modal-de-transformacao
 
 ## Current Position
 
-Phase: 8
-Plan: Not started
-Status: Executing Phase 07.1
-Last activity: 2026-04-08
+Phase: 07.2 (instrucao-do-lider-por-sku-no-modal-de-transformacao) — EXECUTING
+Plan: 1 of 2
+Status: Executing Phase 07.2
+Last activity: 2026-04-08 -- Phase 07.2 execution started
 
 Progress: [██████████] 100%
 
@@ -128,12 +128,16 @@ Recent decisions affecting current work:
 - [Deferred] **PDF prateleira: agrupar SKUs e coluna fardo** — No PDF do modal de prateleira (generateChecklist), agrupar linhas do mesmo SKU em uma linha única com quantidade total (ex: "20 separado" + "4 aguardar" → "SKU | 24 peças"). Adicionar coluna com código IN e endereço do fardo quando houver reserva associada. Arquivo: `src/features/cards/lib/pdf-generator.ts`.
 - [Deferred] **Instrução do líder por SKU no modal de transformação** — Botão por linha de SKU no modal (apenas líder/admin) abre popup com 4 opções: TRANSFORMAÇÃO LIBERADA (verde), SKU VAI CHEGAR (amarelo), PEGAR NA VALERIA (azul), PEGAR NA LOJA (roxo). Badge colorido aparece ao lado do SKU visível para todos. Requer: nova coluna/tabela para persistir instrução, API route, realtime sync. Componente alvo: `src/features/transformacao/components/transformacao-modal.tsx`.
 
+### Roadmap Evolution
+
+- Phase 07.2 inserted after Phase 7.1: Instrucao do lider por SKU no modal de transformacao (URGENT)
+
 ### Blockers/Concerns
 
 None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T23:48:35.401Z
-Stopped at: Completed 06-02-PLAN.md
-Resume file: None
+Last session: 2026-04-08T19:56:28.169Z
+Stopped at: Phase 8 context gathered
+Resume file: .planning/phases/08-baixa-de-fardos/08-CONTEXT.md
