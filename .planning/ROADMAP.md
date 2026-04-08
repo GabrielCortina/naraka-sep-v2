@@ -146,6 +146,17 @@ Plans:
 Plans:
 - [x] 07-01: TBD
 
+### Phase 07.2: Instrucao do lider por SKU no modal de transformacao (INSERTED)
+
+**Goal:** Lider/admin pode definir instrucao por SKU no modal de transformacao e badge colorido aparece em tempo real para todos
+**Requirements**: INST-01 (coluna DB), INST-02 (API endpoint), INST-03 (badge UI), INST-04 (realtime sync)
+**Depends on:** Phase 7
+**Plans:** 2 plans
+
+Plans:
+- [ ] 07.2-01-PLAN.md — Backend: coluna instrucao_lider, tipo TypeScript, PATCH endpoint com role check
+- [ ] 07.2-02-PLAN.md — Frontend: InstrucaoPopover, InstrucaoBadge, integracao no TransformacaoModal
+
 ### Phase 8: Baixa de Fardos
 **Goal**: Fardista pode escanear ou digitar codigo IN para dar baixa no fardo, removendo do trafego e atualizando a planilha de estoque
 **Depends on**: Phase 7
