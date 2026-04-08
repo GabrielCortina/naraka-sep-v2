@@ -151,11 +151,11 @@ Plans:
 **Goal:** Lider/admin pode definir instrucao por SKU no modal de transformacao e badge colorido aparece em tempo real para todos
 **Requirements**: INST-01 (coluna DB), INST-02 (API endpoint), INST-03 (badge UI), INST-04 (realtime sync)
 **Depends on:** Phase 7
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 07.2-01-PLAN.md — Backend: coluna instrucao_lider, tipo TypeScript, PATCH endpoint com role check
-- [ ] 07.2-02-PLAN.md — Frontend: InstrucaoPopover, InstrucaoBadge, integracao no TransformacaoModal
+- [x] 07.2-01-PLAN.md — Backend: coluna instrucao_lider, tipo TypeScript, PATCH endpoint com role check
+- [x] 07.2-02-PLAN.md — Frontend: InstrucaoPopover, InstrucaoBadge, integracao no TransformacaoModal
 
 ### Phase 8: Baixa de Fardos
 **Goal**: Fardista pode escanear ou digitar codigo IN para dar baixa no fardo, removendo do trafego e atualizando a planilha de estoque
@@ -165,11 +165,13 @@ Plans:
   1. Fardista digita ou escaneia codigo IN e Enter aciona busca automatica no trafego
   2. Card de confirmacao exibe SKU, quantidade, endereco e "para quem entregar" (nome do separador; se multiplos, mostra todos)
   3. Confirmar Baixa remove fardo do trafego, libera prateleira e apaga colunas F+ na planilha de estoque externa via Google Sheets API
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 08-01: TBD
+- [ ] 08-01-PLAN.md — Migration baixado status, tipos, utilidades e API routes buscar/confirmar
+- [ ] 08-02-PLAN.md — Hook useBaixa, componentes BaixaInput, BaixaModal e BaixadosHoje
+- [ ] 08-03-PLAN.md — Page wiring, camera scanner e verificacao end-to-end
 
 ### Phase 9: Dashboard
 **Goal**: Lider e admin acompanham operacao em tempo real com metricas de progressao, rankings e status de fardos
@@ -214,6 +216,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 5. Cards e UI Foundation | 0/6 | Not started | - |
 | 6. Lista de Fardos | 0/3 | Not started | - |
 | 7. Lista de Prateleira e Cascata | 0/? | Not started | - |
-| 8. Baixa de Fardos | 0/? | Not started | - |
+| 8. Baixa de Fardos | 0/3 | Not started | - |
 | 9. Dashboard | 0/? | Not started | - |
 | 10. Gestao de Usuarios | 0/? | Not started | - |
