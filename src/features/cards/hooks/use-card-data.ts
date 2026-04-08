@@ -112,11 +112,19 @@ export function useCardData(
         }
       }
 
-      // Build set of codigo_in that have been baixado (fardo delivered)
-      const baixadoCodigoIns = new Set<string>()
+      // Build set of codigo_in still in trafego (not yet baixado).
+      // After baixa, trafego_fardos row is deleted — so if a reserva's
+      // codigo_in is NOT in this set, the fardo was already delivered.
+      const trafegoCodigoIns = new Set<string>()
       for (const tf of trafegoFardos) {
-        if (tf.status === 'baixado') {
-          baixadoCodigoIns.add(tf.codigo_in)
+        trafegoCodigoIns.add(tf.codigo_in)
+      }
+
+      // baixadoCodigoIns = reserva codigo_ins that are NOT in trafego anymore
+      const baixadoCodigoIns = new Set<string>()
+      for (const r of reservas) {
+        if (!trafegoCodigoIns.has(r.codigo_in)) {
+          baixadoCodigoIns.add(r.codigo_in)
         }
       }
 

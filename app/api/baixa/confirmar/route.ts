@@ -53,10 +53,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Fardo ja teve baixa' }, { status: 409 })
   }
 
-  // 4. Status guard: trafego must be 'encontrado'
+  // 4. Status guard: trafego must be 'encontrado' — fetch full row for copy
   const { data: trafego } = await supabaseAdmin
     .from('trafego_fardos')
-    .select('id, status')
+    .select('*')
     .eq('id', trafego_id)
     .single()
 
@@ -64,16 +64,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Fardo ja foi processado' }, { status: 409 })
   }
 
-  // 5. Execute 3-step baixa (D-19)
+  // 5. Execute baixa: copy to baixados, delete from trafego_fardos, unlock progresso
   try {
-    // (a) Insert into baixados
+    // (a) Copy full trafego_fardos data to baixados
     const { error: insertError } = await supabaseAdmin
       .from('baixados')
       .insert({
         codigo_in: trimmedCodigoIn,
         trafego_id: trafego_id,
         baixado_por: user.id,
-      })
+        sku: trafego.sku,
+        quantidade: trafego.quantidade,
+        endereco: trafego.endereco,
+        reserva_id: trafego.reserva_id,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        fardista_id: (trafego as any).fardista_id ?? null,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        fardista_nome: (trafego as any).fardista_nome ?? null,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
 
     if (insertError) {
       // Race condition: unique constraint violation
@@ -84,15 +93,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Erro ao registrar baixa' }, { status: 500 })
     }
 
-    // (b) Update trafego_fardos status to 'baixado'
-    const { error: updateError } = await supabaseAdmin
+    // (b) Delete from trafego_fardos (row moves to baixados)
+    const { error: deleteError } = await supabaseAdmin
       .from('trafego_fardos')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .update({ status: 'baixado' as any })
+      .delete()
       .eq('id', trafego_id)
 
-    if (updateError) {
-      console.error('[baixa/confirmar] Erro ao atualizar trafego:', updateError)
+    if (deleteError) {
+      console.error('[baixa/confirmar] Erro ao deletar trafego:', deleteError)
     }
 
     // (c) Unlock AGUARDAR FARDISTA lines (D-17, D-18)

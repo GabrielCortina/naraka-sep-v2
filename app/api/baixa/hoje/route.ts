@@ -26,9 +26,10 @@ export async function GET() {
   hoje.setHours(0, 0, 0, 0)
   const hojeISO = hoje.toISOString()
 
-  const { data: baixados, error: queryError } = await supabaseAdmin
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: baixados, error: queryError } = await (supabaseAdmin as any)
     .from('baixados')
-    .select('id, codigo_in, trafego_id, baixado_em')
+    .select('id, codigo_in, sku, quantidade, baixado_em')
     .gte('baixado_em', hojeISO)
     .order('baixado_em', { ascending: false })
 
@@ -44,16 +45,9 @@ export async function GET() {
   // 3. For each baixado, build full BaixadoItem with entregas
   const items: BaixadoItem[] = []
 
-  for (const baixado of baixados) {
-    // Get trafego_fardos data
-    const { data: trafego } = await supabaseAdmin
-      .from('trafego_fardos')
-      .select('sku, quantidade')
-      .eq('id', baixado.trafego_id)
-      .single()
-
-    const sku = trafego?.sku ?? ''
-    const quantidade = trafego?.quantidade ?? 0
+  for (const baixado of baixados as { id: string; codigo_in: string; sku: string | null; quantidade: number | null; baixado_em: string }[]) {
+    const sku = baixado.sku ?? ''
+    const quantidade = baixado.quantidade ?? 0
 
     // Build entregas: reservas -> pedidos -> atribuicoes -> users
     const entregas: { card_key: string; separador_nome: string | null }[] = []
