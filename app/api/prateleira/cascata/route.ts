@@ -283,6 +283,32 @@ export async function POST(request: NextRequest) {
     const separadorNome =
       (sepAtrib?.users as { nome: string } | null)?.nome ?? null
 
+    // Compute numero_transformacao (D-11): if current max card is all concluido, increment; else use same
+    // Step 1: Get the max numero_transformacao for this card_key (limit 1 for efficiency)
+    const { data: maxRow } = await supabaseAdmin
+      .from('transformacoes')
+      .select('numero_transformacao')
+      .eq('card_key', card_key as string)
+      .order('numero_transformacao', { ascending: false })
+      .limit(1)
+
+    let nextNumeroTransformacao = 1
+    if (maxRow && maxRow.length > 0) {
+      const currentMax = (maxRow[0] as { numero_transformacao: number }).numero_transformacao
+      // Step 2: Check if ALL items with currentMax are concluido (targeted query)
+      const { data: activeItems } = await supabaseAdmin
+        .from('transformacoes')
+        .select('id')
+        .eq('card_key', card_key as string)
+        .eq('numero_transformacao', currentMax)
+        .neq('status', 'concluido')
+        .limit(1)
+
+      // If no active items found (all concluido), increment
+      const allConcluido = !activeItems || activeItems.length === 0
+      nextNumeroTransformacao = allConcluido ? currentMax + 1 : currentMax
+    }
+
     // Insert transformacao record (cast as any for migration 00006 cols)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabaseAdmin as any).from('transformacoes').insert({
@@ -293,6 +319,7 @@ export async function POST(request: NextRequest) {
       separador_id: separadorId,
       separador_nome: separadorNome,
       status: 'pendente',
+      numero_transformacao: nextNumeroTransformacao,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any)
 
