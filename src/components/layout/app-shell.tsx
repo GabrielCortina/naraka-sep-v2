@@ -6,6 +6,7 @@ import { NAV_ITEMS } from '@/features/auth/lib/role-config'
 import { Sidebar } from './sidebar'
 import { MobileHeader } from './mobile-header'
 import { BottomTabs } from './bottom-tabs'
+import { LoadingOverlay } from './loading-overlay'
 
 export function AppShell({
   children,
@@ -50,6 +51,7 @@ export function AppShell({
         {children}
       </main>
       <BottomTabs items={filteredItems} />
+      <LoadingOverlay />
     </div>
   )
 }

@@ -52,6 +52,15 @@ const config: Config = {
         "urgency-warning": "hsl(var(--urgency-warning))",
         "urgency-ok": "hsl(var(--urgency-ok))",
       },
+      keyframes: {
+        "loading-slide": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(300%)" },
+        },
+      },
+      animation: {
+        "loading-slide": "loading-slide 1s ease-in-out infinite",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
