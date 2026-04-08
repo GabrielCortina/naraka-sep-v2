@@ -36,7 +36,7 @@ export function useCardData(
       const supabase = createClient()
 
       // Fetch all required data in parallel
-      const [pedidosRes, progressoRes, reservasRes, atribuicoesRes, transformacoesRes] =
+      const [pedidosRes, progressoRes, reservasRes, atribuicoesRes, transformacoesRes, trafegoRes] =
         await Promise.all([
           supabase.from('pedidos').select('*'),
           supabase.from('progresso').select('*'),
@@ -44,6 +44,7 @@ export function useCardData(
           supabase.from('atribuicoes').select('*, users(nome)'),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (supabase as any).from('transformacoes').select('*'),
+          supabase.from('trafego_fardos').select('codigo_in, status'),
         ])
 
       if (pedidosRes.error) throw pedidosRes.error
@@ -51,6 +52,7 @@ export function useCardData(
       if (reservasRes.error) throw reservasRes.error
       if (atribuicoesRes.error) throw atribuicoesRes.error
       if (transformacoesRes.error) throw transformacoesRes.error
+      if (trafegoRes.error) throw trafegoRes.error
 
       const pedidos = pedidosRes.data
       const progresso = progressoRes.data
@@ -58,6 +60,7 @@ export function useCardData(
       const atribuicoes = atribuicoesRes.data
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const transformacoes = (transformacoesRes.data ?? []) as any[]
+      const trafegoFardos = trafegoRes.data as { codigo_in: string; status: string }[]
 
       // Build transformacao totals by card_key
       const transformacaoByCard = new Map<string, number>()
@@ -109,6 +112,14 @@ export function useCardData(
         }
       }
 
+      // Build set of codigo_in that have been baixado (fardo delivered)
+      const baixadoCodigoIns = new Set<string>()
+      for (const tf of trafegoFardos) {
+        if (tf.status === 'baixado') {
+          baixadoCodigoIns.add(tf.codigo_in)
+        }
+      }
+
       // Group pedidos by card_key and build CardData[]
       const groups = groupByCardKey(filteredPedidos)
       const cardList: CardData[] = []
@@ -116,7 +127,7 @@ export function useCardData(
 
       for (const [cardKey, groupPedidos] of entries) {
         const first = groupPedidos[0]
-        const items = aggregateItems(groupPedidos, progressMap, reservasBySku)
+        const items = aggregateItems(groupPedidos, progressMap, reservasBySku, baixadoCodigoIns)
         const transformTotal = transformacaoByCard.get(cardKey) ?? 0
         const progress = calcProgress(
           groupPedidos.map((p) => ({

@@ -5,6 +5,7 @@ import { DEADLINES } from './deadline-config'
 type PedidoRow = Tables<'pedidos'>
 type ProgressoRow = Tables<'progresso'>
 type ReservaRow = Tables<'reservas'>
+type TrafegoFardoRow = Tables<'trafego_fardos'>
 
 /**
  * Agrupa pedidos por card_key.
@@ -93,6 +94,7 @@ export function aggregateItems(
   pedidos: PedidoRow[],
   progressMap: Map<string, ProgressoRow>,
   reservasBySku: Map<string, ReservaRow[]>,
+  baixadoCodigoIns?: Set<string>,
 ): CardItem[] {
   const skuMap = new Map<
     string,
@@ -137,13 +139,20 @@ export function aggregateItems(
     }))
 
     // Determine aggregate status
-    // Priority: nao_encontrado > transformacao > separado > parcial > pendente
+    // Priority: nao_encontrado > transformacao > aguardar_fardista > separado > parcial > pendente
+    //
+    // Blocking rule: if SKU has active reservas (status='reservado') whose fardos
+    // have NOT been baixado, the item is blocked regardless of progresso status.
+    const hasActiveReserva = reservas.some(
+      (r) => r.status === 'reservado' && !(baixadoCodigoIns?.has(r.codigo_in) ?? false),
+    )
+
     let status: CardItem['status']
     if (data.statuses.some((s) => s === 'nao_encontrado')) {
       status = 'nao_encontrado'
     } else if (data.statuses.every((s) => s === 'transformacao')) {
       status = 'transformacao'
-    } else if (data.statuses.some((s) => s === 'aguardar_fardista')) {
+    } else if (hasActiveReserva || data.statuses.some((s) => s === 'aguardar_fardista')) {
       status = 'aguardar_fardista'
     } else if (
       data.quantidade_separada >= data.quantidade_necessaria &&

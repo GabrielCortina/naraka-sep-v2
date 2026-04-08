@@ -263,7 +263,9 @@ describe('aggregateItems', () => {
       ['SKU-001', [makeReserva({ sku: 'SKU-001', codigo_in: 'F1', quantidade: 10 })]],
     ])
 
-    const result = aggregateItems(pedidos, progressMap, reservasBySku)
+    // F1 has been baixado, so item should be unlocked
+    const baixadoCodigoIns = new Set(['F1'])
+    const result = aggregateItems(pedidos, progressMap, reservasBySku, baixadoCodigoIns)
 
     const sku001 = result.find(i => i.sku === 'SKU-001')!
     expect(sku001.quantidade_necessaria).toBe(8)
@@ -317,5 +319,59 @@ describe('aggregateItems', () => {
     const result = aggregateItems(pedidos, new Map(), new Map())
     expect(result[0].quantidade_separada).toBe(0)
     expect(result[0].status).toBe('pendente')
+  })
+
+  it('blocks item with active reserva even when progresso is pendente', () => {
+    const pedidos = [
+      makePedido({ id: 'p1', sku: 'SKU-001', quantidade: 5 }),
+    ]
+    const progressMap = new Map([
+      ['p1', makeProgresso({ pedido_id: 'p1', quantidade_separada: 0, status: 'pendente' })],
+    ])
+    const reservasBySku = new Map([
+      ['SKU-001', [makeReserva({ sku: 'SKU-001', codigo_in: 'FARDO-001', status: 'reservado' })]],
+    ])
+    // FARDO-001 has NOT been baixado → item should be blocked
+    const baixadoCodigoIns = new Set<string>()
+
+    const result = aggregateItems(pedidos, progressMap, reservasBySku, baixadoCodigoIns)
+    expect(result[0].status).toBe('aguardar_fardista')
+  })
+
+  it('unblocks item when reserva fardo has been baixado', () => {
+    const pedidos = [
+      makePedido({ id: 'p1', sku: 'SKU-001', quantidade: 5 }),
+    ]
+    const progressMap = new Map([
+      ['p1', makeProgresso({ pedido_id: 'p1', quantidade_separada: 0, status: 'pendente' })],
+    ])
+    const reservasBySku = new Map([
+      ['SKU-001', [makeReserva({ sku: 'SKU-001', codigo_in: 'FARDO-001', status: 'reservado' })]],
+    ])
+    // FARDO-001 HAS been baixado → item should be unlocked
+    const baixadoCodigoIns = new Set(['FARDO-001'])
+
+    const result = aggregateItems(pedidos, progressMap, reservasBySku, baixadoCodigoIns)
+    expect(result[0].status).toBe('pendente')
+  })
+
+  it('blocks item when one of multiple reservas is not yet baixado', () => {
+    const pedidos = [
+      makePedido({ id: 'p1', sku: 'SKU-001', quantidade: 5 }),
+    ]
+    const progressMap = new Map([
+      ['p1', makeProgresso({ pedido_id: 'p1', quantidade_separada: 0, status: 'pendente' })],
+    ])
+    const reservasBySku = new Map([
+      ['SKU-001', [
+        makeReserva({ id: 'r1', sku: 'SKU-001', codigo_in: 'FARDO-001', status: 'reservado' }),
+        makeReserva({ id: 'r2', sku: 'SKU-001', codigo_in: 'FARDO-002', status: 'reservado' }),
+      ]],
+    ])
+    // Only FARDO-001 baixado, FARDO-002 still pending → blocked
+    const baixadoCodigoIns = new Set(['FARDO-001'])
+
+    const result = aggregateItems(pedidos, progressMap, reservasBySku, baixadoCodigoIns)
+    expect(result[0].status).toBe('aguardar_fardista')
   })
 })
