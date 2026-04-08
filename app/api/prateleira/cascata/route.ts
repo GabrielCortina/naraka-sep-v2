@@ -285,7 +285,8 @@ export async function POST(request: NextRequest) {
 
     // Compute numero_transformacao (D-11): if current max card is all concluido, increment; else use same
     // Step 1: Get the max numero_transformacao for this card_key (limit 1 for efficiency)
-    const { data: maxRow } = await supabaseAdmin
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: maxRow } = await (supabaseAdmin as any)
       .from('transformacoes')
       .select('numero_transformacao')
       .eq('card_key', card_key as string)
@@ -296,7 +297,8 @@ export async function POST(request: NextRequest) {
     if (maxRow && maxRow.length > 0) {
       const currentMax = (maxRow[0] as { numero_transformacao: number }).numero_transformacao
       // Step 2: Check if ALL items with currentMax are concluido (targeted query)
-      const { data: activeItems } = await supabaseAdmin
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: activeItems } = await (supabaseAdmin as any)
         .from('transformacoes')
         .select('id')
         .eq('card_key', card_key as string)
