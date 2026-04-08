@@ -5,6 +5,7 @@ status: draft
 shadcn_initialized: true
 preset: default/neutral
 created: 2026-04-08
+revised: 2026-04-08
 ---
 
 # Phase 8 — UI Design Contract: Baixa de Fardos
@@ -35,7 +36,7 @@ Declared values (multiples of 4):
 |-------|-------|-------|
 | xs | 4px | Icon-to-text gap inside buttons, inline padding |
 | sm | 8px | Gap between badge elements, compact list item padding |
-| md | 16px | Default padding inside modal sections, input padding |
+| md | 16px | Default padding inside modal sections, input padding, Entregar Para left padding (after border) |
 | lg | 24px | Section padding (BAIXADOS HOJE header), modal content padding |
 | xl | 32px | Gap between input area and BAIXADOS HOJE section |
 | 2xl | 48px | Top padding from nav to input area (mobile) |
@@ -49,13 +50,15 @@ Exceptions: Input field height is 56px (h-14) per D-02 for large touch target. M
 
 | Role | Size | Weight | Line Height | Usage in This Phase |
 |------|------|--------|-------------|---------------------|
-| Body | 14px (text-sm) | 400 (normal) | 1.5 | BAIXADOS HOJE list items, separador names, card_key labels |
 | Label | 12px (text-xs) | 600 (semibold) | 1.5 | Section headers ("BAIXADOS HOJE (3)"), field labels ("CONTEM", "Entregar para:"), timestamps |
-| Input | 18px (text-lg) | 400 (normal) | 1.5 | Barcode input field text (D-02: fonte grande) |
-| Heading | 20px (text-xl) | 600 (semibold) | 1.2 | Modal title (codigo IN display), quantity number |
-| Display | 28px (text-2xl) | 700 (bold) | 1.2 | Quantity value in modal (numero grande bold per D-05) |
+| Body | 14px (text-sm) | 400 (normal) | 1.5 | BAIXADOS HOJE list items, separador names, card_key labels |
+| Heading | 20px (text-xl) | 600 (semibold) | 1.2 | Modal title (codigo IN display), barcode input field text (D-02: fonte grande), quantity number |
+| Display | 28px (text-2xl) | 600 (semibold) | 1.2 | Quantity value in modal (numero grande per D-05 — 28px size provides sufficient hierarchy without needing bold weight) |
 
-Source: D-02 (fonte grande), D-05 (numero grande bold), established project patterns from Phase 5
+Font sizes: 4 declared (12px, 14px, 20px, 28px).
+Font weights: 2 declared (400 normal, 600 semibold).
+
+Source: D-02 (fonte grande), D-05 (numero grande bold), established project patterns from Phase 5. Input field merged from 18px to 20px — text-xl fulfills D-02's "fonte grande" intent. Display weight reduced from 700 to 600 — the 28px size alone creates sufficient visual hierarchy.
 
 ---
 
@@ -100,12 +103,12 @@ Source: globals.css (existing tokens), CONTEXT.md D-04/D-06/D-07/D-08/D-13, REQU
 | Component | shadcn Input + custom wrapper |
 | Width | 80% of viewport on mobile, 50% on desktop (D-02) |
 | Height | 56px (h-14) |
-| Font size | 18px (text-lg) |
+| Font size | 20px (text-xl) |
 | Placeholder | "Escanear ou digitar codigo IN" |
 | Auto-focus | On mount and after every baixa confirmation (D-01, D-13) |
 | Trigger | Enter key only -- no onChange debounce (D-01, Pitfall 6) |
 | Error state | border-red-500 for 2 seconds, then revert (D-04) |
-| Camera button | 40px square icon button to the right with Camera icon from lucide-react (D-03) |
+| Camera button | 40px square icon button to the right with Camera icon from lucide-react (D-03), aria-label="Escanear com camera" |
 | Layout | Centered horizontally on both mobile and desktop |
 
 ### 2. BaixaModal (confirmacao)
@@ -116,9 +119,9 @@ Source: globals.css (existing tokens), CONTEXT.md D-04/D-06/D-07/D-08/D-13, REQU
 | Border-top | 4px solid in marketplace color (D-06) |
 | Max width | 420px on desktop, 90vw on mobile |
 | Padding | 24px |
-| Sections (top to bottom) | Codigo IN (heading, 20px semibold), SKU (body, 14px), Endereco (body, 14px, with MapPin icon in green), Quantidade ("CONTEM" label 12px semibold + value 28px bold), "Entregar para:" section |
+| Sections (top to bottom) | Codigo IN (heading, 20px semibold), SKU (body, 14px), Endereco (body, 14px, with MapPin icon in green), Quantidade ("CONTEM" label 12px semibold + value 28px semibold), "Entregar para:" section |
 | MapPin icon | 16px, color urgency-ok (green), inline with endereco text (D-05) |
-| Quantidade | Label "CONTEM" in 12px semibold uppercase above, number in 28px bold below |
+| Quantidade | Label "CONTEM" in 12px semibold uppercase above, number in 28px semibold below |
 | Animation | Default shadcn Dialog animation (fade + scale) |
 
 ### 3. Entregar Para Section (inside modal)
@@ -129,7 +132,7 @@ Source: globals.css (existing tokens), CONTEXT.md D-04/D-06/D-07/D-08/D-13, REQU
 | List | Vertical, each line = separador nome + card_key |
 | Line format | "{nome}" in 14px semibold + "{card_key}" in 12px normal muted-foreground |
 | Line accent | Left border 3px solid in marketplace color of that card (D-09) |
-| Line padding | 8px vertical, 12px left (after border) |
+| Line padding | 8px vertical, 16px left (after border) |
 | Not assigned | "Nao atribuido" in 14px italic + card_key in 12px muted (D-11) |
 | Scroll | Internal scroll if more than 4 entries (D-12), max-height 200px |
 
@@ -183,7 +186,7 @@ Source: globals.css (existing tokens), CONTEXT.md D-04/D-06/D-07/D-08/D-13, REQU
 
 | State | Style | Copy | Duration |
 |-------|-------|------|----------|
-| Not found (D-04) | destructive variant (red tint) | "Fardo nao encontrado no trafego" | 3s |
+| Not found (D-04) | destructive variant (red tint) | "Fardo nao encontrado -- verifique o codigo e tente novamente" | 3s |
 | Already discharged (D-08) | warning (amber tint) | "Fardo {codigo_in} ja teve baixa" | 3s |
 | Success (D-13) | success (green tint) | "Baixa confirmada -- {codigo_in}" | 2s |
 
@@ -198,7 +201,7 @@ Source: sonner (already installed), CONTEXT.md D-04/D-08/D-13
 | State | Visual |
 |-------|--------|
 | Idle (focused) | Default border, blinking cursor, auto-focused |
-| Typing | Text appears in 18px, no search triggered |
+| Typing | Text appears in 20px, no search triggered |
 | Error flash | border-red-500 for 2 seconds, then returns to default (D-04) |
 | Processing | Input disabled while modal is open |
 
@@ -258,11 +261,11 @@ Source: sonner (already installed), CONTEXT.md D-04/D-08/D-13
 |  [MapPin] Endereco (body)                 |
 |  16px gap                                 |
 |  CONTEM (label)                           |
-|  {quantidade} (display, 28px bold)        |
+|  {quantidade} (display, 28px semibold)    |
 |  16px gap                                 |
 |  Entregar para: (label)                   |
-|  [3px left border] Nome - card_key        |
-|  [3px left border] Nome - card_key        |
+|  [3px left border] 16px pad | Nome - card_key |
+|  [3px left border] 16px pad | Nome - card_key |
 |  24px gap                                 |
 |  [   Confirmar Baixa (green, full)   ]    |
 |  8px gap                                  |
@@ -285,7 +288,7 @@ Source: sonner (already installed), CONTEXT.md D-04/D-08/D-13
 | Not assigned fallback | "Nao atribuido ({card_key})" |
 | Empty state heading | N/A -- page always shows input field, no empty state needed |
 | Empty state body | N/A |
-| Error: not found | "Fardo nao encontrado no trafego" |
+| Error: not found | "Fardo nao encontrado -- verifique o codigo e tente novamente" |
 | Error: duplicate | "Fardo {codigo_in} ja teve baixa" |
 | Success | "Baixa confirmada -- {codigo_in}" |
 | Destructive confirmation | N/A -- baixa uses single-click confirm, no double confirmation (D-07, D-16) |
@@ -320,6 +323,7 @@ New npm dependency: `@yudiel/react-qr-scanner` (camera scanning only). Not a sha
 | Input auto-focus | useEffect focus on mount; re-focus after modal close |
 | Modal keyboard | shadcn Dialog handles Escape to close, Tab trap, focus return |
 | Toast announcements | sonner handles aria-live regions |
+| Camera button | aria-label="Escanear com camera" on icon-only button |
 | Camera scanner | Full-screen overlay with visible close button; Escape to dismiss |
 | Color contrast | Green button (#22C55E) on white meets WCAG AA for large text (48px button); marketplace colors used only as decorative borders, not for text |
 
