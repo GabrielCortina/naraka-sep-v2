@@ -54,8 +54,8 @@ const config: Config = {
       },
       keyframes: {
         "loading-slide": {
-          "0%": { transform: "translateX(-100%)" },
-          "100%": { transform: "translateX(300%)" },
+          "0%": { transform: "translateX(-160px)" },
+          "100%": { transform: "translateX(160px)" },
         },
       },
       animation: {
