@@ -1,3 +1,9 @@
+export type InstrucaoLider =
+  | 'TRANSFORMACAO_LIBERADA'
+  | 'SKU_VAI_CHEGAR'
+  | 'PEGAR_NA_VALERIA'
+  | 'PEGAR_NA_LOJA'
+
 export interface TransformacaoItem {
   id: string
   sku: string
@@ -10,6 +16,7 @@ export interface TransformacaoItem {
   numero_transformacao: number
   created_at: string
   concluido_at: string | null
+  instrucao_lider: InstrucaoLider | null
 }
 
 export interface TransformacaoCardData {
