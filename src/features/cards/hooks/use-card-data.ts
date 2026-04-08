@@ -36,7 +36,7 @@ export function useCardData(
       const supabase = createClient()
 
       // Fetch all required data in parallel
-      const [pedidosRes, progressoRes, reservasRes, atribuicoesRes, transformacoesRes, trafegoRes] =
+      const [pedidosRes, progressoRes, reservasRes, atribuicoesRes, transformacoesRes, baixadosRes] =
         await Promise.all([
           supabase.from('pedidos').select('*'),
           supabase.from('progresso').select('*'),
@@ -44,7 +44,7 @@ export function useCardData(
           supabase.from('atribuicoes').select('*, users(nome)'),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (supabase as any).from('transformacoes').select('*'),
-          supabase.from('trafego_fardos').select('codigo_in, status'),
+          supabase.from('baixados').select('codigo_in'),
         ])
 
       if (pedidosRes.error) throw pedidosRes.error
@@ -52,7 +52,7 @@ export function useCardData(
       if (reservasRes.error) throw reservasRes.error
       if (atribuicoesRes.error) throw atribuicoesRes.error
       if (transformacoesRes.error) throw transformacoesRes.error
-      if (trafegoRes.error) throw trafegoRes.error
+      if (baixadosRes.error) throw baixadosRes.error
 
       const pedidos = pedidosRes.data
       const progresso = progressoRes.data
@@ -60,7 +60,7 @@ export function useCardData(
       const atribuicoes = atribuicoesRes.data
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const transformacoes = (transformacoesRes.data ?? []) as any[]
-      const trafegoFardos = trafegoRes.data as { codigo_in: string; status: string }[]
+      const baixadosData = baixadosRes.data as { codigo_in: string }[]
 
       // Build transformacao totals by card_key
       const transformacaoByCard = new Map<string, number>()
@@ -112,20 +112,11 @@ export function useCardData(
         }
       }
 
-      // Build set of codigo_in still in trafego (not yet baixado).
-      // After baixa, trafego_fardos row is deleted — so if a reserva's
-      // codigo_in is NOT in this set, the fardo was already delivered.
-      const trafegoCodigoIns = new Set<string>()
-      for (const tf of trafegoFardos) {
-        trafegoCodigoIns.add(tf.codigo_in)
-      }
-
-      // baixadoCodigoIns = reserva codigo_ins that are NOT in trafego anymore
+      // Build set of codigo_in that have been baixado (exist in baixados table).
+      // A reserva's fardo is delivered only when it appears in baixados.
       const baixadoCodigoIns = new Set<string>()
-      for (const r of reservas) {
-        if (!trafegoCodigoIns.has(r.codigo_in)) {
-          baixadoCodigoIns.add(r.codigo_in)
-        }
+      for (const b of baixadosData) {
+        baixadoCodigoIns.add(b.codigo_in)
       }
 
       // Group pedidos by card_key and build CardData[]
