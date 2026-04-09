@@ -5,7 +5,7 @@ import type { UserRole } from '@/types'
  * Middleware usa para verificar acesso; AppShell usa para filtrar navegacao.
  */
 export const ROLE_ROUTES: Record<UserRole, string[]> = {
-  admin: ['/dashboard', '/upload', '/fardos', '/prateleira', '/transformacao', '/baixa'],
+  admin: ['/dashboard', '/upload', '/fardos', '/prateleira', '/transformacao', '/baixa', '/usuarios'],
   lider: ['/dashboard', '/upload', '/fardos', '/prateleira', '/transformacao'],
   separador: ['/prateleira', '/transformacao'],
   fardista: ['/fardos', '/baixa'],
@@ -66,5 +66,11 @@ export const NAV_ITEMS: {
     href: '/baixa',
     icon: 'PackageCheck',
     roles: ['admin', 'fardista'],
+  },
+  {
+    label: 'Usuarios',
+    href: '/usuarios',
+    icon: 'Users',
+    roles: ['admin'],
   },
 ]

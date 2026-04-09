@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 // Inlined from role-config.ts (Edge Runtime may not resolve path aliases)
 const ROLE_ROUTES: Record<string, string[]> = {
-  admin: ['/dashboard', '/upload', '/fardos', '/prateleira', '/transformacao', '/baixa'],
+  admin: ['/dashboard', '/upload', '/fardos', '/prateleira', '/transformacao', '/baixa', '/usuarios'],
   lider: ['/dashboard', '/upload', '/fardos', '/prateleira', '/transformacao'],
   separador: ['/prateleira', '/transformacao'],
   fardista: ['/fardos', '/baixa'],

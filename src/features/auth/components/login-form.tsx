@@ -47,6 +47,20 @@ export function LoginForm() {
         return
       }
 
+      // Check if user is active (D-10)
+      const { data: userRecord } = await supabase
+        .from('users')
+        .select('ativo')
+        .eq('id', data.user.id)
+        .single()
+
+      if (!userRecord?.ativo) {
+        await supabase.auth.signOut()
+        setError('Usuario desativado. Contate o administrador.')
+        setLoading(false)
+        return
+      }
+
       // Extract role: try JWT claim first, fall back to database lookup
       let userRole: string | undefined
       try {
