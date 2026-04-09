@@ -47,7 +47,7 @@ export function BaixaPageClient() {
   }
 
   return (
-    <div className="flex flex-col items-center pt-12 md:pt-16 min-h-[60vh] bg-zinc-100">
+    <div className="flex flex-col items-center pt-12 md:pt-16 min-h-screen bg-zinc-100">
       <BaixaInput
         onSearch={handleSearch}
         hasError={hasError}
