@@ -369,17 +369,15 @@ export function useDashboardRealtime(onUpdate: () => void) {
 | A2 | reservas deletion cascades to trafego_fardos and then to baixados via FK | Pitfall 6 | HIGH -- if cascade doesn't happen, snapshot timing is less critical but virada data retention changes |
 | A3 | Data volume per day is small enough (<5000 pedidos, <50 users) for full table fetches | Architecture | MEDIUM -- if volume grows, would need pagination or server-side aggregation |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Reservas FK cascade behavior**
+1. **Reservas FK cascade behavior** -- RESOLVED
    - What we know: `trafego_fardos.reserva_id` references `reservas(id) ON DELETE CASCADE`, and `baixados.trafego_id` references `trafego_fardos(id)` [VERIFIED: 00001_initial_schema.sql]. However, the upload route comments say "NAO limpar: trafego_fardos, baixados, fardos_nao_encontrados" suggesting they intend to keep these. But deleting reservas WILL cascade-delete trafego_fardos.
-   - What's unclear: Whether this cascade is intentional or a bug. The snapshot logic must account for this.
-   - Recommendation: The snapshot MUST run before any deletes. After implementing, verify cascade behavior with a test.
+   - Resolution: The baixados FK to trafego_fardos was dropped in migration 00010_baixados_full_data.sql, so deleting reservas cascade-deletes trafego_fardos but baixados survives. The snapshot MUST run before deletes regardless to capture trafego_fardos data. Plan 09-04 implements this guard.
 
-2. **historico_diario write policy**
+2. **historico_diario write policy** -- RESOLVED
    - What we know: All other tables use service role for writes (upload API pattern).
-   - What's unclear: Whether historico_diario needs any write policy beyond service role.
-   - Recommendation: Service role only for writes (matching upload API pattern). Read via authenticated policy.
+   - Resolution: Service role only for writes (matching upload API pattern). SELECT policy for authenticated users. This matches the migration in 00011_historico_diario.sql which creates an authenticated SELECT policy with no INSERT/UPDATE/DELETE policies (service role bypasses RLS).
 
 ## Validation Architecture
 
