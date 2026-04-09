@@ -9,6 +9,7 @@ import {
   BookOpen,
   PackageCheck,
   Repeat,
+  Users,
 } from 'lucide-react'
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -18,6 +19,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   BookOpen,
   PackageCheck,
   Repeat,
+  Users,
 }
 
 interface NavItem {

@@ -10,6 +10,7 @@ import {
   BookOpen,
   PackageCheck,
   Repeat,
+  Users,
   LogOut,
   Menu,
 } from 'lucide-react'
@@ -24,6 +25,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   BookOpen,
   PackageCheck,
   Repeat,
+  Users,
 }
 
 interface NavItem {
