@@ -54,6 +54,31 @@ export async function POST(request: NextRequest) {
     .from('config').select('valor').eq('chave', 'ultima_importacao_data').single()
 
   if (!dataConfig || dataConfig.valor !== today) {
+    // Snapshot historico before cleanup (D-13)
+    const [snapPedidos, snapProgresso, snapAtrib, snapBaixados, snapTransf, snapUsers] = await Promise.all([
+      supabase.from('pedidos').select('id, card_key, grupo_envio, tipo, sku, quantidade, importacao_numero'),
+      supabase.from('progresso').select('pedido_id, quantidade_separada, status'),
+      supabase.from('atribuicoes').select('card_key, user_id, tipo'),
+      supabase.from('baixados').select('codigo_in, baixado_por'),
+      supabase.from('transformacoes').select('card_key, quantidade'),
+      supabase.from('users').select('id, role, nome'),
+    ])
+
+    if (snapPedidos.data && snapProgresso.data && snapAtrib.data && snapBaixados.data && snapUsers.data) {
+      const { buildSnapshotRows } = await import('@/features/dashboard/lib/snapshot')
+      const snapshotRows = buildSnapshotRows({
+        pedidos: snapPedidos.data,
+        progresso: snapProgresso.data,
+        atribuicoes: snapAtrib.data,
+        baixados: snapBaixados.data,
+        transformacoes: snapTransf.data ?? [],
+        users: snapUsers.data,
+      }, dataConfig?.valor ?? today)
+      if (snapshotRows.length > 0) {
+        await supabase.from('historico_diario').insert(snapshotRows)
+      }
+    }
+
     // Limpar tabelas na ordem FK-safe
     // NAO limpar: trafego_fardos, baixados, fardos_nao_encontrados (historico de fardos preservado)
     await supabase.from('atribuicoes').delete().neq('id', '')
