@@ -5,7 +5,6 @@ import { DEADLINES } from './deadline-config'
 type PedidoRow = Tables<'pedidos'>
 type ProgressoRow = Tables<'progresso'>
 type ReservaRow = Tables<'reservas'>
-type TrafegoFardoRow = Tables<'trafego_fardos'>
 
 /**
  * Agrupa pedidos por card_key.

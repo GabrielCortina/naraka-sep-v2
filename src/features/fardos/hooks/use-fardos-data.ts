@@ -245,7 +245,7 @@ export function useFardosData(userId: string, userRole: string) {
         return updated
       })
     },
-    [],
+    [baixadosHoje.length],
   )
 
   return { fardos, baixadosHoje, counters, loading, error, refetch: fetchFardos, updateFardos }
