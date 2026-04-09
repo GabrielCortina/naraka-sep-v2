@@ -48,11 +48,11 @@ Exceptions: none
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 14px | 400 (regular) | 1.5 |
-| Label | 14px | 500 (medium) | 1.4 |
+| Label | 14px | 600 (semibold) | 1.4 |
 | Heading | 20px | 600 (semibold) | 1.2 |
-| Table header | 12px | 500 (medium) | 1.4 |
+| Table header | 12px | 600 (semibold) | 1.4 |
 
-Note: This phase uses 3 sizes (12, 14, 20). The heading "Usuarios" at the top of the page uses 20px semibold. Table headers use 12px medium uppercase with muted-foreground color. All other text (body, labels, table cells) uses 14px.
+Note: This phase uses 3 sizes (12, 14, 20) and 2 weights (400 regular, 600 semibold). The heading "Usuarios" at the top of the page uses 20px semibold. Table headers use 12px semibold uppercase with muted-foreground color. Labels use 14px semibold. All body text and table cells use 14px regular.
 
 ---
 
@@ -127,7 +127,7 @@ Additional semantic colors used this phase:
 - Page title "Usuarios" at 20px semibold, left-aligned
 - "+ Novo Usuario" button at top-right, primary variant (black bg, white text)
 - Table fills available width inside the authenticated layout content area
-- Table header row: muted background, 12px medium uppercase text
+- Table header row: muted background, 12px semibold uppercase text
 - Table rows: 14px regular, vertical padding 12px (sm + xs), hover state with muted background
 - Acoes column: Pencil icon button (edit), Switch component (ativo toggle)
 - Sort: alphabetical by nome ascending (default)
