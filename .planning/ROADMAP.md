@@ -182,13 +182,14 @@ Plans:
   2. Dashboard exibe Top Separadores (ranking por pecas e cards) e Top Fardistas (ranking por fardos confirmados)
   3. Dashboard exibe Status de Fardos (pendentes/encontrados/entregues) e progresso Por Separador
   4. Todos os 6 blocos atualizam em tempo real via Supabase subscriptions sem polling
-**Plans**: 3 plans
+**Plans**: 4 plans
 **UI hint**: yes
 
 Plans:
 - [ ] 09-01-PLAN.md — Migration historico_diario, tipos, logica pura de agregacao e snapshot com TDD
 - [ ] 09-02-PLAN.md — Hooks de dados (dashboard-data, realtime, period-filter) com fetching paralelo
 - [ ] 09-03-PLAN.md — Componentes UI dos 6 blocos, page wiring, schema push e verificacao visual
+- [ ] 09-04-PLAN.md — Fix migration 00012 (remove duplicate baixados) e snapshot empty-database guard
 
 ### Phase 10: Gestao de Usuarios
 **Goal**: Admin pode criar, editar e desativar usuarios do sistema
@@ -219,5 +220,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 6. Lista de Fardos | 0/3 | Not started | - |
 | 7. Lista de Prateleira e Cascata | 0/? | Not started | - |
 | 8. Baixa de Fardos | 0/3 | Not started | - |
-| 9. Dashboard | 0/3 | Not started | - |
+| 9. Dashboard | 0/4 | Not started | - |
 | 10. Gestao de Usuarios | 0/? | Not started | - |
