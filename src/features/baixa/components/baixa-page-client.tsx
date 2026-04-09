@@ -47,7 +47,7 @@ export function BaixaPageClient() {
   }
 
   return (
-    <div className="flex flex-col items-center pt-12 md:pt-16 min-h-[60vh]">
+    <div className="flex flex-col items-center pt-12 md:pt-16 min-h-[60vh] bg-zinc-100">
       <BaixaInput
         onSearch={handleSearch}
         hasError={hasError}
@@ -56,7 +56,7 @@ export function BaixaPageClient() {
         onCameraClick={() => setShowCamera(true)}
       />
 
-      <div className="mt-8">
+      <div className="mt-8 w-full flex flex-col items-center">
         <BaixadosHoje items={baixadosHoje} />
       </div>
 

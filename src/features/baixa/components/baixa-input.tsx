@@ -40,30 +40,37 @@ export function BaixaInput({
   }
 
   return (
-    <div className="flex items-center gap-2 w-[80%] md:w-[50%]">
-      <Input
-        ref={inputRef}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="Escanear ou digitar codigo IN"
-        disabled={disabled}
-        className={cn(
-          'text-xl h-14',
-          hasError && 'border-red-500',
-        )}
-      />
-      <Button
-        type="button"
-        variant="outline"
-        size="icon"
-        className="h-10 w-10 shrink-0"
-        disabled={disabled}
-        onClick={onCameraClick}
-        aria-label="Escanear com camera"
-      >
-        <Camera className="h-5 w-5" />
-      </Button>
+    <div className="w-[80%] md:w-[50%]">
+      <div className="bg-white rounded-lg shadow-sm p-4">
+        <label className="block text-[10px] font-semibold uppercase text-muted-foreground mb-2 tracking-wide">
+          Código do fardo
+        </label>
+        <div className="flex items-center gap-2">
+          <Input
+            ref={inputRef}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Digite ou escaneie o código IN..."
+            disabled={disabled}
+            className={cn(
+              'text-xl h-14 border-2',
+              hasError && 'border-red-500',
+            )}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-14 w-14 shrink-0 border-2"
+            disabled={disabled}
+            onClick={onCameraClick}
+            aria-label="Escanear com camera"
+          >
+            <Camera className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

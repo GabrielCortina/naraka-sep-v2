@@ -29,7 +29,7 @@ export async function GET() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: baixados, error: queryError } = await (supabaseAdmin as any)
     .from('baixados')
-    .select('id, codigo_in, sku, quantidade, baixado_em')
+    .select('id, codigo_in, sku, quantidade, endereco, baixado_em')
     .gte('baixado_em', hojeISO)
     .order('baixado_em', { ascending: false })
 
@@ -45,9 +45,10 @@ export async function GET() {
   // 3. For each baixado, build full BaixadoItem with entregas
   const items: BaixadoItem[] = []
 
-  for (const baixado of baixados as { id: string; codigo_in: string; sku: string | null; quantidade: number | null; baixado_em: string }[]) {
+  for (const baixado of baixados as { id: string; codigo_in: string; sku: string | null; quantidade: number | null; endereco: string | null; baixado_em: string }[]) {
     const sku = baixado.sku ?? ''
     const quantidade = baixado.quantidade ?? 0
+    const endereco = baixado.endereco ?? null
 
     // Build entregas: reservas -> pedidos -> atribuicoes -> users
     const entregas: { card_key: string; separador_nome: string | null }[] = []
@@ -107,6 +108,7 @@ export async function GET() {
       codigo_in: baixado.codigo_in,
       sku,
       quantidade,
+      endereco,
       entregas,
       baixado_em: baixado.baixado_em,
     })

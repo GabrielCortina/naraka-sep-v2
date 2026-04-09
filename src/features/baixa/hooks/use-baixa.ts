@@ -120,6 +120,7 @@ export function useBaixa() {
           codigo_in: fardo.codigo_in,
           sku: fardo.sku,
           quantidade: fardo.quantidade,
+          endereco: fardo.endereco,
           entregas: fardo.entregas.map((e) => ({
             separador_nome: e.separador_nome,
             card_key: e.card_key,

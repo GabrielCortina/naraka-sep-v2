@@ -20,6 +20,7 @@ export interface BaixadoItem {
   codigo_in: string
   sku: string
   quantidade: number
+  endereco: string | null
   entregas: Pick<EntregaInfo, 'card_key' | 'separador_nome'>[]
   baixado_em: string
 }

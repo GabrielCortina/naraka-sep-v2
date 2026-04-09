@@ -6,7 +6,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, MapPin } from 'lucide-react'
 import type { BaixadoItem } from '../lib/baixa-utils'
 
 interface BaixadosHojeProps {
@@ -40,38 +40,47 @@ export function BaixadosHoje({ items }: BaixadosHojeProps) {
   }, [items.length])
 
   return (
-    <div className="w-[80%] md:w-[50%] bg-secondary rounded-lg overflow-hidden">
+    <div className="w-[80%] md:w-[50%]">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
-          <button className="flex items-center justify-between w-full px-4 py-3 text-xs font-semibold uppercase">
+          <button className="flex items-center justify-between w-full px-1 py-3 text-sm font-bold">
             BAIXADOS HOJE ({items.length})
             {isOpen ? (
-              <ChevronUp className="h-4 w-4" />
+              <ChevronUp className="h-4 w-4 text-muted-foreground" />
             ) : (
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
             )}
           </button>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="divide-y">
+          <div className="space-y-2">
             {items.map((item, idx) => (
-              <div key={`${item.codigo_in}-${idx}`} className="py-2 px-4">
-                {/* Mobile layout */}
-                <div className="md:hidden">
-                  <div className="text-sm">
-                    {item.codigo_in} | {item.sku} | {item.quantidade}
+              <div
+                key={`${item.codigo_in}-${idx}`}
+                className="bg-white rounded-lg shadow-sm border-l-[3px] border-green-500 p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  {/* Left: fardo info */}
+                  <div className="flex-1 min-w-0">
+                    <span className="text-lg font-bold block">{item.codigo_in}</span>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {item.sku} · {item.quantidade} un
+                    </p>
+                    {item.endereco && (
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                        <MapPin className="h-3 w-3 text-green-500 shrink-0" />
+                        {item.endereco}
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Entregue para: {formatEntregas(item.entregas)}
+                    </p>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    Para: {formatEntregas(item.entregas)} | {formatTime(item.baixado_em)}
-                  </div>
-                </div>
-                {/* Desktop layout */}
-                <div className="hidden md:flex md:items-center md:gap-4 text-sm">
-                  <span className="font-medium min-w-[100px]">{item.codigo_in}</span>
-                  <span className="min-w-[100px]">{item.sku}</span>
-                  <span className="min-w-[40px]">{item.quantidade}</span>
-                  <span className="flex-1 truncate">{formatEntregas(item.entregas)}</span>
-                  <span className="text-xs text-muted-foreground">{formatTime(item.baixado_em)}</span>
+
+                  {/* Right: time */}
+                  <span className="text-xs text-muted-foreground shrink-0 pt-1">
+                    {formatTime(item.baixado_em)}
+                  </span>
                 </div>
               </div>
             ))}
