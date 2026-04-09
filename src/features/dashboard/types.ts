@@ -1,21 +1,54 @@
 import type { UrgencyTier } from '@/features/cards/types'
 
 export interface DashboardData {
-  resumo: {
-    pecas_separadas: number
-    listas_pendentes: number
-    listas_concluidas: number
-    listas_em_atraso: number
-  }
+  resumo: ResumoData
   progressao: ProgressaoMetodo[]
   topSeparadores: RankingEntry[]
   topFardistas: RankingEntry[]
-  statusFardos: {
-    pendentes: number
-    encontrados: number
-    baixados: number
-  }
+  statusFardos: StatusFardosData
   porSeparador: SeparadorProgress[]
+  comparacao: ComparacaoData | null
+  performanceSemanal: PerformanceSemanal[]
+  transformacoesResumo: TransformacoesResumo
+  volumePorHora: VolumePorHora[]
+  comparativoLojas: ComparativoLoja[]
+}
+
+export interface ComparativoLoja {
+  loja: string
+  total_pedidos: number
+  total_pecas: number
+}
+
+export interface VolumePorHora {
+  hora: number // 0-23
+  pecas: number
+}
+
+export interface ResumoData {
+  total_pedidos: number
+  pecas_separadas: number
+  percent_conclusao: number
+  fardos_processados: number
+  listas_pendentes: number
+  listas_concluidas: number
+  listas_em_atraso: number
+}
+
+export interface ComparacaoData {
+  pecas_separadas_ontem: number
+  fardos_processados_ontem: number
+  total_pedidos_ontem: number
+  percent_conclusao_ontem: number
+}
+
+export interface StatusFardosData {
+  ok: number
+  nao_encontrado: number
+  pendentes: number
+  transformacao: number
+  sem_atribuicao: number
+  total: number
 }
 
 export interface ProgressaoMetodo {
@@ -34,6 +67,7 @@ export interface RankingEntry {
   pecas_separadas: number
   cards_concluidos: number
   fardos_confirmados: number
+  fardos_ne: number
 }
 
 export interface SeparadorProgress {
@@ -45,7 +79,19 @@ export interface SeparadorProgress {
   num_cards: number
 }
 
-export type PeriodFilter = 'hoje' | '15d' | '30d' | 'mes_atual' | 'ultimo_mes' | '3m' | 'personalizado'
+export type PeriodFilter = 'hoje' | 'ontem' | '7d' | '30d' | 'personalizado'
+
+export interface TransformacoesResumo {
+  total_pedidos: number
+  total_pecas: number
+}
+
+export interface PerformanceSemanal {
+  separador_nome: string
+  dias: Record<string, number> // 'YYYY-MM-DD' -> total_pecas
+  media: number
+  tendencia: 'up' | 'down' | 'stable'
+}
 
 export interface HistoricoDiarioRow {
   user_id: string

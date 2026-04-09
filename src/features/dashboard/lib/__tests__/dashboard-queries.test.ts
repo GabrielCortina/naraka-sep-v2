@@ -157,22 +157,24 @@ describe('computeTopFardistas', () => {
 })
 
 describe('computeStatusFardos', () => {
+  // After baixa, trafego row is DELETED (migration 00010) — so trafego only has non-baixados
   const trafego: TrafegoRow[] = [
     { codigo_in: 'IN001', status: 'pendente' },
     { codigo_in: 'IN002', status: 'pendente' },
-    { codigo_in: 'IN003', status: 'encontrado' },
     { codigo_in: 'IN004', status: 'encontrado' },
-    { codigo_in: 'IN005', status: 'encontrado' },
+    { codigo_in: 'IN005', status: 'nao_encontrado' },
   ]
   const baixados: BaixadoRow[] = [
     { codigo_in: 'IN003', baixado_por: 'u3' },
+    { codigo_in: 'IN006', baixado_por: 'u3' },
   ]
 
-  it('returns correct counts excluding baixados from encontrados', () => {
+  it('counts ok from baixados, others from trafego', () => {
     const result = computeStatusFardos(trafego, baixados)
-    expect(result.pendentes).toBe(2)
-    expect(result.encontrados).toBe(2) // IN004, IN005 (IN003 is in baixados)
-    expect(result.baixados).toBe(1)
+    expect(result.ok).toBe(2) // 2 baixados
+    expect(result.pendentes).toBe(3) // 2 pendente + 1 encontrado
+    expect(result.nao_encontrado).toBe(1)
+    expect(result.total).toBe(6) // 4 trafego + 2 baixados
   })
 })
 

@@ -1,73 +1,81 @@
 'use client'
 
 import type { ProgressaoMetodo as ProgressaoMetodoType } from '../types'
-import { DashboardBlock } from './dashboard-block'
-import { ProgressBar } from '@/features/cards/components/progress-bar'
-import { UrgencyBadge } from '@/features/cards/components/urgency-badge'
-import { MarketplaceBadge } from '@/features/cards/components/marketplace-badge'
-import { formatCountdown } from '@/features/cards/lib/card-utils'
+import { DEADLINES } from '@/features/cards/lib/deadline-config'
 
 interface ProgressaoMetodoProps {
   progressao: ProgressaoMetodoType[]
 }
 
+function getBarColor(percent: number): string {
+  if (percent === 100) return '#888780'
+  if (percent >= 70) return '#1D9E75'
+  if (percent >= 40) return '#EF9F27'
+  return '#E24B4A'
+}
+
+function getPercentColor(percent: number): string {
+  if (percent === 100) return '#888780'
+  if (percent >= 70) return '#1D9E75'
+  if (percent >= 40) return '#EF9F27'
+  return '#E24B4A'
+}
+
+function getCutoffLabel(grupoEnvio: string): string | null {
+  const hour = DEADLINES[grupoEnvio]
+  if (hour === undefined) return null
+  return `corte ${hour}h`
+}
+
 export function ProgressaoMetodo({ progressao }: ProgressaoMetodoProps) {
+  if (progressao.length === 0) {
+    return (
+      <div className="bg-card border rounded-lg p-4">
+        <p className="text-xs text-muted-foreground">Nenhum dado disponivel</p>
+      </div>
+    )
+  }
+
   return (
-    <DashboardBlock title="PROGRESSAO POR METODO">
-      {progressao.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Nenhum dado disponivel</p>
-      ) : (
-        <div>
-          {progressao.map((entry) => {
-            const countdown = formatCountdown(entry.deadline_ms)
-            return (
-              <div key={entry.grupo_envio}>
-                {/* Desktop row */}
-                <div className="hidden lg:flex items-center gap-2 py-2 border-b last:border-b-0">
-                  <MarketplaceBadge grupoEnvio={entry.grupo_envio} />
-                  <span className="text-sm whitespace-nowrap">
-                    {entry.grupo_envio}
+    <div className="bg-card border rounded-lg p-4 space-y-3">
+      {progressao.map((entry) => {
+        const barColor = getBarColor(entry.percent)
+        const cutoff = getCutoffLabel(entry.grupo_envio)
+
+        return (
+          <div key={entry.grupo_envio} className="space-y-1">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium">
+                  {entry.grupo_envio}
+                </span>
+                {cutoff && (
+                  <span className="text-[10px] text-muted-foreground">
+                    {cutoff}
                   </span>
-                  <div className="flex-1">
-                    <ProgressBar
-                      percent={entry.percent}
-                      urgency={entry.urgency}
-                    />
-                  </div>
-                  <span className="text-sm whitespace-nowrap">
-                    {entry.pecas_separadas}/{entry.total_pecas} pecas
-                  </span>
-                  <span className="text-sm whitespace-nowrap">
-                    {countdown ?? ''}
-                  </span>
-                  <UrgencyBadge urgency={entry.urgency} countdown={countdown} />
-                </div>
-                {/* Mobile row */}
-                <div className="flex lg:hidden flex-col gap-1 py-2 border-b last:border-b-0">
-                  <div className="flex items-center gap-2">
-                    <MarketplaceBadge grupoEnvio={entry.grupo_envio} />
-                    <span className="text-sm">{entry.grupo_envio}</span>
-                  </div>
-                  <ProgressBar
-                    percent={entry.percent}
-                    urgency={entry.urgency}
-                  />
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">
-                      {entry.pecas_separadas}/{entry.total_pecas} pecas
-                    </span>
-                    <span className="text-sm">{countdown ?? ''}</span>
-                    <UrgencyBadge
-                      urgency={entry.urgency}
-                      countdown={countdown}
-                    />
-                  </div>
-                </div>
+                )}
               </div>
-            )
-          })}
-        </div>
-      )}
-    </DashboardBlock>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-muted-foreground tabular-nums">
+                  {entry.pecas_separadas}/{entry.total_pecas}
+                </span>
+                <span
+                  className="text-xs font-bold tabular-nums"
+                  style={{ color: getPercentColor(entry.percent) }}
+                >
+                  {entry.percent}%
+                </span>
+              </div>
+            </div>
+            <div className="h-3 bg-muted rounded overflow-hidden">
+              <div
+                className="h-full rounded transition-all duration-500"
+                style={{ width: `${entry.percent}%`, backgroundColor: barColor }}
+              />
+            </div>
+          </div>
+        )
+      })}
+    </div>
   )
 }

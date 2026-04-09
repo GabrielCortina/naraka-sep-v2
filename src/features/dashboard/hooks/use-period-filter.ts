@@ -4,11 +4,6 @@ import { useState, useMemo } from 'react'
 import { getDateRange } from '../lib/date-utils'
 import type { PeriodFilter } from '../types'
 
-/**
- * Manages period filter state for the dashboard.
- * Computes date ranges for historical queries and exposes isHistorical flag
- * to determine whether rankings come from live tables or historico_diario.
- */
 export function usePeriodFilter() {
   const [period, setPeriod] = useState<PeriodFilter>('hoje')
   const [customStart, setCustomStart] = useState<string>('')
