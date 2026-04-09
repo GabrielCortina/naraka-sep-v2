@@ -23,6 +23,11 @@ export function FardoCounters({ counters }: FardoCountersProps) {
         <span className="text-[16px] font-semibold">{counters.nao_encontrados}</span>{' '}
         <span className="text-[12px] text-muted-foreground">N/E</span>
       </span>
+      <span className="text-muted-foreground">|</span>
+      <span>
+        <span className="text-[16px] font-semibold">{counters.baixados}</span>{' '}
+        <span className="text-[12px] text-muted-foreground">baixados</span>
+      </span>
     </div>
   )
 }

@@ -26,6 +26,7 @@ const STATUS_OPTIONS: { value: StatusOption; label: string }[] = [
   { value: 'pendentes', label: 'Pendentes' },
   { value: 'encontrados', label: 'Encontrados' },
   { value: 'nao_encontrados', label: 'N/E' },
+  { value: 'baixados', label: 'Baixados' },
   { value: 'todos', label: 'Todos' },
 ]
 

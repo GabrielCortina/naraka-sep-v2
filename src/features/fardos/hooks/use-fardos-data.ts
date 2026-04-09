@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useCardsRealtime } from '@/features/cards/hooks/use-cards-realtime'
-import type { FardoItem, FardoStatus, FardoCounters } from '../types'
+import type { FardoItem, FardoStatus, FardoCounters, BaixadoFardoItem } from '../types'
 
 /**
  * Fetches reservas, trafego_fardos, atribuicoes, fardos_nao_encontrados, and pedidos
@@ -17,10 +17,12 @@ import type { FardoItem, FardoStatus, FardoCounters } from '../types'
  */
 export function useFardosData(userId: string, userRole: string) {
   const [fardos, setFardos] = useState<FardoItem[]>([])
+  const [baixadosHoje, setBaixadosHoje] = useState<BaixadoFardoItem[]>([])
   const [counters, setCounters] = useState<FardoCounters>({
     pendentes: 0,
     encontrados: 0,
     nao_encontrados: 0,
+    baixados: 0,
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -56,9 +58,10 @@ export function useFardosData(userId: string, userRole: string) {
         supabase
           .from('pedidos')
           .select('sku, card_key, importacao_numero'),
-        supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (supabase as any)
           .from('baixados')
-          .select('codigo_in'),
+          .select('codigo_in, sku, quantidade, endereco, fardista_nome, baixado_em'),
       ])
 
       if (reservasRes.error) throw reservasRes.error
@@ -73,13 +76,29 @@ export function useFardosData(userId: string, userRole: string) {
       const atribuicoes = atribuicoesRes.data
       const naoEncontrados = naoEncontradosRes.data
       const pedidos = pedidosRes.data
-      const baixados = baixadosRes.data as { codigo_in: string }[]
+      const baixadosAll = baixadosRes.data as { codigo_in: string; sku: string | null; quantidade: number | null; endereco: string | null; fardista_nome: string | null; baixado_em: string }[]
 
       // Build set of codigo_in that have been baixado (fardo delivered and removed from trafego)
       const baixadoSet = new Set<string>()
-      for (const b of baixados) {
+      for (const b of baixadosAll) {
         baixadoSet.add(b.codigo_in)
       }
+
+      // Build today's baixados list for the "Baixados" filter tab
+      const hoje = new Date()
+      hoje.setHours(0, 0, 0, 0)
+      const hojeTs = hoje.getTime()
+      const baixadosHojeList: BaixadoFardoItem[] = baixadosAll
+        .filter((b) => new Date(b.baixado_em).getTime() >= hojeTs)
+        .map((b) => ({
+          codigo_in: b.codigo_in,
+          sku: b.sku ?? '',
+          quantidade: b.quantidade ?? 0,
+          endereco: b.endereco,
+          fardista_nome: b.fardista_nome,
+          baixado_em: b.baixado_em,
+        }))
+        .sort((a, b) => new Date(b.baixado_em).getTime() - new Date(a.baixado_em).getTime())
 
       // Build trafego lookup by codigo_in
       const trafegoMap = new Map<string, { status: string; fardista_id: string | null; is_cascata: boolean }>()
@@ -164,6 +183,7 @@ export function useFardosData(userId: string, userRole: string) {
         pendentes: 0,
         encontrados: 0,
         nao_encontrados: 0,
+        baixados: baixadosHojeList.length,
       }
       for (const f of fardoList) {
         if (f.status === 'pendente') newCounters.pendentes++
@@ -186,6 +206,7 @@ export function useFardosData(userId: string, userRole: string) {
       }
 
       setFardos(filteredFardos)
+      setBaixadosHoje(baixadosHojeList)
       setCounters(newCounters)
       setError(null)
     } catch (err) {
@@ -213,6 +234,7 @@ export function useFardosData(userId: string, userRole: string) {
           pendentes: 0,
           encontrados: 0,
           nao_encontrados: 0,
+          baixados: baixadosHoje.length,
         }
         for (const f of updated) {
           if (f.status === 'pendente') newCounters.pendentes++
@@ -226,5 +248,5 @@ export function useFardosData(userId: string, userRole: string) {
     [],
   )
 
-  return { fardos, counters, loading, error, refetch: fetchFardos, updateFardos }
+  return { fardos, baixadosHoje, counters, loading, error, refetch: fetchFardos, updateFardos }
 }

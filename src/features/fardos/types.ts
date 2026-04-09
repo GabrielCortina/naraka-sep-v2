@@ -54,7 +54,7 @@ export interface FardoItem {
 /** Filtros da lista de fardos (D-06 a D-13) */
 export interface FardoFilters {
   search: string                 // D-06: busca por codigo IN
-  statusFilter: 'pendentes' | 'encontrados' | 'nao_encontrados' | 'todos'  // D-07
+  statusFilter: 'pendentes' | 'encontrados' | 'nao_encontrados' | 'baixados' | 'todos'  // D-07
   assignFilter: 'todos' | 'atribuidos' | 'nao_atribuidos'  // D-08
   sortBy: 'endereco' | 'sku' | 'importacao'  // D-11, D-13
 }
@@ -64,4 +64,15 @@ export interface FardoCounters {
   pendentes: number
   encontrados: number
   nao_encontrados: number
+  baixados: number
+}
+
+/** Item baixado para exibicao na lista de fardos (filtro Baixados) */
+export interface BaixadoFardoItem {
+  codigo_in: string
+  sku: string
+  quantidade: number
+  endereco: string | null
+  fardista_nome: string | null
+  baixado_em: string
 }

@@ -60,6 +60,7 @@ describe('Fardo domain types', () => {
       pendentes: 10,
       encontrados: 5,
       nao_encontrados: 2,
+      baixados: 3,
     }
 
     expect(counters.pendentes).toBe(10)

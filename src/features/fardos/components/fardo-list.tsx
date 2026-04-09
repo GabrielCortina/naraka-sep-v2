@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { toast } from 'sonner'
-import { RefreshCw, CheckSquare, Printer } from 'lucide-react'
+import { RefreshCw, CheckSquare, Printer, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
@@ -12,10 +12,11 @@ import { FardoItem } from './fardo-item'
 import { SelectionBar } from './selection-bar'
 import { AssignModal } from '@/features/cards/components/assign-modal'
 import { generateFardosPdf } from '../lib/fardo-pdf-generator'
-import type { FardoItem as FardoItemType, FardoFilters as FardoFiltersType, FardoCounters as FardoCountersType } from '../types'
+import type { FardoItem as FardoItemType, FardoFilters as FardoFiltersType, FardoCounters as FardoCountersType, BaixadoFardoItem } from '../types'
 
 interface FardoListProps {
   fardos: FardoItemType[]
+  baixadosHoje: BaixadoFardoItem[]
   counters: FardoCountersType
   userRole: string
   userId: string
@@ -26,6 +27,7 @@ interface FardoListProps {
 
 export function FardoList({
   fardos,
+  baixadosHoje,
   counters,
   userRole,
   onRefetch,
@@ -347,22 +349,61 @@ export function FardoList({
 
       {/* List */}
       <div className="flex flex-col gap-3">
-        {filteredFardos.map((fardo) => (
-          <FardoItem
-            key={fardo.reserva_id}
-            fardo={fardo}
-            userRole={userRole}
-            selected={selectedIds.has(fardo.reserva_id)}
-            onSelect={handleSelect}
-            onOk={handleOk}
-            onNe={handleNe}
-          />
-        ))}
+        {filters.statusFilter === 'baixados' ? (
+          <>
+            {baixadosHoje.map((item, idx) => (
+              <div
+                key={`${item.codigo_in}-${idx}`}
+                className="flex items-center p-4 rounded-lg shadow-sm border-l-[3px] border-green-500 bg-white min-h-[80px]"
+              >
+                <div className="flex-1 flex flex-col gap-1 min-w-0">
+                  <span className="text-lg font-bold truncate">{item.codigo_in}</span>
+                  <p className="text-xs text-muted-foreground">
+                    {item.sku} · {item.quantidade} un
+                  </p>
+                  {item.endereco && (
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <MapPin className="h-3 w-3 text-green-500 shrink-0" />
+                      {item.endereco}
+                    </div>
+                  )}
+                  {item.fardista_nome && (
+                    <p className="text-xs text-muted-foreground">
+                      Baixa por: {item.fardista_nome}
+                    </p>
+                  )}
+                </div>
+                <span className="text-xs text-muted-foreground shrink-0">
+                  {new Date(item.baixado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            ))}
+            {baixadosHoje.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                Nenhum fardo baixado hoje.
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {filteredFardos.map((fardo) => (
+              <FardoItem
+                key={fardo.reserva_id}
+                fardo={fardo}
+                userRole={userRole}
+                selected={selectedIds.has(fardo.reserva_id)}
+                onSelect={handleSelect}
+                onOk={handleOk}
+                onNe={handleNe}
+              />
+            ))}
 
-        {filteredFardos.length === 0 && fardos.length > 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            Nenhum fardo encontrado com os filtros atuais.
-          </div>
+            {filteredFardos.length === 0 && fardos.length > 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                Nenhum fardo encontrado com os filtros atuais.
+              </div>
+            )}
+          </>
         )}
       </div>
 
