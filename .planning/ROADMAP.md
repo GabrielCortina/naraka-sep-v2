@@ -169,9 +169,9 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 08-01-PLAN.md — Migration baixado status, tipos, utilidades e API routes buscar/confirmar
-- [ ] 08-02-PLAN.md — Hook useBaixa, componentes BaixaInput, BaixaModal e BaixadosHoje
-- [ ] 08-03-PLAN.md — Page wiring, camera scanner e verificacao end-to-end
+- [x] 08-01-PLAN.md — Migration baixado status, tipos, utilidades e API routes buscar/confirmar
+- [x] 08-02-PLAN.md — Hook useBaixa, componentes BaixaInput, BaixaModal e BaixadosHoje
+- [x] 08-03-PLAN.md — Page wiring, camera scanner e verificacao end-to-end
 
 ### Phase 9: Dashboard
 **Goal**: Lider e admin acompanham operacao em tempo real com metricas de progressao, rankings e status de fardos
