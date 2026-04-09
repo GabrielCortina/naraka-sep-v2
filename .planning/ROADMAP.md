@@ -199,11 +199,12 @@ Plans:
   1. Admin pode criar novo usuario com nome, PIN e role
   2. Admin pode editar dados de usuarios existentes e desativar usuarios
   3. Apenas o role Admin ve e acessa a tela de gestao de usuarios
-**Plans**: TBD
+**Plans**: 2 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 10-01: TBD
+- [ ] 10-01-PLAN.md — Backend: route registration, API routes CRUD, login ativo check, validation com TDD
+- [ ] 10-02-PLAN.md — Frontend: page, table/cards responsivo, modais create/edit/deactivate, verificacao visual
 
 ## Progress
 
@@ -221,4 +222,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Lista de Prateleira e Cascata | 0/? | Not started | - |
 | 8. Baixa de Fardos | 0/3 | Not started | - |
 | 9. Dashboard | 0/4 | Not started | - |
-| 10. Gestao de Usuarios | 0/? | Not started | - |
+| 10. Gestao de Usuarios | 0/2 | Not started | - |
