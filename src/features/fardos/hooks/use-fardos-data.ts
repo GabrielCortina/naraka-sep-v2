@@ -36,6 +36,7 @@ export function useFardosData(userId: string, userRole: string) {
         atribuicoesRes,
         naoEncontradosRes,
         pedidosRes,
+        baixadosRes,
       ] = await Promise.all([
         supabase
           .from('reservas')
@@ -55,6 +56,9 @@ export function useFardosData(userId: string, userRole: string) {
         supabase
           .from('pedidos')
           .select('sku, card_key, importacao_numero'),
+        supabase
+          .from('baixados')
+          .select('codigo_in'),
       ])
 
       if (reservasRes.error) throw reservasRes.error
@@ -62,12 +66,20 @@ export function useFardosData(userId: string, userRole: string) {
       if (atribuicoesRes.error) throw atribuicoesRes.error
       if (naoEncontradosRes.error) throw naoEncontradosRes.error
       if (pedidosRes.error) throw pedidosRes.error
+      if (baixadosRes.error) throw baixadosRes.error
 
       const reservas = reservasRes.data
       const trafego = trafegoRes.data
       const atribuicoes = atribuicoesRes.data
       const naoEncontrados = naoEncontradosRes.data
       const pedidos = pedidosRes.data
+      const baixados = baixadosRes.data as { codigo_in: string }[]
+
+      // Build set of codigo_in that have been baixado (fardo delivered and removed from trafego)
+      const baixadoSet = new Set<string>()
+      for (const b of baixados) {
+        baixadoSet.add(b.codigo_in)
+      }
 
       // Build trafego lookup by codigo_in
       const trafegoMap = new Map<string, { status: string; fardista_id: string | null; is_cascata: boolean }>()
@@ -112,6 +124,9 @@ export function useFardosData(userId: string, userRole: string) {
       const fardoList: FardoItem[] = []
 
       for (const r of reservas) {
+        // Skip reservas whose fardos have been baixado (delivered and removed from trafego)
+        if (baixadoSet.has(r.codigo_in)) continue
+
         // Derive card_key from pedidos by SKU + importacao_numero
         const cardKey = skuCardMap.get(`${r.sku}|${r.importacao_numero}`) ?? null
 
