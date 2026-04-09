@@ -203,7 +203,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 10-01: TBD
+- [x] 10-01: TBD
 
 ## Progress
 
@@ -221,4 +221,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Lista de Prateleira e Cascata | 0/? | Not started | - |
 | 8. Baixa de Fardos | 0/3 | Not started | - |
 | 9. Dashboard | 0/4 | Not started | - |
-| 10. Gestao de Usuarios | 0/? | Not started | - |
+| 10. Gestao de Usuarios | 1/2 | In Progress|  |

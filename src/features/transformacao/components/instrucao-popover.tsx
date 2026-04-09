@@ -23,9 +23,10 @@ const COLOR_BORDER: Record<InstrucaoLider, string> = {
 interface InstrucaoPopoverProps {
   transformacaoId: string
   instrucaoAtual: InstrucaoLider | null
+  onInstrucaoChange?: (instrucao: InstrucaoLider | null) => void
 }
 
-export function InstrucaoPopover({ transformacaoId, instrucaoAtual }: InstrucaoPopoverProps) {
+export function InstrucaoPopover({ transformacaoId, instrucaoAtual, onInstrucaoChange }: InstrucaoPopoverProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -44,6 +45,7 @@ export function InstrucaoPopover({ transformacaoId, instrucaoAtual }: InstrucaoP
       const data = await response.json()
 
       if (response.ok) {
+        onInstrucaoChange?.(instrucao)
         toast.success(instrucao ? 'Instrucao definida' : 'Instrucao removida')
         setOpen(false)
       } else {

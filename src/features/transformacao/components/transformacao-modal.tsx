@@ -13,7 +13,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
 
-import type { TransformacaoCardData, TransformacaoItem } from '../types'
+import type { TransformacaoCardData, TransformacaoItem, InstrucaoLider } from '../types'
 import { TYPE_ABBREV } from '@/features/cards/lib/deadline-config'
 import { ProgressBar } from '@/features/cards/components/progress-bar'
 import { NumpadPopup } from '@/features/cards/components/numpad-popup'
@@ -39,6 +39,7 @@ export function TransformacaoModal({
 }: TransformacaoModalProps) {
   const [numpadOpen, setNumpadOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<TransformacaoItem | null>(null)
+  const [instrucaoOverrides, setInstrucaoOverrides] = useState<Record<string, InstrucaoLider | null>>({})
 
   if (!card) return null
 
@@ -92,6 +93,7 @@ export function TransformacaoModal({
               {card.items.map((item) => {
                 const done = item.status === 'concluido'
                 const itemLoading = loadingItems?.has(item.id) ?? false
+                const instrucao = item.id in instrucaoOverrides ? instrucaoOverrides[item.id] : item.instrucao_lider
                 return (
                   <div
                     key={item.id}
@@ -113,8 +115,8 @@ export function TransformacaoModal({
                             {item.sku}
                           </span>
                           {/* Instrucao badge - visivel para todos (per D-03) */}
-                          {item.instrucao_lider && (
-                            <InstrucaoBadge instrucao={item.instrucao_lider} />
+                          {instrucao && (
+                            <InstrucaoBadge instrucao={instrucao} />
                           )}
                           <p className="text-xs text-muted-foreground mt-0.5">
                             {done ? item.quantidade : 0}/{item.quantidade}
@@ -127,7 +129,8 @@ export function TransformacaoModal({
                           {(userRole === 'admin' || userRole === 'lider') && !done && (
                             <InstrucaoPopover
                               transformacaoId={item.id}
-                              instrucaoAtual={item.instrucao_lider}
+                              instrucaoAtual={instrucao}
+                              onInstrucaoChange={(val) => setInstrucaoOverrides((prev) => ({ ...prev, [item.id]: val }))}
                             />
                           )}
 
