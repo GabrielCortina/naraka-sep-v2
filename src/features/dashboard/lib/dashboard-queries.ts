@@ -1,18 +1,14 @@
 import { getUrgencyTier, calcProgress } from '@/features/cards/lib/card-utils'
 import { DEADLINES, COLUMN_ORDER } from '@/features/cards/lib/deadline-config'
-import type { ProgressaoMetodo, RankingEntry, SeparadorProgress } from '../types'
+import type { ProgressaoMetodo, RankingEntry, SeparadorProgress, ResumoData, StatusFardosData } from '../types'
 
-// Raw row types matching DB shape (not importing database.types to keep pure)
 interface PedidoRow { id: string; card_key: string; grupo_envio: string; tipo: string; sku: string; quantidade: number; importacao_numero: number }
 interface ProgressoRow { pedido_id: string; quantidade_separada: number; status: string }
 interface AtribuicaoRow { card_key: string; user_id: string; tipo: string; users: { nome: string } | null }
-interface TrafegoRow { codigo_in: string; status: string }
+interface TrafegoRow { codigo_in: string; status: string; fardista_id?: string | null }
 interface BaixadoRow { codigo_in: string; baixado_por: string }
 interface TransformacaoRow { card_key: string; quantidade: number }
 
-/**
- * Groups pedidos by card_key using Array.from(Map) pattern.
- */
 function groupByCard(pedidos: PedidoRow[]): Map<string, PedidoRow[]> {
   const map = new Map<string, PedidoRow[]>()
   for (const p of pedidos) {
@@ -26,9 +22,6 @@ function groupByCard(pedidos: PedidoRow[]): Map<string, PedidoRow[]> {
   return map
 }
 
-/**
- * Build a Map of pedido_id -> ProgressoRow for quick lookup.
- */
 function buildProgressoMap(progresso: ProgressoRow[]): Map<string, ProgressoRow> {
   const map = new Map<string, ProgressoRow>()
   for (const p of progresso) {
@@ -37,9 +30,6 @@ function buildProgressoMap(progresso: ProgressoRow[]): Map<string, ProgressoRow>
   return map
 }
 
-/**
- * Sum transformacao quantities per card_key.
- */
 function sumTransformacoes(transformacoes: TransformacaoRow[]): Map<string, number> {
   const map = new Map<string, number>()
   for (const t of transformacoes) {
@@ -48,9 +38,6 @@ function sumTransformacoes(transformacoes: TransformacaoRow[]): Map<string, numb
   return map
 }
 
-/**
- * Compute card progress using calcProgress from card-utils.
- */
 function getCardProgress(
   cardPedidos: PedidoRow[],
   progressoMap: Map<string, ProgressoRow>,
@@ -63,17 +50,13 @@ function getCardProgress(
   return calcProgress(items, transformacaoTotal)
 }
 
-/**
- * Bloco 1 - Resumo geral.
- * Returns pecas_separadas, listas_pendentes, listas_concluidas, listas_em_atraso.
- */
 export function computeResumo(
   pedidos: PedidoRow[],
   progresso: ProgressoRow[],
   _atribuicoes: AtribuicaoRow[],
   transformacoes: TransformacaoRow[],
   now?: Date,
-): { pecas_separadas: number; listas_pendentes: number; listas_concluidas: number; listas_em_atraso: number } {
+): ResumoData {
   const cardMap = groupByCard(pedidos)
   const progressoMap = buildProgressoMap(progresso)
   const transMap = sumTransformacoes(transformacoes)
@@ -101,13 +84,20 @@ export function computeResumo(
     }
   }
 
-  return { pecas_separadas, listas_pendentes, listas_concluidas, listas_em_atraso }
+  const total_pedidos = entries.length
+  const percent_conclusao = total_pedidos === 0 ? 0 : Math.round((listas_concluidas / total_pedidos) * 100)
+
+  return {
+    total_pedidos,
+    pecas_separadas,
+    percent_conclusao,
+    fardos_processados: 0, // Filled by caller from statusFardos
+    listas_pendentes,
+    listas_concluidas,
+    listas_em_atraso,
+  }
 }
 
-/**
- * Bloco 2 - Progressao por metodo de envio.
- * Returns ProgressaoMetodo[] sorted by COLUMN_ORDER.
- */
 export function computeProgressao(
   pedidos: PedidoRow[],
   progresso: ProgressoRow[],
@@ -117,7 +107,6 @@ export function computeProgressao(
   const progressoMap = buildProgressoMap(progresso)
   const transMap = sumTransformacoes(transformacoes)
 
-  // Group pedidos by grupo_envio
   const grupoMap = new Map<string, PedidoRow[]>()
   for (const p of pedidos) {
     const existing = grupoMap.get(p.grupo_envio)
@@ -132,7 +121,6 @@ export function computeProgressao(
   const grupoEntries = Array.from(grupoMap.entries())
 
   for (const [grupoEnvio, grupoPedidos] of grupoEntries) {
-    // Need to calculate per-card transformacao deductions
     const cardMap = groupByCard(grupoPedidos)
     let totalPecas = 0
     let totalSeparadas = 0
@@ -167,7 +155,6 @@ export function computeProgressao(
     })
   }
 
-  // Sort by COLUMN_ORDER
   result.sort((a, b) => {
     const idxA = COLUMN_ORDER.indexOf(a.grupo_envio)
     const idxB = COLUMN_ORDER.indexOf(b.grupo_envio)
@@ -177,10 +164,6 @@ export function computeProgressao(
   return result
 }
 
-/**
- * Bloco 3 - Top separadores.
- * Returns RankingEntry[] sorted by pecas_separadas desc.
- */
 export function computeTopSeparadores(
   atribuicoes: AtribuicaoRow[],
   pedidos: PedidoRow[],
@@ -191,10 +174,7 @@ export function computeTopSeparadores(
   const progressoMap = buildProgressoMap(progresso)
   const transMap = sumTransformacoes(transformacoes)
 
-  // Filter separadores
   const separadores = atribuicoes.filter(a => a.tipo === 'separador')
-
-  // Aggregate per user
   const userMap = new Map<string, { nome: string; pecas_separadas: number; cards_concluidos: number }>()
 
   for (const attr of separadores) {
@@ -217,46 +197,52 @@ export function computeTopSeparadores(
     }
   }
 
-  const entries = Array.from(userMap.entries())
-  const sorted = entries
+  const sorted = Array.from(userMap.entries())
     .map(([user_id, data]) => ({
-      user_id,
-      nome: data.nome,
-      pecas_separadas: data.pecas_separadas,
-      cards_concluidos: data.cards_concluidos,
-      fardos_confirmados: 0,
-      position: 0,
+      user_id, nome: data.nome,
+      pecas_separadas: data.pecas_separadas, cards_concluidos: data.cards_concluidos,
+      fardos_confirmados: 0, fardos_ne: 0, position: 0,
     }))
     .sort((a, b) => b.pecas_separadas - a.pecas_separadas)
 
-  // Assign positions 1-based
   for (let i = 0; i < sorted.length; i++) {
     sorted[i].position = i + 1
   }
-
   return sorted
 }
 
-/**
- * Bloco 4 - Top fardistas.
- * Returns RankingEntry[] sorted by fardos_confirmados desc.
- */
 export function computeTopFardistas(
   baixados: BaixadoRow[],
+  userNames?: Map<string, string>,
+  trafego?: TrafegoRow[],
 ): RankingEntry[] {
-  const userMap = new Map<string, number>()
+  // Count OK (baixados) per fardista
+  const okMap = new Map<string, number>()
   for (const b of baixados) {
-    userMap.set(b.baixado_por, (userMap.get(b.baixado_por) ?? 0) + 1)
+    okMap.set(b.baixado_por, (okMap.get(b.baixado_por) ?? 0) + 1)
   }
 
-  const entries = Array.from(userMap.entries())
-  const sorted = entries
-    .map(([user_id, count]) => ({
+  // Count N/E per fardista from trafego_fardos
+  const neMap = new Map<string, number>()
+  if (trafego) {
+    for (const t of trafego) {
+      if (t.status === 'nao_encontrado' && t.fardista_id) {
+        neMap.set(t.fardista_id, (neMap.get(t.fardista_id) ?? 0) + 1)
+      }
+    }
+  }
+
+  // Merge all fardista IDs
+  const allIds = new Set([...Array.from(okMap.keys()), ...Array.from(neMap.keys())])
+
+  const sorted = Array.from(allIds)
+    .map(user_id => ({
       user_id,
-      nome: '',
+      nome: userNames?.get(user_id) ?? '',
       pecas_separadas: 0,
       cards_concluidos: 0,
-      fardos_confirmados: count,
+      fardos_confirmados: okMap.get(user_id) ?? 0,
+      fardos_ne: neMap.get(user_id) ?? 0,
       position: 0,
     }))
     .sort((a, b) => b.fardos_confirmados - a.fardos_confirmados)
@@ -264,40 +250,38 @@ export function computeTopFardistas(
   for (let i = 0; i < sorted.length; i++) {
     sorted[i].position = i + 1
   }
-
   return sorted
 }
 
-/**
- * Bloco 5 - Status de fardos.
- * PENDENTES = trafego WHERE status==='pendente'
- * ENCONTRADOS = trafego WHERE status==='encontrado' AND codigo_in NOT IN baixados
- * BAIXADOS = baixados.length
- */
 export function computeStatusFardos(
   trafego: TrafegoRow[],
   baixados: BaixadoRow[],
-): { pendentes: number; encontrados: number; baixados: number } {
-  const baixadosSet = new Set(baixados.map(b => b.codigo_in))
+): StatusFardosData {
+  // After baixa, trafego_fardos row is DELETED and data moves to baixados (migration 00010).
+  // So trafego_fardos only contains non-baixado fardos.
+  const ok = baixados.length
 
+  let nao_encontrado = 0
   let pendentes = 0
-  let encontrados = 0
+  const transformacao = 0
+  const sem_atribuicao = 0
 
   for (const t of trafego) {
-    if (t.status === 'pendente') {
+    if (t.status === 'nao_encontrado') {
+      nao_encontrado++
+    } else if (t.status === 'pendente') {
       pendentes++
-    } else if (t.status === 'encontrado' && !baixadosSet.has(t.codigo_in)) {
-      encontrados++
+    } else if (t.status === 'encontrado') {
+      // encontrado but not yet baixado
+      pendentes++
     }
   }
 
-  return { pendentes, encontrados, baixados: baixados.length }
+  const total = trafego.length + baixados.length
+
+  return { ok, nao_encontrado, pendentes, transformacao, sem_atribuicao, total }
 }
 
-/**
- * Bloco 6 - Progresso por separador.
- * Returns SeparadorProgress[] sorted by percent desc.
- */
 export function computePorSeparador(
   atribuicoes: AtribuicaoRow[],
   pedidos: PedidoRow[],
@@ -309,7 +293,6 @@ export function computePorSeparador(
   const transMap = sumTransformacoes(transformacoes)
 
   const separadores = atribuicoes.filter(a => a.tipo === 'separador')
-
   const userMap = new Map<string, { nome: string; total_pecas: number; pecas_separadas: number; num_cards: number }>()
 
   for (const attr of separadores) {
@@ -334,13 +317,10 @@ export function computePorSeparador(
     }
   }
 
-  const entries = Array.from(userMap.entries())
-  return entries
+  return Array.from(userMap.entries())
     .map(([user_id, data]) => ({
-      user_id,
-      nome: data.nome,
-      total_pecas: data.total_pecas,
-      pecas_separadas: data.pecas_separadas,
+      user_id, nome: data.nome,
+      total_pecas: data.total_pecas, pecas_separadas: data.pecas_separadas,
       percent: data.total_pecas === 0 ? 0 : Math.round((data.pecas_separadas / data.total_pecas) * 100),
       num_cards: data.num_cards,
     }))

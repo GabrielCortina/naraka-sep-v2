@@ -75,6 +75,7 @@ export function useCardData(
         { id: string; nome: string; tipo: string }
       >()
       for (const a of atribuicoes) {
+        if (a.tipo !== 'separador') continue
         const users = a.users as { nome: string } | null
         atribMap.set(a.card_key, {
           id: a.user_id,
