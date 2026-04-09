@@ -304,12 +304,13 @@ if (!userRecord?.ativo) {
 
 **A2 resolved:** Login flow confirmed to NOT check `ativo`. Verified by reading `src/features/auth/components/login-form.tsx` -- no query to `ativo` field exists in the entire file.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Session invalidation on deactivation?**
+1. **Session invalidation on deactivation?** (RESOLVED)
    - What we know: JWT tokens remain valid until expiry even after ativo=false. The login ativo check prevents NEW logins but does not kill existing sessions.
    - What's unclear: Whether immediate session kill is required or natural expiry is acceptable
    - Recommendation: Natural expiry is likely fine for warehouse context (short sessions, shared devices). Could optionally add `admin.signOut` call as enhancement but not blocking.
+   - **RESOLVED:** Natural JWT expiry acceptable for warehouse context. No immediate session kill required. Short session lifetimes on shared devices mean deactivated users lose access quickly. Login ativo check (D-10) prevents new logins.
 
 ## Validation Architecture
 
@@ -324,9 +325,9 @@ if (!userRecord?.ativo) {
 ### Phase Requirements to Test Map
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| USER-01 | Create user: nomeToEmail slug, dual-write Auth+DB, validation (PIN length, required fields) | unit | `npx vitest run src/features/users/lib/__tests__/user-utils.test.ts -x` | Wave 0 |
-| USER-02 | Edit user: name change updates email, PIN optional, role change | unit | `npx vitest run src/features/users/lib/__tests__/user-utils.test.ts -x` | Wave 0 |
-| USER-03 | Deactivate user: toggle ativo flag, login ativo check | unit | `npx vitest run src/features/users/lib/__tests__/user-utils.test.ts -x` | Wave 0 |
+| USER-01 | Create user: nomeToEmail slug, dual-write Auth+DB, validation (PIN length, required fields) | unit | `npx vitest run src/features/users/lib/__tests__/user-validation.test.ts -x` | Wave 0 |
+| USER-02 | Edit user: name change updates email, PIN optional, role change | unit | `npx vitest run src/features/users/lib/__tests__/user-validation.test.ts -x` | Wave 0 |
+| USER-03 | Deactivate user: toggle ativo flag, login ativo check | unit | `npx vitest run src/features/users/lib/__tests__/user-validation.test.ts -x` | Wave 0 |
 
 ### Sampling Rate
 - **Per task commit:** `npx vitest run src/features/users/`
@@ -334,7 +335,7 @@ if (!userRecord?.ativo) {
 - **Phase gate:** Full suite green before `/gsd-verify-work`
 
 ### Wave 0 Gaps
-- [ ] `src/features/users/lib/__tests__/user-utils.test.ts` -- covers validation logic (PIN length, name required, email slug generation)
+- [ ] `src/features/users/lib/__tests__/user-validation.test.ts` -- covers validation logic (PIN length, name required, email slug generation)
 - [ ] Test for duplicate name/email detection logic
 
 ## Security Domain
