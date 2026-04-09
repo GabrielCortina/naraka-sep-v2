@@ -34,8 +34,8 @@ Declared values (multiples of 4):
 | Token | Value | Usage |
 |-------|-------|-------|
 | xs | 4px | Icon-to-text gap in stat cards, medal-to-name gap in rankings |
-| sm | 8px | Gap between stat cards on mobile, padding inside ranking rows |
-| md | 16px | Padding inside dashboard blocks, gap between block header and content |
+| sm | 8px | Gap between stat cards on mobile, padding inside ranking rows, vertical padding inside Status de Fardos counters |
+| md | 16px | Padding inside dashboard blocks, gap between block header and content, horizontal padding inside Status de Fardos counters |
 | lg | 24px | Gap between dashboard blocks (vertical stack), section padding |
 | xl | 32px | Gap between left and right columns on desktop |
 | 2xl | 48px | Top padding from nav to first block (mobile) |
@@ -173,7 +173,7 @@ Source: globals.css (existing tokens), CONTEXT.md D-05/D-06/D-07/D-10
 | PENDENTES | Left border amber (#EAB308), background amber/5 |
 | ENCONTRADOS | Left border blue (#3B82F6), background blue/5 |
 | BAIXADOS | Left border green (#16A34A), background green/5 |
-| Counter padding | 12px vertical, 16px horizontal |
+| Counter padding | 8px vertical, 16px horizontal |
 | Counter gap | 8px between counters |
 
 ### 6. Por Separador (DASH-06, D-11)
