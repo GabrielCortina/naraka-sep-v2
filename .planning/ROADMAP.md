@@ -186,10 +186,10 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 09-01-PLAN.md — Migration historico_diario, tipos, logica pura de agregacao e snapshot com TDD
-- [ ] 09-02-PLAN.md — Hooks de dados (dashboard-data, realtime, period-filter) com fetching paralelo
-- [ ] 09-03-PLAN.md — Componentes UI dos 6 blocos, page wiring, schema push e verificacao visual
-- [ ] 09-04-PLAN.md — Fix migration 00012 (remove duplicate baixados) e snapshot empty-database guard
+- [x] 09-01-PLAN.md — Migration historico_diario, tipos, logica pura de agregacao e snapshot com TDD
+- [x] 09-02-PLAN.md — Hooks de dados (dashboard-data, realtime, period-filter) com fetching paralelo
+- [x] 09-03-PLAN.md — Componentes UI dos 6 blocos, page wiring, schema push e verificacao visual
+- [x] 09-04-PLAN.md — Fix migration 00012 (remove duplicate baixados) e snapshot empty-database guard
 
 ### Phase 10: Gestao de Usuarios
 **Goal**: Admin pode criar, editar e desativar usuarios do sistema
