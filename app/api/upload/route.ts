@@ -64,13 +64,14 @@ export async function POST(request: NextRequest) {
       supabase.from('users').select('id, role, nome'),
     ])
 
-    if (snapPedidos.data && snapProgresso.data && snapAtrib.data && snapBaixados.data && snapUsers.data) {
+    // Guard: only snapshot if previous day had actual work (Research Pitfall 2)
+    if (snapPedidos.data && snapProgresso.data && snapProgresso.data.length > 0 && snapUsers.data) {
       const { buildSnapshotRows } = await import('@/features/dashboard/lib/snapshot')
       const snapshotRows = buildSnapshotRows({
         pedidos: snapPedidos.data,
         progresso: snapProgresso.data,
-        atribuicoes: snapAtrib.data,
-        baixados: snapBaixados.data,
+        atribuicoes: snapAtrib.data ?? [],
+        baixados: snapBaixados.data ?? [],
         transformacoes: snapTransf.data ?? [],
         users: snapUsers.data,
       }, dataConfig?.valor ?? today)
@@ -78,6 +79,10 @@ export async function POST(request: NextRequest) {
         await supabase.from('historico_diario').insert(snapshotRows)
       }
     }
+
+    // WARNING: Deleting reservas CASCADE-deletes trafego_fardos (FK ON DELETE CASCADE).
+    // baixados survives (FK dropped in 00010_baixados_full_data.sql).
+    // The snapshot above MUST run before these deletes to capture trafego_fardos data.
 
     // Limpar tabelas na ordem FK-safe
     // NAO limpar: trafego_fardos, baixados, fardos_nao_encontrados (historico de fardos preservado)
