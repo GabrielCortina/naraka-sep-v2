@@ -3,7 +3,7 @@ phase: 10
 slug: gestao-de-usuarios
 status: draft
 nyquist_compliant: true
-wave_0_complete: true
+wave_0_complete: false
 created: 2026-04-09
 ---
 
@@ -17,18 +17,18 @@ created: 2026-04-09
 
 | Property | Value |
 |----------|-------|
-| **Framework** | vitest (jsdom environment) |
+| **Framework** | Vitest (installed in project) |
 | **Config file** | vitest.config.ts |
-| **Quick run command** | `npx vitest run src/features/users/` |
-| **Full suite command** | `npm test` |
+| **Quick run command** | `npx vitest run src/features/users/ --reporter=verbose` |
+| **Full suite command** | `npx vitest run` |
 | **Estimated runtime** | ~5 seconds |
 
 ---
 
 ## Sampling Rate
 
-- **After every task commit:** Run `npx vitest run src/features/users/`
-- **After every plan wave:** Run `npm test`
+- **After every task commit:** Run `npx vitest run src/features/users/ --reporter=verbose`
+- **After every plan wave:** Run `npx vitest run`
 - **Before `/gsd-verify-work`:** Full suite must be green
 - **Max feedback latency:** 5 seconds
 
@@ -38,9 +38,11 @@ created: 2026-04-09
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 10-01-01 | 01 | 1 | USER-01 | T-10-01 | Admin-only API route, supabaseAdmin writes | unit | `npx vitest run src/features/users/lib/__tests__/user-validation.test.ts -x` | ❌ W0 | ⬜ pending |
-| 10-01-02 | 01 | 1 | USER-02 | T-10-02 | Name change updates Auth email, PIN optional | unit | `npx vitest run src/features/users/lib/__tests__/user-validation.test.ts -x` | ❌ W0 | ⬜ pending |
-| 10-01-03 | 01 | 1 | USER-03 | T-10-03 | Ativo toggle + login check, confirmation dialog | unit | `npx vitest run src/features/users/lib/__tests__/user-validation.test.ts -x` | ❌ W0 | ⬜ pending |
+| 10-01-01 | 01 | 1 | USER-01 | T-10-01 | Admin-only API route, supabaseAdmin writes | integration | `npx vitest run src/features/users/ -t "create"` | ❌ W0 | ⬜ pending |
+| 10-01-02 | 01 | 1 | USER-01 | T-10-02 | PIN validation (4-6 digits, match) | unit | `npx vitest run src/features/users/ -t "pin"` | ❌ W0 | ⬜ pending |
+| 10-01-03 | 01 | 1 | USER-02 | T-10-03 | Edit user, partial updates, Auth sync | integration | `npx vitest run src/features/users/ -t "edit"` | ❌ W0 | ⬜ pending |
+| 10-01-04 | 01 | 1 | USER-03 | T-10-04 | Toggle ativo, login check | integration | `npx vitest run src/features/users/ -t "toggle"` | ❌ W0 | ⬜ pending |
+| 10-01-05 | 01 | 1 | USER-01/02/03 | T-10-05 | Role check (admin-only access) | unit | `npx vitest run src/features/users/ -t "role"` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -48,8 +50,8 @@ created: 2026-04-09
 
 ## Wave 0 Requirements
 
-- [ ] `src/features/users/lib/__tests__/user-validation.test.ts` — stubs for USER-01, USER-02, USER-03 (PIN validation, name validation, email slug generation)
-- [ ] Test for duplicate name/email detection logic
+- [ ] `src/features/users/__tests__/user-api.test.ts` — covers USER-01, USER-02, USER-03 API logic
+- [ ] `src/features/users/__tests__/user-validation.test.ts` — covers PIN validation rules
 
 *If none: "Existing infrastructure covers all phase requirements."*
 
@@ -73,4 +75,4 @@ created: 2026-04-09
 - [x] Feedback latency < 5s
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** approved
+**Approval:** approved 2026-04-09
